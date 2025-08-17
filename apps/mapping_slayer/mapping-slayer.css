@@ -2845,7 +2845,7 @@ body {
 
 .ms-flag-visual-container {
     position: relative;
-    width: 200px;
+    width: auto;
     min-height: 162px;
     margin: 0 auto;
     display: grid;
@@ -2853,6 +2853,8 @@ body {
     grid-template-rows: auto auto;
     gap: 20px;
     padding: 10px;
+    justify-items: center;
+    max-width: 260px;
 }
 
 .ms-flag-corner {
