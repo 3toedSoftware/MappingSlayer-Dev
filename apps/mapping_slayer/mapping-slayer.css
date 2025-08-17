@@ -2846,15 +2846,17 @@ body {
 .ms-flag-visual-container {
     position: relative;
     width: 200px;
-    height: 162px;
+    min-height: 162px;
     margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
+    padding: 10px;
 }
 
 .ms-flag-corner {
-    position: absolute;
+    position: static;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2866,23 +2868,23 @@ body {
 }
 
 .ms-flag-top-left {
-    top: 0;
-    left: 0;
+    grid-column: 1;
+    grid-row: 1;
 }
 
 .ms-flag-top-right {
-    top: 0;
-    right: 0;
+    grid-column: 2;
+    grid-row: 1;
 }
 
 .ms-flag-bottom-left {
-    bottom: 0;
-    left: 0;
+    grid-column: 1;
+    grid-row: 2;
 }
 
 .ms-flag-bottom-right {
-    bottom: 0;
-    right: 0;
+    grid-column: 2;
+    grid-row: 2;
 }
 
 .ms-flag-name-input {

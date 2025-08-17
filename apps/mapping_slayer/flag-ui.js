@@ -40,8 +40,6 @@ export function openFlagModal(markerTypeCode = null) {
     // Initialize global flags if needed
     const flagConfig = initializeGlobalFlags();
 
-
-
     // Update each corner's configuration
     Object.keys(FLAG_POSITIONS).forEach(key => {
         const position = FLAG_POSITIONS[key];
@@ -73,7 +71,7 @@ function updateFlagCornerUI(position, config) {
     );
     if (symbolDisplay) {
         const symbolInfo = getSymbolInfo(config.symbol);
-        
+
         // Check if it's a custom icon (base64 data URL)
         if (symbolInfo && symbolInfo.isCustom) {
             symbolDisplay.innerHTML = `<img src="${symbolInfo.symbol}" alt="${symbolInfo.label}">`;
@@ -102,7 +100,6 @@ export function handleFlagSymbolNavigation(position, direction) {
     flagConfig[position].symbol = newSymbol;
     updateFlagCornerUI(position, flagConfig[position]);
 }
-
 
 // Save flag configuration
 export function saveFlagConfiguration() {
@@ -147,45 +144,101 @@ function updateAllDots() {
     renderDotsForCurrentPage();
 }
 
+// Resize image if it's too large
+function resizeImage(dataUrl, maxSize, callback) {
+    const img = new Image();
+    img.onload = function () {
+        // Calculate new dimensions (max 256x256 for icons)
+        let width = img.width;
+        let height = img.height;
+        const maxDimension = 256;
+
+        if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+                height = (height / width) * maxDimension;
+                width = maxDimension;
+            } else {
+                width = (width / height) * maxDimension;
+                height = maxDimension;
+            }
+        }
+
+        // Create canvas and resize
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Try different quality levels to get under maxSize
+        let quality = 0.9;
+        let resizedDataUrl = canvas.toDataURL('image/jpeg', quality);
+
+        // Reduce quality until file size is acceptable
+        while (resizedDataUrl.length > maxSize && quality > 0.1) {
+            quality -= 0.1;
+            resizedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+
+        // If still too large, reduce dimensions
+        if (resizedDataUrl.length > maxSize) {
+            canvas.width = width * 0.5;
+            canvas.height = height * 0.5;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resizedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        }
+
+        callback(resizedDataUrl);
+    };
+    img.src = dataUrl;
+}
+
 // Handle custom icon upload
 export function handleCustomIconUpload(position, file) {
     if (!file) return;
 
     // Validate file type
     if (!ALLOWED_ICON_TYPES.includes(file.type)) {
-        alert(`Please upload a valid image file (PNG, JPG, SVG, GIF, or WebP)`);
+        alert('Please upload a valid image file (PNG, JPG, SVG, GIF, or WebP)');
         return;
     }
 
-    // Validate file size (max 1MB)
-    if (file.size > 1024 * 1024) {
-        alert('File size must be less than 1MB');
-        return;
-    }
-
-    // Convert to base64
+    // Read file and process
     const reader = new FileReader();
-    reader.onload = function(e) {
-        // Generate unique ID for the custom icon
-        const iconId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const iconName = file.name.replace(/\.[^/.]+$/, ''); // Remove extension
-        
-        // Add to custom icon library if not already there
-        const existingIcon = appState.customIconLibrary.find(icon => icon.data === e.target.result);
-        
-        if (!existingIcon) {
-            appState.customIconLibrary.push({
-                id: iconId,
-                name: iconName,
-                data: e.target.result
-            });
-        }
-        
-        // Set the symbol to the custom icon ID
-        const flagConfig = appState.globalFlagConfiguration;
-        if (flagConfig && flagConfig[position]) {
-            flagConfig[position].symbol = existingIcon ? existingIcon.id : iconId;
-            updateFlagCornerUI(position, flagConfig[position]);
+    reader.onload = function (e) {
+        const processIcon = dataUrl => {
+            // Generate unique ID for the custom icon
+            const iconId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const iconName = file.name.replace(/\.[^/.]+$/, ''); // Remove extension
+
+            // Add to custom icon library if not already there
+            const existingIcon = appState.customIconLibrary.find(icon => icon.data === dataUrl);
+
+            if (!existingIcon) {
+                appState.customIconLibrary.push({
+                    id: iconId,
+                    name: iconName,
+                    data: dataUrl
+                });
+            }
+
+            // Set the symbol to the custom icon ID
+            const flagConfig = appState.globalFlagConfiguration;
+            if (flagConfig && flagConfig[position]) {
+                flagConfig[position].symbol = existingIcon ? existingIcon.id : iconId;
+                updateFlagCornerUI(position, flagConfig[position]);
+            }
+        };
+
+        // Check if file needs resizing (>1MB when encoded)
+        const dataUrl = e.target.result;
+        const maxBase64Size = 1024 * 1024 * 1.37; // ~1MB (base64 is ~37% larger)
+
+        if (dataUrl.length > maxBase64Size) {
+            // Resize the image
+            resizeImage(dataUrl, maxBase64Size, processIcon);
+        } else {
+            processIcon(dataUrl);
         }
     };
     reader.readAsDataURL(file);
@@ -242,7 +295,9 @@ export function initializeFlagUI() {
     document.querySelectorAll('.ms-flag-upload-btn').forEach(btn => {
         btn.addEventListener('click', e => {
             const position = e.target.dataset.position;
-            const fileInput = document.querySelector(`.ms-flag-upload-input[data-position="${position}"]`);
+            const fileInput = document.querySelector(
+                `.ms-flag-upload-input[data-position="${position}"]`
+            );
             if (fileInput) {
                 fileInput.click();
             }
