@@ -2835,7 +2835,7 @@ body {
 
 /* Flag Customization Modal Styles */
 .ms-flag-modal-content {
-    width: 320px;
+    width: 280px;
     max-width: 90vw;
 }
 
@@ -2846,7 +2846,7 @@ body {
 .ms-flag-visual-container {
     position: relative;
     width: 200px;
-    height: 200px;
+    height: 162px;
     margin: 0 auto;
     display: flex;
     align-items: center;
