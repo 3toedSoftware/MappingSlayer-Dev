@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Design Slayer with Modal Test</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background: #1a1a1a;
+                color: white;
+                font-family: Arial, sans-serif;
+            }
+            #info-panel {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: rgba(0, 0, 0, 0.8);
+                padding: 15px;
+                border-radius: 8px;
+                z-index: 100000;
+                max-width: 300px;
+            }
+            #info-panel h3 {
+                margin: 0 0 10px 0;
+                color: #f07727;
+            }
+            #info-panel button {
+                background: #f07727;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin: 5px 0;
+                width: 100%;
+            }
+            #info-panel button:hover {
+                background: #ff8838;
+            }
+            iframe {
+                width: 100%;
+                height: calc(100vh - 20px);
+                border: none;
+            }
+            .console-output {
+                background: #111;
+                padding: 10px;
+                border-radius: 4px;
+                margin-top: 10px;
+                max-height: 200px;
+                overflow-y: auto;
+                font-family: monospace;
+                font-size: 12px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="info-panel">
+            <h3>Design Slayer Modal Test</h3>
+            <p>Try these actions:</p>
+            <button onclick="checkModal()">Check if Modal Exists</button>
+            <button onclick="showModal()">Force Show Modal</button>
+            <button onclick="addTestElement()">Add Test Element</button>
+            <button onclick="simulateRightClick()">Simulate Right-Click</button>
+            <div class="console-output" id="console-output"></div>
+        </div>
+
+        <iframe id="ds-frame" src="/apps/design_slayer/index.html"></iframe>
+
+        <script>
+            const output = document.getElementById('console-output');
+
+            function log(message) {
+                output.innerHTML += message + '<br>';
+                output.scrollTop = output.scrollHeight;
+            }
+
+            function getIframeDocument() {
+                const iframe = document.getElementById('ds-frame');
+                try {
+                    return iframe.contentDocument || iframe.contentWindow.document;
+                } catch (e) {
+                    log('Error accessing iframe: ' + e.message);
+                    return null;
+                }
+            }
+
+            function checkModal() {
+                const doc = getIframeDocument();
+                if (!doc) return;
+
+                const modal = doc.getElementById('element-properties-modal');
+                if (modal) {
+                    log('✓ Modal found!');
+                    log('Modal display: ' + modal.style.display);
+                    log('Modal classes: ' + modal.className);
+                } else {
+                    log('✗ Modal not found');
+
+                    // Check for any modals
+                    const anyModals = doc.querySelectorAll('[id*="modal"]');
+                    log('Found ' + anyModals.length + ' elements with "modal" in ID');
+                    anyModals.forEach(m => log('  - ' + m.id));
+                }
+            }
+
+            function showModal() {
+                const doc = getIframeDocument();
+                if (!doc) return;
+
+                const modal = doc.getElementById('element-properties-modal');
+                if (modal) {
+                    modal.style.display = 'block';
+                    log('Modal display set to block');
+                } else {
+                    log('Cannot show - modal not found');
+                }
+            }
+
+            function addTestElement() {
+                const doc = getIframeDocument();
+                if (!doc) return;
+
+                // Try to add an element using the UI
+                const addBtn = doc.getElementById('add-element-btn');
+                const typeSelect = doc.getElementById('element-type-select');
+
+                if (addBtn && typeSelect) {
+                    typeSelect.value = 'plate';
+                    addBtn.click();
+                    log('Added plate element');
+                } else {
+                    log('Add button or type select not found');
+                }
+            }
+
+            function simulateRightClick() {
+                const doc = getIframeDocument();
+                if (!doc) return;
+
+                // Find an element row
+                const elementRow = doc.querySelector('.element-row');
+                if (elementRow) {
+                    const event = new MouseEvent('contextmenu', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: doc.defaultView,
+                        button: 2
+                    });
+                    elementRow.dispatchEvent(event);
+                    log('Right-click event dispatched on element row');
+                } else {
+                    log('No element rows found to right-click');
+                }
+            }
+
+            // Wait for iframe to load
+            window.addEventListener('load', function () {
+                setTimeout(function () {
+                    log('Page loaded, checking for modal...');
+                    checkModal();
+                }, 3000);
+            });
+
+            // Listen for iframe load
+            document.getElementById('ds-frame').addEventListener('load', function () {
+                log('Design Slayer iframe loaded');
+                setTimeout(checkModal, 1000);
+            });
+        </script>
+    </body>
+</html>

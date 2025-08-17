@@ -1,0 +1,22 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Get the commit message
+commit_regex='^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(\(.+\))?: .{1,100}$'
+commit_message=$(cat "$1")
+
+if ! echo "$commit_message" | grep -qE "$commit_regex"; then
+    echo "❌ Invalid commit message format!"
+    echo ""
+    echo "✅ Valid formats:"
+    echo "  feat: add new feature"
+    echo "  fix: fix bug in login"
+    echo "  docs: update README"
+    echo "  style: format code"
+    echo "  refactor: restructure auth module"
+    echo "  test: add unit tests"
+    echo "  chore: update dependencies"
+    echo ""
+    echo "📝 Your message: $commit_message"
+    exit 1
+fi

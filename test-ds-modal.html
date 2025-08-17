@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test Design Slayer Modal</title>
+        <style>
+            body {
+                background: #1a1a1a;
+                color: white;
+                font-family: Arial, sans-serif;
+                padding: 20px;
+            }
+            .test-element {
+                background: #2a2a2a;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+            .test-element:hover {
+                background: #333;
+            }
+            .instructions {
+                background: #333;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                border-left: 4px solid #f07727;
+            }
+            .open-modal-btn {
+                background: #f07727;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            .open-modal-btn:hover {
+                background: #ff8838;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Design Slayer Modal Test</h1>
+
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Click the button below to test opening the modal directly</li>
+                <li>Try right-clicking on the test elements</li>
+                <li>Check the browser console for any errors (F12)</li>
+            </ol>
+        </div>
+
+        <button class="open-modal-btn" onclick="testOpenModal()">
+            Open Element Properties Modal
+        </button>
+
+        <div class="test-element element-row" data-element-id="1">
+            <h3>Test Element 1 - Plate</h3>
+            <p>Right-click me to open properties modal</p>
+        </div>
+
+        <div class="test-element element-row" data-element-id="2">
+            <h3>Test Element 2 - Text</h3>
+            <p>Right-click me to open properties modal</p>
+        </div>
+
+        <script>
+            // Log to console when page loads
+            console.log('Test page loaded');
+
+            // Simple test to open modal directly
+            function testOpenModal() {
+                console.log('Attempting to open modal...');
+                const modal = document.getElementById('element-properties-modal');
+                if (modal) {
+                    modal.style.display = 'block';
+                    console.log('Modal found and displayed');
+                } else {
+                    console.log('Modal not found! Checking for modal in iframe...');
+
+                    // Check if Design Slayer is in an iframe
+                    const iframe = document.querySelector('iframe');
+                    if (iframe) {
+                        try {
+                            const iframeDoc =
+                                iframe.contentDocument || iframe.contentWindow.document;
+                            const iframeModal = iframeDoc.getElementById(
+                                'element-properties-modal'
+                            );
+                            if (iframeModal) {
+                                iframeModal.style.display = 'block';
+                                console.log('Modal found in iframe and displayed');
+                            } else {
+                                console.log('Modal not found in iframe either');
+                            }
+                        } catch (e) {
+                            console.error('Cannot access iframe:', e);
+                        }
+                    }
+                }
+            }
+
+            // Add right-click handler
+            document.addEventListener('contextmenu', function (e) {
+                const elementRow = e.target.closest('.element-row');
+                if (elementRow) {
+                    e.preventDefault();
+                    console.log('Right-clicked on element:', elementRow.dataset.elementId);
+
+                    // Try to trigger the modal
+                    const event = new CustomEvent('openElementModal', {
+                        detail: { elementId: elementRow.dataset.elementId }
+                    });
+                    window.dispatchEvent(event);
+                }
+            });
+
+            // Listen for console messages
+            window.addEventListener('error', function (e) {
+                console.error('JavaScript Error:', e.message, e.filename, e.lineno);
+            });
+
+            // Check what's loaded after a delay
+            setTimeout(function () {
+                console.log("Checking what's loaded after 2 seconds...");
+                console.log(
+                    'Modal element exists?',
+                    !!document.getElementById('element-properties-modal')
+                );
+                console.log(
+                    'Design Slayer app exists?',
+                    !!document.querySelector('.design-slayer-app')
+                );
+
+                // List all modals found
+                const allModals = document.querySelectorAll('[class*="modal"]');
+                console.log('Found', allModals.length, 'modal elements:', allModals);
+            }, 2000);
+        </script>
+    </body>
+</html>

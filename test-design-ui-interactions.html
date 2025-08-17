@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Design Slayer UI Interaction Tests</title>
+        <style>
+            body {
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background: #1a1a1a;
+                color: #fff;
+                display: flex;
+                height: 100vh;
+            }
+
+            .test-panel {
+                width: 300px;
+                background: #2a2a2a;
+                border-right: 2px solid #f07727;
+                padding: 20px;
+                overflow-y: auto;
+                box-sizing: border-box;
+            }
+
+            .test-results {
+                flex: 1;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            .test-group {
+                margin-bottom: 30px;
+                border: 1px solid #444;
+                border-radius: 5px;
+                padding: 15px;
+            }
+
+            .test-group h3 {
+                margin: 0 0 15px 0;
+                color: #f07727;
+                border-bottom: 1px solid #f07727;
+                padding-bottom: 5px;
+            }
+
+            .test-button {
+                display: block;
+                width: 100%;
+                margin-bottom: 10px;
+                padding: 10px;
+                background: #333;
+                color: #fff;
+                border: 1px solid #666;
+                border-radius: 3px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .test-button:hover {
+                background: #444;
+                border-color: #f07727;
+            }
+
+            .test-button.success {
+                background: #2d5a2d;
+                border-color: #4a9;
+            }
+
+            .test-button.failure {
+                background: #5a2d2d;
+                border-color: #a44;
+            }
+
+            .result-item {
+                margin-bottom: 15px;
+                padding: 10px;
+                background: #333;
+                border-radius: 3px;
+                border-left: 4px solid #666;
+            }
+
+            .result-item.success {
+                border-left-color: #4a9;
+            }
+
+            .result-item.failure {
+                border-left-color: #a44;
+            }
+
+            .result-item.info {
+                border-left-color: #49a;
+            }
+
+            .console-log {
+                background: #000;
+                color: #0f0;
+                padding: 10px;
+                border-radius: 3px;
+                font-family: monospace;
+                font-size: 12px;
+                max-height: 200px;
+                overflow-y: auto;
+                margin-top: 10px;
+            }
+
+            .element-selector {
+                margin-bottom: 15px;
+            }
+
+            .element-selector select {
+                width: 100%;
+                padding: 8px;
+                background: #333;
+                color: #fff;
+                border: 1px solid #666;
+                border-radius: 3px;
+            }
+
+            .status-indicator {
+                display: inline-block;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                margin-right: 8px;
+            }
+
+            .status-indicator.pending {
+                background: #666;
+            }
+
+            .status-indicator.success {
+                background: #4a9;
+            }
+
+            .status-indicator.failure {
+                background: #a44;
+            }
+
+            .instructions {
+                background: #2a3a4a;
+                padding: 15px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+                border-left: 4px solid #49a;
+            }
+
+            .debug-panel {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: rgba(0, 0, 0, 0.9);
+                color: #0ff;
+                padding: 15px;
+                font-family: monospace;
+                font-size: 12px;
+                border: 1px solid #0ff;
+                border-radius: 4px;
+                z-index: 10000;
+                min-width: 400px;
+                max-width: 600px;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="test-panel">
+            <h2>🐛 Design Slayer UI Tests</h2>
+
+            <div class="instructions">
+                <strong>Instructions:</strong><br />
+                1. Navigate to Design Slayer app<br />
+                2. Run the setup test first<br />
+                3. Test each interaction group<br />
+                4. Check console for detailed logs
+            </div>
+
+            <div class="test-group">
+                <h3>Setup</h3>
+                <button class="test-button" onclick="navigateToDesignSlayer()">
+                    <span class="status-indicator pending"></span>Navigate to Design Slayer
+                </button>
+                <button class="test-button" onclick="addTestPlate()">
+                    <span class="status-indicator pending"></span>Add Test Plate Element
+                </button>
+            </div>
+
+            <div class="test-group">
+                <h3>Selection Behavior</h3>
+                <button class="test-button" onclick="testElementSelection()">
+                    <span class="status-indicator pending"></span>Test Element Selection
+                </button>
+                <button class="test-button" onclick="testClickToDeselect()">
+                    <span class="status-indicator pending"></span>Test Click to Deselect
+                </button>
+                <button class="test-button" onclick="testEmptySpaceDeselect()">
+                    <span class="status-indicator pending"></span>Test Empty Space Deselect
+                </button>
+                <button class="test-button" onclick="testEscapeDeselect()">
+                    <span class="status-indicator pending"></span>Test ESC Key Deselect
+                </button>
+            </div>
+
+            <div class="test-group">
+                <h3>Mouse Handling</h3>
+                <button class="test-button" onclick="testLeftClickDrag()">
+                    <span class="status-indicator pending"></span>Test Left Click/Drag
+                </button>
+                <button class="test-button" onclick="testMiddleMousePan()">
+                    <span class="status-indicator pending"></span>Test Middle Mouse Pan
+                </button>
+                <button class="test-button" onclick="testRightClickPrevention()">
+                    <span class="status-indicator pending"></span>Test Right Click Prevention
+                </button>
+            </div>
+
+            <div class="test-group">
+                <h3>Drag Threshold</h3>
+                <button class="test-button" onclick="testSmallMovementClick()">
+                    <span class="status-indicator pending"></span>Test Small Movement = Click
+                </button>
+                <button class="test-button" onclick="testLargeMovementDrag()">
+                    <span class="status-indicator pending"></span>Test Large Movement = Drag
+                </button>
+            </div>
+
+            <div class="test-group">
+                <h3>Visual Feedback</h3>
+                <button class="test-button" onclick="testSelectionVisuals()">
+                    <span class="status-indicator pending"></span>Test Selection Visuals
+                </button>
+                <button class="test-button" onclick="testZIndexBehavior()">
+                    <span class="status-indicator pending"></span>Test Z-Index Behavior
+                </button>
+            </div>
+
+            <div class="test-group">
+                <h3>Console Monitoring</h3>
+                <button class="test-button" onclick="startConsoleMonitor()">
+                    <span class="status-indicator pending"></span>Start Console Monitor
+                </button>
+                <button class="test-button" onclick="clearResults()">Clear Results</button>
+            </div>
+        </div>
+
+        <div class="test-results">
+            <h2>Test Results</h2>
+            <div id="results-container">
+                <div class="result-item info">
+                    <strong>Ready to test!</strong><br />
+                    Start by navigating to Design Slayer and adding a test element.
+                </div>
+            </div>
+
+            <div class="console-log" id="console-output">Console output will appear here...</div>
+        </div>
+
+        <div class="debug-panel" id="debug-panel" style="display: none">
+            <div style="color: #0ff; font-weight: bold">🎯 DEBUG BEAST PANEL</div>
+            <div id="debug-info">Monitoring interactions...</div>
+        </div>
+
+        <script>
+            let consoleMonitorActive = false;
+            let originalConsoleLog = console.log;
+            let originalConsoleError = console.error;
+            let originalConsoleWarn = console.warn;
+
+            // Override console methods to capture output
+            function startConsoleCapture() {
+                const consoleOutput = document.getElementById('console-output');
+
+                console.log = function (...args) {
+                    originalConsoleLog.apply(console, args);
+                    const message = args
+                        .map(arg =>
+                            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                        )
+                        .join(' ');
+                    consoleOutput.innerHTML += `<div style="color: #0f0;">[LOG] ${message}</div>`;
+                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                };
+
+                console.error = function (...args) {
+                    originalConsoleError.apply(console, args);
+                    const message = args
+                        .map(arg =>
+                            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                        )
+                        .join(' ');
+                    consoleOutput.innerHTML += `<div style="color: #f44;">[ERROR] ${message}</div>`;
+                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                };
+
+                console.warn = function (...args) {
+                    originalConsoleWarn.apply(console, args);
+                    const message = args
+                        .map(arg =>
+                            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                        )
+                        .join(' ');
+                    consoleOutput.innerHTML += `<div style="color: #fa0;">[WARN] ${message}</div>`;
+                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                };
+            }
+
+            // Start console capture immediately
+            startConsoleCapture();
+
+            function addResult(message, status = 'info', details = '') {
+                const container = document.getElementById('results-container');
+                const result = document.createElement('div');
+                result.className = `result-item ${status}`;
+                result.innerHTML = `
+                <strong>${message}</strong><br>
+                ${details}
+                <small style="color: #999; display: block; margin-top: 5px;">
+                    ${new Date().toLocaleTimeString()}
+                </small>
+            `;
+                container.appendChild(result);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function updateButtonStatus(button, status) {
+                const indicator = button.querySelector('.status-indicator');
+                indicator.className = `status-indicator ${status}`;
+
+                if (status === 'success') {
+                    button.classList.add('success');
+                    button.classList.remove('failure');
+                } else if (status === 'failure') {
+                    button.classList.add('failure');
+                    button.classList.remove('success');
+                }
+            }
+
+            function navigateToDesignSlayer() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Starting navigation to Design Slayer...');
+
+                try {
+                    // Check if we're already on the suite
+                    if (window.location.pathname.includes('slayer-suite')) {
+                        // We're in the suite, try to activate Design Slayer
+                        if (window.appBridge && window.designApp) {
+                            console.log('🎯 Found Design Slayer app instance, activating...');
+                            window.appBridge.activateApp('design_slayer');
+                            updateButtonStatus(button, 'success');
+                            addResult(
+                                'Navigation successful',
+                                'success',
+                                'Design Slayer app activated'
+                            );
+                            return;
+                        }
+                    }
+
+                    // Navigate to the suite
+                    const suiteUrl = 'http://localhost:8080';
+                    console.log('🌐 Navigating to:', suiteUrl);
+                    window.location.href = suiteUrl;
+
+                    updateButtonStatus(button, 'success');
+                    addResult('Navigation initiated', 'success', 'Redirecting to Slayer Suite...');
+                } catch (error) {
+                    console.error('❌ Navigation failed:', error);
+                    updateButtonStatus(button, 'failure');
+                    addResult('Navigation failed', 'failure', error.message);
+                }
+            }
+
+            function addTestPlate() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Adding test plate element...');
+
+                try {
+                    // Check if Design Slayer is available
+                    if (!window.designApp) {
+                        throw new Error(
+                            "Design Slayer app not found. Make sure you're on the Design Slayer page."
+                        );
+                    }
+
+                    // Add a plate element
+                    const addElementBtn = document.getElementById('add-element-btn');
+                    const elementTypeSelect = document.getElementById('element-type-select');
+
+                    if (!addElementBtn || !elementTypeSelect) {
+                        throw new Error('Add element controls not found in DOM');
+                    }
+
+                    // Select plate type
+                    elementTypeSelect.value = 'plate';
+
+                    // Click add button
+                    addElementBtn.click();
+
+                    console.log('✅ Test plate added successfully');
+                    updateButtonStatus(button, 'success');
+                    addResult(
+                        'Test plate added',
+                        'success',
+                        'Plate element added to elements list'
+                    );
+
+                    // Wait a moment and then drag it to canvas
+                    setTimeout(() => {
+                        dragPlateToCanvas();
+                    }, 500);
+                } catch (error) {
+                    console.error('❌ Failed to add test plate:', error);
+                    updateButtonStatus(button, 'failure');
+                    addResult('Failed to add test plate', 'failure', error.message);
+                }
+            }
+
+            function dragPlateToCanvas() {
+                try {
+                    console.log('🔍 DEBUG BEAST: Dragging plate to canvas...');
+
+                    // Find the plate element in the list
+                    const plateRow = document.querySelector(
+                        '[data-element-id*="element-"] .element-row'
+                    );
+                    if (!plateRow) {
+                        throw new Error('Plate element row not found');
+                    }
+
+                    const faceCanvas = document.getElementById('face-canvas');
+                    if (!faceCanvas) {
+                        throw new Error('Face canvas not found');
+                    }
+
+                    // Get the element ID
+                    const elementId = plateRow.closest('[data-element-id]').dataset.elementId;
+
+                    // Simulate drag and drop
+                    const dragEvent = new DragEvent('dragstart', {
+                        bubbles: true,
+                        cancelable: true,
+                        dataTransfer: new DataTransfer()
+                    });
+                    dragEvent.dataTransfer.setData('application/element-id', elementId);
+
+                    plateRow.dispatchEvent(dragEvent);
+
+                    // Simulate drop on canvas
+                    const rect = faceCanvas.getBoundingClientRect();
+                    const dropEvent = new DragEvent('drop', {
+                        bubbles: true,
+                        cancelable: true,
+                        clientX: rect.left + rect.width / 2,
+                        clientY: rect.top + rect.height / 2,
+                        dataTransfer: dragEvent.dataTransfer
+                    });
+
+                    faceCanvas.dispatchEvent(dropEvent);
+
+                    console.log('✅ Plate dragged to canvas successfully');
+                    addResult(
+                        'Plate added to canvas',
+                        'success',
+                        'Test element is now available for interaction testing'
+                    );
+                } catch (error) {
+                    console.error('❌ Failed to drag plate to canvas:', error);
+                    addResult('Failed to add plate to canvas', 'failure', error.message);
+                }
+            }
+
+            function testElementSelection() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing element selection behavior...');
+
+                try {
+                    const plateElement = document.querySelector(
+                        '.sign-element[data-element-type="plate"]'
+                    );
+                    if (!plateElement) {
+                        throw new Error(
+                            'No plate element found on canvas. Add a test plate first.'
+                        );
+                    }
+
+                    console.log('🎯 Found plate element:', plateElement);
+
+                    // Test clicking on element to select it
+                    const clickEvent = new MouseEvent('click', {
+                        bubbles: true,
+                        cancelable: true,
+                        clientX: plateElement.getBoundingClientRect().left + 50,
+                        clientY: plateElement.getBoundingClientRect().top + 50
+                    });
+
+                    plateElement.dispatchEvent(clickEvent);
+
+                    // Check if element is selected
+                    setTimeout(() => {
+                        const isSelected =
+                            plateElement.classList.contains('selected') ||
+                            document.querySelector('.selection-handles[data-element-id]');
+
+                        if (isSelected) {
+                            console.log('✅ Element selection working');
+                            updateButtonStatus(button, 'success');
+                            addResult(
+                                'Element selection works',
+                                'success',
+                                'Element becomes selected when clicked'
+                            );
+                        } else {
+                            console.log('❌ Element selection not working');
+                            updateButtonStatus(button, 'failure');
+                            addResult(
+                                'Element selection failed',
+                                'failure',
+                                'Element should become selected when clicked'
+                            );
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ Element selection test failed:', error);
+                    updateButtonStatus(button, 'failure');
+                    addResult('Element selection test failed', 'failure', error.message);
+                }
+            }
+
+            function testClickToDeselect() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing click to deselect behavior...');
+
+                try {
+                    // First ensure an element is selected
+                    const plateElement = document.querySelector(
+                        '.sign-element[data-element-type="plate"]'
+                    );
+                    if (!plateElement) {
+                        throw new Error('No plate element found on canvas');
+                    }
+
+                    // Click to select first
+                    plateElement.click();
+
+                    setTimeout(() => {
+                        // Now click the same element again to deselect
+                        plateElement.click();
+
+                        setTimeout(() => {
+                            const isSelected =
+                                plateElement.classList.contains('selected') ||
+                                document.querySelector('.selection-handles[data-element-id]');
+
+                            if (!isSelected) {
+                                console.log('✅ Click to deselect working');
+                                updateButtonStatus(button, 'success');
+                                addResult(
+                                    'Click to deselect works',
+                                    'success',
+                                    'Selected element deselects when clicked again'
+                                );
+                            } else {
+                                console.log('❌ Click to deselect not working');
+                                updateButtonStatus(button, 'failure');
+                                addResult(
+                                    'Click to deselect failed',
+                                    'failure',
+                                    'Element should deselect when clicked while selected'
+                                );
+                            }
+                        }, 100);
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ Click to deselect test failed:', error);
+                    updateButtonStatus(button, 'failure');
+                    addResult('Click to deselect test failed', 'failure', error.message);
+                }
+            }
+
+            function testEmptySpaceDeselect() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing empty space deselect...');
+
+                try {
+                    // First select an element
+                    const plateElement = document.querySelector(
+                        '.sign-element[data-element-type="plate"]'
+                    );
+                    if (!plateElement) {
+                        throw new Error('No plate element found on canvas');
+                    }
+
+                    plateElement.click();
+
+                    setTimeout(() => {
+                        // Click on empty canvas space
+                        const faceCanvas = document.getElementById('face-canvas');
+                        const rect = faceCanvas.getBoundingClientRect();
+
+                        const emptySpaceClick = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            clientX: rect.left + 50, // Click in top-left area
+                            clientY: rect.top + 50
+                        });
+
+                        faceCanvas.dispatchEvent(emptySpaceClick);
+
+                        setTimeout(() => {
+                            const isSelected =
+                                plateElement.classList.contains('selected') ||
+                                document.querySelector('.selection-handles[data-element-id]');
+
+                            if (!isSelected) {
+                                console.log('✅ Empty space deselect working');
+                                updateButtonStatus(button, 'success');
+                                addResult(
+                                    'Empty space deselect works',
+                                    'success',
+                                    'Elements deselect when clicking empty canvas space'
+                                );
+                            } else {
+                                console.log('❌ Empty space deselect not working');
+                                updateButtonStatus(button, 'failure');
+                                addResult(
+                                    'Empty space deselect failed',
+                                    'failure',
+                                    'Elements should deselect when clicking empty space'
+                                );
+                            }
+                        }, 100);
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ Empty space deselect test failed:', error);
+                    updateButtonStatus(button, 'failure');
+                    addResult('Empty space deselect test failed', 'failure', error.message);
+                }
+            }
+
+            function testEscapeDeselect() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing ESC key deselect...');
+
+                try {
+                    // First select an element
+                    const plateElement = document.querySelector(
+                        '.sign-element[data-element-type="plate"]'
+                    );
+                    if (!plateElement) {
+                        throw new Error('No plate element found on canvas');
+                    }
+
+                    plateElement.click();
+
+                    setTimeout(() => {
+                        // Press ESC key
+                        const escEvent = new KeyboardEvent('keydown', {
+                            key: 'Escape',
+                            code: 'Escape',
+                            bubbles: true,
+                            cancelable: true
+                        });
+
+                        document.dispatchEvent(escEvent);
+
+                        setTimeout(() => {
+                            const isSelected =
+                                plateElement.classList.contains('selected') ||
+                                document.querySelector('.selection-handles[data-element-id]');
+
+                            if (!isSelected) {
+                                console.log('✅ ESC key deselect working');
+                                updateButtonStatus(button, 'success');
+                                addResult(
+                                    'ESC key deselect works',
+                                    'success',
+                                    'Elements deselect when ESC key is pressed'
+                                );
+                            } else {
+                                console.log('❌ ESC key deselect not working');
+                                updateButtonStatus(button, 'failure');
+                                addResult(
+                                    'ESC key deselect failed',
+                                    'failure',
+                                    'Elements should deselect when ESC key is pressed'
+                                );
+                            }
+                        }, 100);
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ ESC key deselect test failed:', error);
+                    updateButtonStatus(button, 'failure');
+                    addResult('ESC key deselect test failed', 'failure', error.message);
+                }
+            }
+
+            function testLeftClickDrag() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing left click and drag...');
+
+                addResult(
+                    'Left click/drag test',
+                    'info',
+                    'This test requires manual interaction. Try clicking and dragging the plate element and observe the behavior.'
+                );
+                updateButtonStatus(button, 'success');
+            }
+
+            function testMiddleMousePan() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing middle mouse pan...');
+
+                addResult(
+                    'Middle mouse pan test',
+                    'info',
+                    'This test requires manual interaction. Try middle-mouse clicking and dragging to pan the viewport (should NOT move elements).'
+                );
+                updateButtonStatus(button, 'success');
+            }
+
+            function testRightClickPrevention() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing right click prevention...');
+
+                try {
+                    const faceCanvas = document.getElementById('face-canvas');
+                    if (!faceCanvas) {
+                        throw new Error('Face canvas not found');
+                    }
+
+                    let contextMenuPrevented = false;
+
+                    // Listen for contextmenu event
+                    const contextMenuHandler = e => {
+                        contextMenuPrevented = e.defaultPrevented;
+                    };
+
+                    faceCanvas.addEventListener('contextmenu', contextMenuHandler);
+
+                    // Simulate right click
+                    const rightClickEvent = new MouseEvent('contextmenu', {
+                        bubbles: true,
+                        cancelable: true,
+                        button: 2
+                    });
+
+                    faceCanvas.dispatchEvent(rightClickEvent);
+
+                    setTimeout(() => {
+                        faceCanvas.removeEventListener('contextmenu', contextMenuHandler);
+
+                        if (contextMenuPrevented) {
+                            console.log('✅ Right click prevention working');
+                            updateButtonStatus(button, 'success');
+                            addResult(
+                                'Right click prevention works',
+                                'success',
+                                'Context menu is prevented on canvas'
+                            );
+                        } else {
+                            console.log('❌ Right click prevention not working');
+                            updateButtonStatus(button, 'failure');
+                            addResult(
+                                'Right click prevention failed',
+                                'failure',
+                                'Context menu should be prevented on canvas'
+                            );
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ Right click prevention test failed:', error);
+                    updateButtonStatus(button, 'failure');
+                    addResult('Right click prevention test failed', 'failure', error.message);
+                }
+            }
+
+            function testSmallMovementClick() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing small movement threshold...');
+
+                addResult(
+                    'Small movement test',
+                    'info',
+                    'This test requires manual interaction. Try clicking and moving the mouse less than 5 pixels - it should register as a click, not a drag.'
+                );
+                updateButtonStatus(button, 'success');
+            }
+
+            function testLargeMovementDrag() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing large movement threshold...');
+
+                addResult(
+                    'Large movement test',
+                    'info',
+                    'This test requires manual interaction. Try clicking and moving the mouse more than 5 pixels - it should register as a drag, not a click.'
+                );
+                updateButtonStatus(button, 'success');
+            }
+
+            function testSelectionVisuals() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing selection visuals...');
+
+                try {
+                    const plateElement = document.querySelector(
+                        '.sign-element[data-element-type="plate"]'
+                    );
+                    if (!plateElement) {
+                        throw new Error('No plate element found on canvas');
+                    }
+
+                    // Click to select
+                    plateElement.click();
+
+                    setTimeout(() => {
+                        // Check for visual indicators
+                        const hasSelectionHandles = !!document.querySelector('.selection-handles');
+                        const hasSelectedClass = plateElement.classList.contains('selected');
+                        const hasVisualDistinction = hasSelectionHandles || hasSelectedClass;
+
+                        if (hasVisualDistinction) {
+                            console.log('✅ Selection visuals working');
+                            updateButtonStatus(button, 'success');
+                            addResult(
+                                'Selection visuals work',
+                                'success',
+                                `Visual indicators present: handles=${hasSelectionHandles}, class=${hasSelectedClass}`
+                            );
+                        } else {
+                            console.log('❌ Selection visuals not working');
+                            updateButtonStatus(button, 'failure');
+                            addResult(
+                                'Selection visuals failed',
+                                'failure',
+                                'Selected elements should have visual distinction (border/glow/handles)'
+                            );
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ Selection visuals test failed:', error);
+                    updateButtonStatus(button, 'failure');
+                    addResult('Selection visuals test failed', 'failure', error.message);
+                }
+            }
+
+            function testZIndexBehavior() {
+                const button = event.target.closest('.test-button');
+                console.log('🔍 DEBUG BEAST: Testing z-index behavior...');
+
+                addResult(
+                    'Z-index test',
+                    'info',
+                    'Add multiple elements and test that they layer correctly and selection works with overlapping elements.'
+                );
+                updateButtonStatus(button, 'success');
+            }
+
+            function startConsoleMonitor() {
+                const button = event.target.closest('.test-button');
+                const debugPanel = document.getElementById('debug-panel');
+
+                if (!consoleMonitorActive) {
+                    consoleMonitorActive = true;
+                    debugPanel.style.display = 'block';
+
+                    // Create enhanced mouse tracking
+                    const faceCanvas = document.getElementById('face-canvas');
+                    if (faceCanvas) {
+                        const debugInfo = document.getElementById('debug-info');
+
+                        faceCanvas.addEventListener('mousemove', e => {
+                            const rect = faceCanvas.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+
+                            const elementAtPoint = document.elementFromPoint(e.clientX, e.clientY);
+                            const elementsAtPoint = document.elementsFromPoint(
+                                e.clientX,
+                                e.clientY
+                            );
+
+                            let stackInfo = elementsAtPoint
+                                .slice(0, 5)
+                                .map(el => {
+                                    const id = el.id ? `#${el.id}` : '';
+                                    const classes =
+                                        el.classList.length > 0
+                                            ? `.${Array.from(el.classList).join('.')}`
+                                            : '';
+                                    const tag = el.tagName.toLowerCase();
+                                    const pointerEvents = window.getComputedStyle(el).pointerEvents;
+                                    return `  ${tag}${id}${classes} [${pointerEvents}]`;
+                                })
+                                .join('<br>');
+
+                            debugInfo.innerHTML = `
+                            Position: ${Math.round(x)}, ${Math.round(y)}<br>
+                            Top Element: ${elementAtPoint ? elementAtPoint.tagName : 'none'}<br>
+                            <div style="margin-top: 5px; color: #f07727;">Element Stack:</div>
+                            ${stackInfo}
+                        `;
+                        });
+
+                        faceCanvas.addEventListener('click', e => {
+                            console.log('🖱️ CLICK EVENT:', {
+                                target: e.target,
+                                currentTarget: e.currentTarget,
+                                clientX: e.clientX,
+                                clientY: e.clientY,
+                                button: e.button
+                            });
+                        });
+                    }
+
+                    updateButtonStatus(button, 'success');
+                    addResult(
+                        'Console monitor started',
+                        'success',
+                        'Enhanced debugging panel is now active'
+                    );
+                } else {
+                    consoleMonitorActive = false;
+                    debugPanel.style.display = 'none';
+                    updateButtonStatus(button, 'pending');
+                    addResult('Console monitor stopped', 'info', 'Debug panel hidden');
+                }
+            }
+
+            function clearResults() {
+                const container = document.getElementById('results-container');
+                const consoleOutput = document.getElementById('console-output');
+
+                container.innerHTML =
+                    '<div class="result-item info"><strong>Results cleared!</strong><br>Ready for new tests.</div>';
+                consoleOutput.innerHTML = 'Console output cleared...';
+            }
+
+            // Auto-start console monitoring when page loads
+            window.addEventListener('load', () => {
+                console.log('🐛 DEBUG BEAST: UI Interaction Test Suite Ready!');
+                console.log("Time to hunt some bugs! Let's test these interactions thoroughly!");
+            });
+        </script>
+    </body>
+</html>

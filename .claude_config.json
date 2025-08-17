@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+        "playwright": {
+            "command": "npx",
+            "args": ["-y", "@executeautomation/playwright-mcp-server"]
+        },
+        "playwright-microsoft": {
+            "command": "npx",
+            "args": ["@playwright/mcp@latest"]
+        }
+    }
+}

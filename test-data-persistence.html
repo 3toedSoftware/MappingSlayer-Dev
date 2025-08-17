@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Test Data Persistence</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                background: #1a1a1a;
+                color: #fff;
+            }
+            button {
+                padding: 10px 20px;
+                margin: 10px;
+                background: #4caf50;
+                color: white;
+                border: none;
+                cursor: pointer;
+                border-radius: 4px;
+            }
+            button:hover {
+                background: #45a049;
+            }
+            #output {
+                margin-top: 20px;
+                padding: 20px;
+                background: #2a2a2a;
+                border-radius: 4px;
+                white-space: pre-wrap;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Test Thumbnail Slayer Data Persistence</h1>
+
+        <button onclick="checkLocalStorage()">Check LocalStorage</button>
+        <button onclick="clearFlagStorage()">Clear Flag Storage</button>
+        <button onclick="clearAllStorage()">Clear All Storage</button>
+        <button onclick="addTestData()">Add Test Data to LocalStorage</button>
+
+        <div id="output"></div>
+
+        <script>
+            function log(message) {
+                const output = document.getElementById('output');
+                output.textContent += message + '\n';
+            }
+
+            function checkLocalStorage() {
+                const output = document.getElementById('output');
+                output.textContent = '';
+
+                log('=== LocalStorage Contents ===\n');
+
+                // Check flag storage
+                const flags = localStorage.getItem('thumbnail_slayer_flags');
+                if (flags) {
+                    try {
+                        const flagData = JSON.parse(flags);
+                        log('Flag Storage:');
+                        log(JSON.stringify(flagData, null, 2));
+                        log(`Total locations with flags: ${Object.keys(flagData).length}\n`);
+                    } catch (e) {
+                        log('Flag storage exists but is invalid JSON\n');
+                    }
+                } else {
+                    log('No flag storage found\n');
+                }
+
+                // Check state storage
+                const state = localStorage.getItem('thumbnail_slayer_state');
+                if (state) {
+                    try {
+                        const stateData = JSON.parse(state);
+                        log('State Storage:');
+                        log(`Locations: ${stateData.locations ? stateData.locations.length : 0}`);
+                        log(
+                            `Templates: ${stateData.designTemplates ? stateData.designTemplates.length : 0}`
+                        );
+                        log(`Last Sync: ${stateData.lastSync || 'Never'}\n`);
+
+                        if (stateData.locations && stateData.locations.length > 0) {
+                            log('Sample location:');
+                            log(JSON.stringify(stateData.locations[0], null, 2));
+                        }
+                    } catch (e) {
+                        log('State storage exists but is invalid JSON\n');
+                    }
+                } else {
+                    log('No state storage found\n');
+                }
+
+                // Check for any other thumbnail-related keys
+                log('\nAll localStorage keys:');
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.includes('thumbnail') || key.includes('slayer')) {
+                        log(`  - ${key}`);
+                    }
+                }
+            }
+
+            function clearFlagStorage() {
+                localStorage.removeItem('thumbnail_slayer_flags');
+                log('Cleared flag storage');
+                checkLocalStorage();
+            }
+
+            function clearAllStorage() {
+                const keys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.includes('thumbnail_slayer')) {
+                        keys.push(key);
+                    }
+                }
+                keys.forEach(key => localStorage.removeItem(key));
+                log(`Cleared ${keys.length} thumbnail_slayer keys`);
+                checkLocalStorage();
+            }
+
+            function addTestData() {
+                // Add some test flag data
+                const testFlags = {
+                    loc_1_1: {
+                        topLeft: true,
+                        topRight: false,
+                        bottomLeft: true,
+                        bottomRight: false
+                    },
+                    loc_2_1: {
+                        topLeft: false,
+                        topRight: true,
+                        bottomLeft: false,
+                        bottomRight: true
+                    },
+                    loc_3_1: { topLeft: true, topRight: true, bottomLeft: true, bottomRight: true }
+                };
+                localStorage.setItem('thumbnail_slayer_flags', JSON.stringify(testFlags));
+
+                // Add some test state data
+                const testState = {
+                    locations: [
+                        {
+                            id: 'loc_1_1',
+                            locationNumber: 1,
+                            pageNumber: 1,
+                            message: 'Test Message 1',
+                            message2: 'Second Line 1',
+                            flags: {
+                                topLeft: true,
+                                topRight: false,
+                                bottomLeft: true,
+                                bottomRight: false
+                            }
+                        },
+                        {
+                            id: 'loc_2_1',
+                            locationNumber: 2,
+                            pageNumber: 1,
+                            message: 'Test Message 2',
+                            message2: 'Second Line 2',
+                            flags: {
+                                topLeft: false,
+                                topRight: true,
+                                bottomLeft: false,
+                                bottomRight: true
+                            }
+                        }
+                    ],
+                    lastSync: new Date().toISOString()
+                };
+                localStorage.setItem('thumbnail_slayer_state', JSON.stringify(testState));
+
+                log('Added test data to localStorage');
+                checkLocalStorage();
+            }
+
+            // Check on load
+            checkLocalStorage();
+        </script>
+    </body>
+</html>

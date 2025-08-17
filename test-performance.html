@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Design Slayer Performance Test</title>
+        <style>
+            body {
+                font-family: monospace;
+                background: #1a1a1a;
+                color: #0f0;
+                padding: 20px;
+                margin: 0;
+            }
+
+            .metrics {
+                background: #000;
+                border: 2px solid #0f0;
+                padding: 15px;
+                margin: 10px 0;
+                border-radius: 5px;
+            }
+
+            .metric-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 5px 0;
+                border-bottom: 1px solid #333;
+            }
+
+            .good {
+                color: #4caf50;
+            }
+            .warning {
+                color: #ffc107;
+            }
+            .bad {
+                color: #f44336;
+            }
+
+            button {
+                background: #f07727;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                margin: 5px;
+                cursor: pointer;
+                border-radius: 3px;
+                font-family: monospace;
+            }
+
+            button:hover {
+                background: #d65c0a;
+            }
+
+            .status {
+                margin: 20px 0;
+                padding: 10px;
+                background: #222;
+                border-radius: 5px;
+            }
+
+            #chart {
+                width: 100%;
+                height: 200px;
+                border: 1px solid #444;
+                margin: 20px 0;
+                position: relative;
+                background: #111;
+            }
+
+            .chart-line {
+                position: absolute;
+                bottom: 0;
+                width: 2px;
+                background: #0f0;
+                transition: none;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🚀 Design Slayer Performance Monitor</h1>
+
+        <div class="status">
+            <h3>Performance Optimizations Applied:</h3>
+            <ul>
+                <li>✅ Grid/ruler rendering throttled to 60fps (16ms)</li>
+                <li>✅ Pan events throttled with requestAnimationFrame</li>
+                <li>✅ Performance monitoring with warnings > 10ms</li>
+                <li>✅ Viewport transforms optimized</li>
+            </ul>
+        </div>
+
+        <div class="metrics">
+            <h3>Real-time Metrics:</h3>
+            <div class="metric-row">
+                <span>Viewport Transform:</span>
+                <span id="transform-time" class="good">0ms</span>
+            </div>
+            <div class="metric-row">
+                <span>Grid/Ruler Render:</span>
+                <span id="grid-time" class="good">0ms</span>
+            </div>
+            <div class="metric-row">
+                <span>Pan Throttle Active:</span>
+                <span id="pan-throttle" class="good">NO</span>
+            </div>
+            <div class="metric-row">
+                <span>FPS:</span>
+                <span id="fps" class="good">60</span>
+            </div>
+            <div class="metric-row">
+                <span>Total Frame Time:</span>
+                <span id="frame-time" class="good">0ms</span>
+            </div>
+        </div>
+
+        <div id="chart"></div>
+
+        <div>
+            <button onclick="startStressTest()">🔥 Start Stress Test</button>
+            <button onclick="openDesignSlayer()">🎨 Open Design Slayer</button>
+            <button onclick="clearMetrics()">🗑️ Clear Metrics</button>
+        </div>
+
+        <div class="metrics">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Click "Open Design Slayer" to launch the app</li>
+                <li>Open browser console (F12)</li>
+                <li>Pan and zoom rapidly to see performance warnings</li>
+                <li>Watch for ⚠️ warnings in console for operations > 10ms</li>
+                <li>Click "Start Stress Test" to simulate heavy usage</li>
+            </ol>
+        </div>
+
+        <div
+            id="log"
+            style="
+                margin-top: 20px;
+                max-height: 300px;
+                overflow-y: auto;
+                background: #000;
+                padding: 10px;
+                border: 1px solid #444;
+            "
+        >
+            <div style="color: #666">Performance log will appear here...</div>
+        </div>
+
+        <script>
+            let frameCount = 0;
+            let lastTime = performance.now();
+            let fpsHistory = [];
+
+            function updateMetrics() {
+                const currentTime = performance.now();
+                const deltaTime = currentTime - lastTime;
+
+                // Calculate FPS
+                const fps = Math.round(1000 / deltaTime);
+                document.getElementById('fps').textContent = fps;
+                document.getElementById('fps').className =
+                    fps >= 50 ? 'good' : fps >= 30 ? 'warning' : 'bad';
+
+                // Update frame time
+                document.getElementById('frame-time').textContent = deltaTime.toFixed(1) + 'ms';
+                document.getElementById('frame-time').className =
+                    deltaTime <= 16.7 ? 'good' : deltaTime <= 33.3 ? 'warning' : 'bad';
+
+                // Add to chart
+                updateChart(fps);
+
+                lastTime = currentTime;
+                frameCount++;
+
+                requestAnimationFrame(updateMetrics);
+            }
+
+            function updateChart(fps) {
+                const chart = document.getElementById('chart');
+                fpsHistory.push(fps);
+
+                // Keep last 100 data points
+                if (fpsHistory.length > 100) {
+                    fpsHistory.shift();
+                }
+
+                // Clear and redraw
+                chart.innerHTML = '';
+                fpsHistory.forEach((value, index) => {
+                    const line = document.createElement('div');
+                    line.className = 'chart-line';
+                    line.style.left = (index * 100) / 100 + '%';
+                    line.style.height = (value * 100) / 60 + '%';
+                    line.style.background =
+                        value >= 50 ? '#4CAF50' : value >= 30 ? '#FFC107' : '#F44336';
+                    chart.appendChild(line);
+                });
+            }
+
+            function openDesignSlayer() {
+                window.open(
+                    'http://localhost:8080/apps/design_slayer/design_slayer.html',
+                    '_blank'
+                );
+                logMessage('🎨 Opened Design Slayer - Monitor console for performance warnings');
+            }
+
+            function startStressTest() {
+                logMessage('🔥 Starting stress test...');
+
+                // Simulate rapid pan/zoom operations
+                const designWindow = window.open(
+                    'http://localhost:8080/apps/design_slayer/design_slayer.html',
+                    'design-slayer'
+                );
+
+                setTimeout(() => {
+                    logMessage('📊 Stress test: Simulating rapid pan/zoom...');
+
+                    // Inject performance monitoring
+                    if (designWindow) {
+                        designWindow.console.log('🚀 STRESS TEST: Starting performance monitoring');
+
+                        // Monitor for performance warnings
+                        const originalLog = designWindow.console.log;
+                        designWindow.console.log = function (...args) {
+                            originalLog.apply(this, args);
+                            const message = args.join(' ');
+                            if (message.includes('⚠️')) {
+                                logMessage('PERF WARNING: ' + message, 'warning');
+                            }
+                        };
+                    }
+
+                    logMessage('✅ Stress test initialized - pan/zoom rapidly to test performance');
+                }, 2000);
+            }
+
+            function clearMetrics() {
+                fpsHistory = [];
+                document.getElementById('log').innerHTML =
+                    '<div style="color: #666;">Performance log cleared...</div>';
+                logMessage('🗑️ Metrics cleared');
+            }
+
+            function logMessage(message, type = 'info') {
+                const log = document.getElementById('log');
+                const entry = document.createElement('div');
+                entry.style.color =
+                    type === 'warning' ? '#FFC107' : type === 'error' ? '#F44336' : '#0f0';
+                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                log.appendChild(entry);
+                log.scrollTop = log.scrollHeight;
+            }
+
+            // Listen for messages from Design Slayer
+            window.addEventListener('message', event => {
+                if (event.data.type === 'performance') {
+                    const { metric, value } = event.data;
+
+                    switch (metric) {
+                        case 'transform':
+                            document.getElementById('transform-time').textContent = value + 'ms';
+                            document.getElementById('transform-time').className =
+                                value <= 5 ? 'good' : value <= 10 ? 'warning' : 'bad';
+                            break;
+                        case 'grid':
+                            document.getElementById('grid-time').textContent = value + 'ms';
+                            document.getElementById('grid-time').className =
+                                value <= 10 ? 'good' : value <= 20 ? 'warning' : 'bad';
+                            break;
+                        case 'pan-throttle':
+                            document.getElementById('pan-throttle').textContent = value
+                                ? 'YES'
+                                : 'NO';
+                            document.getElementById('pan-throttle').className = value
+                                ? 'warning'
+                                : 'good';
+                            break;
+                    }
+                }
+            });
+
+            // Start monitoring
+            updateMetrics();
+            logMessage('🚀 Performance monitor started');
+            logMessage('📊 Optimizations: Grid throttle @ 16ms, Pan throttle with RAF');
+        </script>
+    </body>
+</html>
