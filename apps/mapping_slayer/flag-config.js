@@ -1,5 +1,9 @@
 // flag-config.js - Customizable flag system for Mapping Slayer
 
+// Allowed file types for custom icons
+export const ALLOWED_ICON_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/gif', 'image/webp'];
+export const ALLOWED_ICON_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp'];
+
 // Available symbols/emojis for flag indicators
 export const FLAG_SYMBOLS = [
     { symbol: '', label: 'None', value: null },
@@ -43,21 +47,25 @@ export function getDefaultFlagConfig() {
         [FLAG_POSITIONS.TOP_LEFT]: {
             name: 'Flag 1',
             symbol: null,
+            customIcon: null, // Base64 or URL for custom icon
             enabled: true
         },
         [FLAG_POSITIONS.TOP_RIGHT]: {
             name: 'Flag 2',
             symbol: null,
+            customIcon: null,
             enabled: true
         },
         [FLAG_POSITIONS.BOTTOM_LEFT]: {
             name: 'Flag 3',
             symbol: null,
+            customIcon: null,
             enabled: true
         },
         [FLAG_POSITIONS.BOTTOM_RIGHT]: {
             name: 'Flag 4',
             symbol: null,
+            customIcon: null,
             enabled: true
         }
     };

@@ -4,6 +4,7 @@ import { appState } from './state.js';
 import {
     FLAG_SYMBOLS,
     FLAG_POSITIONS,
+    ALLOWED_ICON_TYPES,
     getDefaultFlagConfig,
     getNextSymbol,
     getPreviousSymbol,
@@ -71,9 +72,15 @@ function updateFlagCornerUI(position, config) {
         `.ms-flag-symbol-display[data-position="${position}"]`
     );
     if (symbolDisplay) {
-        const symbolInfo = getSymbolInfo(config.symbol);
-        symbolDisplay.textContent = symbolInfo.symbol || '';
-        symbolDisplay.classList.toggle('ms-flag-active', config.symbol !== null);
+        // Check if there's a custom icon
+        if (config.customIcon) {
+            symbolDisplay.innerHTML = `<img src="${config.customIcon}" alt="Custom icon">`;
+            symbolDisplay.classList.add('ms-flag-active');
+        } else {
+            const symbolInfo = getSymbolInfo(config.symbol);
+            symbolDisplay.textContent = symbolInfo.symbol || '';
+            symbolDisplay.classList.toggle('ms-flag-active', config.symbol !== null);
+        }
     }
 }
 
@@ -83,6 +90,9 @@ export function handleFlagSymbolNavigation(position, direction) {
 
     const flagConfig = appState.globalFlagConfiguration;
     if (!flagConfig || !flagConfig[position]) return;
+
+    // Clear custom icon when navigating symbols
+    flagConfig[position].customIcon = null;
 
     const currentSymbol = flagConfig[position].symbol;
     const newSymbol =
@@ -136,6 +146,36 @@ function updateAllDots() {
     renderDotsForCurrentPage();
 }
 
+// Handle custom icon upload
+export function handleCustomIconUpload(position, file) {
+    if (!file) return;
+
+    // Validate file type
+    if (!ALLOWED_ICON_TYPES.includes(file.type)) {
+        alert(`Please upload a valid image file (PNG, JPG, SVG, GIF, or WebP)`);
+        return;
+    }
+
+    // Validate file size (max 1MB)
+    if (file.size > 1024 * 1024) {
+        alert('File size must be less than 1MB');
+        return;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const flagConfig = appState.globalFlagConfiguration;
+        if (flagConfig && flagConfig[position]) {
+            // Clear symbol when custom icon is uploaded
+            flagConfig[position].symbol = null;
+            flagConfig[position].customIcon = e.target.result;
+            updateFlagCornerUI(position, flagConfig[position]);
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
 // Initialize event listeners
 export function initializeFlagUI() {
     // Close button
@@ -179,6 +219,28 @@ export function initializeFlagUI() {
             const flagConfig = appState.globalFlagConfiguration;
             if (flagConfig && flagConfig[position]) {
                 flagConfig[position].name = e.target.value;
+            }
+        });
+    });
+
+    // Upload button clicks
+    document.querySelectorAll('.ms-flag-upload-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const position = e.target.dataset.position;
+            const fileInput = document.querySelector(`.ms-flag-upload-input[data-position="${position}"]`);
+            if (fileInput) {
+                fileInput.click();
+            }
+        });
+    });
+
+    // File input changes
+    document.querySelectorAll('.ms-flag-upload-input').forEach(input => {
+        input.addEventListener('change', e => {
+            const position = e.target.dataset.position;
+            const file = e.target.files[0];
+            if (file) {
+                handleCustomIconUpload(position, file);
             }
         });
     });

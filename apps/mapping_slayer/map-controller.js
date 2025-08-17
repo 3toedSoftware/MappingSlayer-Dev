@@ -293,9 +293,6 @@ function createDotElement(dot) {
 
             // Show symbol if flag is checked
             if (isChecked) {
-                // Use configured symbol or default checkmark if no symbol configured
-                const symbolToUse = config && config.symbol ? config.symbol : 'checkmark';
-                const symbolInfo = getSymbolInfo(symbolToUse);
                 const positionClass = position.replace(/([A-Z])/g, '-$1').toLowerCase();
 
                 // Calculate flag offset based on dot size (halved to be closer to center)
@@ -312,7 +309,17 @@ function createDotElement(dot) {
                     positionStyles = `bottom: ${flagOffset}px; right: ${flagOffset}px;`;
                 }
 
-                flagsHTML += `<div class="ms-dot-flag ms-dot-flag-${positionClass}" style="font-size: ${flagSize}px; ${positionStyles}">${symbolInfo.symbol}</div>`;
+                // Check for custom icon first
+                if (config && config.customIcon) {
+                    flagsHTML += `<div class="ms-dot-flag ms-dot-flag-${positionClass}" style="${positionStyles}">
+                        <img src="${config.customIcon}" style="width: ${flagSize}px; height: ${flagSize}px; object-fit: contain;" alt="Flag">
+                    </div>`;
+                } else {
+                    // Use configured symbol or default checkmark if no symbol configured
+                    const symbolToUse = config && config.symbol ? config.symbol : 'checkmark';
+                    const symbolInfo = getSymbolInfo(symbolToUse);
+                    flagsHTML += `<div class="ms-dot-flag ms-dot-flag-${positionClass}" style="font-size: ${flagSize}px; ${positionStyles}">${symbolInfo.symbol}</div>`;
+                }
             }
         });
     }

@@ -377,6 +377,8 @@ class MappingSlayerApp extends SlayerAppBase {
                                     <div class="ms-flag-symbol-display" data-position="topLeft"></div>
                                     <button class="ms-flag-next-btn" data-position="topLeft">&gt;</button>
                                 </div>
+                                <input type="file" class="ms-flag-upload-input" data-position="topLeft" accept=".png,.jpg,.jpeg,.svg,.gif,.webp" style="display:none">
+                                <button class="ms-flag-upload-btn" data-position="topLeft" title="Upload custom icon">📁</button>
                             </div>
                             <div class="ms-flag-corner ms-flag-top-right">
                                 <input type="text" class="ms-flag-name-input" placeholder="Flag 2" data-position="topRight">
@@ -385,6 +387,8 @@ class MappingSlayerApp extends SlayerAppBase {
                                     <div class="ms-flag-symbol-display" data-position="topRight"></div>
                                     <button class="ms-flag-next-btn" data-position="topRight">&gt;</button>
                                 </div>
+                                <input type="file" class="ms-flag-upload-input" data-position="topRight" accept=".png,.jpg,.jpeg,.svg,.gif,.webp" style="display:none">
+                                <button class="ms-flag-upload-btn" data-position="topRight" title="Upload custom icon">📁</button>
                             </div>
                             <div class="ms-flag-corner ms-flag-bottom-left">
                                 <input type="text" class="ms-flag-name-input" placeholder="Flag 3" data-position="bottomLeft">
@@ -393,6 +397,8 @@ class MappingSlayerApp extends SlayerAppBase {
                                     <div class="ms-flag-symbol-display" data-position="bottomLeft"></div>
                                     <button class="ms-flag-next-btn" data-position="bottomLeft">&gt;</button>
                                 </div>
+                                <input type="file" class="ms-flag-upload-input" data-position="bottomLeft" accept=".png,.jpg,.jpeg,.svg,.gif,.webp" style="display:none">
+                                <button class="ms-flag-upload-btn" data-position="bottomLeft" title="Upload custom icon">📁</button>
                             </div>
                             <div class="ms-flag-corner ms-flag-bottom-right">
                                 <input type="text" class="ms-flag-name-input" placeholder="Flag 4" data-position="bottomRight">
@@ -401,6 +407,8 @@ class MappingSlayerApp extends SlayerAppBase {
                                     <div class="ms-flag-symbol-display" data-position="bottomRight"></div>
                                     <button class="ms-flag-next-btn" data-position="bottomRight">&gt;</button>
                                 </div>
+                                <input type="file" class="ms-flag-upload-input" data-position="bottomRight" accept=".png,.jpg,.jpeg,.svg,.gif,.webp" style="display:none">
+                                <button class="ms-flag-upload-btn" data-position="bottomRight" title="Upload custom icon">📁</button>
                             </div>
                         </div>
                     </div>
