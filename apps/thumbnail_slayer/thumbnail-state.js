@@ -34,6 +34,7 @@ export const thumbnailState = {
     selectedItemId: null,
     isLoading: false,
     lastSync: null,
+    previewMode: 'sign', // 'sign' or 'map'
 
     // Statistics
     totalSigns: 0

@@ -940,8 +940,7 @@ class MappingSlayerApp extends SlayerAppBase {
 
         if (!loadedData) {
             console.error('File loading failed.');
-            if (uploadArea)
-                uploadArea.innerHTML = '<div>❌ File loading failed. Please try again.</div>';
+            if (uploadArea) {uploadArea.innerHTML = '<div>❌ File loading failed. Please try again.</div>';}
             return;
         }
 
@@ -955,12 +954,10 @@ class MappingSlayerApp extends SlayerAppBase {
             const success = await projectManager.load(loadedData.file);
 
             if (success) {
-                if (uploadArea)
-                    uploadArea.innerHTML = '<div>✅ Suite project loaded successfully!</div>';
+                if (uploadArea) {uploadArea.innerHTML = '<div>✅ Suite project loaded successfully!</div>';}
                 console.log('✅ .slayer file loaded successfully');
             } else {
-                if (uploadArea)
-                    uploadArea.innerHTML = '<div>❌ Failed to load suite project.</div>';
+                if (uploadArea) {uploadArea.innerHTML = '<div>❌ Failed to load suite project.</div>';}
                 console.error('❌ Failed to load .slayer file');
             }
             return;
@@ -1346,7 +1343,7 @@ class MappingSlayerApp extends SlayerAppBase {
             const { getDefaultFlagConfig } = await import('./flag-config.js');
             this.appState.globalFlagConfiguration = getDefaultFlagConfig();
         }
-        
+
         // Import custom icon library
         if (stateToImport.customIconLibrary) {
             this.appState.customIconLibrary = stateToImport.customIconLibrary;
@@ -1644,8 +1641,8 @@ class MappingSlayerApp extends SlayerAppBase {
                         totalPages: this.appState.totalPages || 0,
                         pageLabels: this.appState.pageLabels
                             ? Array.from(this.appState.pageLabels.entries()).map(
-                                  ([num, label]) => ({ pageNumber: num, label: label })
-                              )
+                                ([num, label]) => ({ pageNumber: num, label: label })
+                            )
                             : []
                     },
                     // Include global flag configuration so Thumbnail Slayer can use proper names
@@ -1695,14 +1692,10 @@ class MappingSlayerApp extends SlayerAppBase {
                     }
 
                     // Update individual flag fields
-                    if (query.updates.topLeft !== undefined)
-                        foundDot.flags.topLeft = query.updates.topLeft;
-                    if (query.updates.topRight !== undefined)
-                        foundDot.flags.topRight = query.updates.topRight;
-                    if (query.updates.bottomLeft !== undefined)
-                        foundDot.flags.bottomLeft = query.updates.bottomLeft;
-                    if (query.updates.bottomRight !== undefined)
-                        foundDot.flags.bottomRight = query.updates.bottomRight;
+                    if (query.updates.topLeft !== undefined) {foundDot.flags.topLeft = query.updates.topLeft;}
+                    if (query.updates.topRight !== undefined) {foundDot.flags.topRight = query.updates.topRight;}
+                    if (query.updates.bottomLeft !== undefined) {foundDot.flags.bottomLeft = query.updates.bottomLeft;}
+                    if (query.updates.bottomRight !== undefined) {foundDot.flags.bottomRight = query.updates.bottomRight;}
 
                     // Remove flag fields from updates to avoid direct assignment
                     const cleanedUpdates = { ...query.updates };
@@ -1786,6 +1779,58 @@ class MappingSlayerApp extends SlayerAppBase {
                     };
                 } else {
                     return { error: 'Invalid marker type data or code already exists' };
+                }
+            case 'get-page-image':
+                // Return PDF page canvas data for Map Location Preview
+                try {
+                    const pageNum = query.pageNumber || this.appState.currentPdfPage;
+
+                    if (!this.appState.pdfDoc) {
+                        return { error: 'No PDF loaded' };
+                    }
+
+                    if (pageNum < 1 || pageNum > this.appState.totalPages) {
+                        return { error: 'Invalid page number' };
+                    }
+
+                    // Get the PDF page
+                    const page = await this.appState.pdfDoc.getPage(pageNum);
+                    const scale = query.scale || 2.0; // Default scale for preview
+                    const viewport = page.getViewport({ scale });
+
+                    // Create a canvas for rendering
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    // Render the PDF page to canvas
+                    const renderTask = page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    });
+
+                    await renderTask.promise;
+
+                    // Convert canvas to data URL
+                    const imageData = canvas.toDataURL('image/png');
+
+                    return {
+                        success: true,
+                        pageNumber: pageNum,
+                        imageData,
+                        dimensions: {
+                            width: viewport.width,
+                            height: viewport.height
+                        },
+                        scale,
+                        pageName: this.appState.pageNames ?
+                            this.appState.pageNames.get(pageNum) || `Page ${pageNum}` :
+                            `Page ${pageNum}`
+                    };
+                } catch (error) {
+                    console.error('Error rendering PDF page:', error);
+                    return { error: 'Failed to render PDF page: ' + error.message };
                 }
             default:
                 return { error: 'Unknown query type' };

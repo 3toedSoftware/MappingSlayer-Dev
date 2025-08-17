@@ -312,7 +312,7 @@ function createDotElement(dot) {
                 // Get symbol info which now handles both emoji and custom icons
                 const symbolToUse = config && config.symbol ? config.symbol : 'checkmark';
                 const symbolInfo = getSymbolInfo(symbolToUse);
-                
+
                 if (symbolInfo && symbolInfo.isCustom) {
                     // Custom icon - display as image
                     flagsHTML += `<div class="ms-dot-flag ms-dot-flag-${positionClass}" style="${positionStyles}">

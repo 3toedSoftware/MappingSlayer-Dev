@@ -86,6 +86,9 @@ function setupSplitViewHandlers(handlers) {
         });
     }
 
+    // Set up preview toggle handlers
+    setupPreviewToggleHandlers();
+
     // Set up spreadsheet and thumbnail interaction handlers
     setupSpreadsheetHandlers();
     setupThumbnailHandlers();
@@ -418,15 +421,20 @@ async function showSinglePreview(itemId) {
         return;
     }
 
-    // Clear and render directly to the preview container
-    preview.innerHTML = '';
-    preview.dataset.itemId = itemId;
-
     // Use original item if it's a transformed spreadsheet item
     const renderItem = item._originalItem || item;
 
-    // Render the sign directly
-    await renderThumbnailImage(renderItem, preview);
+    // Check preview mode and show appropriate preview
+    const previewMode = thumbnailState.previewMode || 'sign';
+
+    if (previewMode === 'map') {
+        await showMapLocationPreview(renderItem);
+    } else {
+        // Clear and render sign preview directly to the preview container
+        preview.innerHTML = '';
+        preview.dataset.itemId = itemId;
+        await renderThumbnailImage(renderItem, preview);
+    }
 }
 
 /**
@@ -842,4 +850,181 @@ function showToast(message, type = 'info') {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+/**
+ * Setup preview toggle handlers
+ */
+function setupPreviewToggleHandlers() {
+    const signToggle = document.getElementById('toggle-sign-preview');
+    const mapToggle = document.getElementById('toggle-map-preview');
+    const previewTitle = document.getElementById('preview-title');
+
+    if (!signToggle || !mapToggle || !previewTitle) return;
+
+    // Initialize state - Sign Preview is active by default
+    thumbnailState.previewMode = 'sign';
+
+    signToggle.addEventListener('click', () => {
+        if (thumbnailState.previewMode !== 'sign') {
+            thumbnailState.previewMode = 'sign';
+            signToggle.classList.remove('btn-secondary');
+            mapToggle.classList.add('btn-secondary');
+            previewTitle.textContent = 'Sign Preview';
+
+            // Refresh preview if item is selected
+            if (thumbnailState.selectedItemId) {
+                showSinglePreview(thumbnailState.selectedItemId);
+            }
+        }
+    });
+
+    mapToggle.addEventListener('click', () => {
+        if (thumbnailState.previewMode !== 'map') {
+            thumbnailState.previewMode = 'map';
+            mapToggle.classList.remove('btn-secondary');
+            signToggle.classList.add('btn-secondary');
+            previewTitle.textContent = 'Map Location Preview';
+
+            // Refresh preview if item is selected
+            if (thumbnailState.selectedItemId) {
+                showSinglePreview(thumbnailState.selectedItemId);
+            }
+        }
+    });
+}
+
+/**
+ * Show Map Location Preview for selected item
+ */
+async function showMapLocationPreview(item) {
+    const preview = dom.previewContainer;
+    if (!preview) return;
+
+    try {
+        // Show loading state
+        preview.innerHTML = `
+            <div class="map-preview-loading">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Loading map preview...</div>
+            </div>
+        `;
+
+        // Request PDF page image from Mapping Slayer
+        const response = await window.appBridge.sendRequest('mapping_slayer', {
+            type: 'get-page-image',
+            pageNumber: item.pageNumber || 1,
+            scale: 1.5 // Good balance of quality and performance
+        });
+
+        if (!response || response.error) {
+            throw new Error(response?.error || 'Failed to get map data');
+        }
+
+        // Create the map preview container
+        const mapContainer = document.createElement('div');
+        mapContainer.className = 'map-preview-container';
+        mapContainer.style.cssText = `
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        `;
+
+        // Create the map image
+        const mapImage = document.createElement('img');
+        mapImage.src = response.imageData;
+        mapImage.style.cssText = `
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            background: #fff;
+            border: 1px solid #555;
+        `;
+
+        // Calculate dot position on the scaled image
+        const scaleRatio = response.scale;
+        const dotX = (item.x || 0) * scaleRatio;
+        const dotY = (item.y || 0) * scaleRatio;
+
+        mapImage.onload = () => {
+            // Get the actual displayed size of the image
+            const imageRect = mapImage.getBoundingClientRect();
+            const containerRect = mapContainer.getBoundingClientRect();
+
+            // Calculate the scale between original image and displayed image
+            const displayScale = Math.min(
+                containerRect.width / response.dimensions.width,
+                containerRect.height / response.dimensions.height
+            );
+
+            // Calculate the displayed image size and position
+            const displayedWidth = response.dimensions.width * displayScale;
+            const displayedHeight = response.dimensions.height * displayScale;
+            const imageOffsetX = (containerRect.width - displayedWidth) / 2;
+            const imageOffsetY = (containerRect.height - displayedHeight) / 2;
+
+            // Create and position the dot
+            const dot = document.createElement('div');
+            dot.className = 'map-preview-dot';
+            dot.style.cssText = `
+                position: absolute;
+                width: 16px;
+                height: 16px;
+                background: #f07727;
+                border: 3px solid #fff;
+                border-radius: 50%;
+                box-shadow: 0 0 10px rgba(240, 119, 39, 0.8);
+                z-index: 10;
+                pointer-events: none;
+            `;
+
+            // Position the dot
+            const dotPosX = imageOffsetX + (dotX * displayScale) - 8; // -8 for half dot width
+            const dotPosY = imageOffsetY + (dotY * displayScale) - 8; // -8 for half dot height
+
+            dot.style.left = `${dotPosX}px`;
+            dot.style.top = `${dotPosY}px`;
+
+            mapContainer.appendChild(dot);
+
+            // Add location info overlay
+            const infoOverlay = document.createElement('div');
+            infoOverlay.className = 'map-preview-info';
+            infoOverlay.style.cssText = `
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                background: rgba(0, 0, 0, 0.8);
+                color: #fff;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-size: 12px;
+                z-index: 20;
+            `;
+            infoOverlay.innerHTML = `
+                <div><strong>Location ${item.locationNumber}</strong></div>
+                <div>${response.pageName}</div>
+                <div>Coordinates: ${Math.round(item.x || 0)}, ${Math.round(item.y || 0)}</div>
+            `;
+
+            mapContainer.appendChild(infoOverlay);
+        };
+
+        mapContainer.appendChild(mapImage);
+        preview.innerHTML = '';
+        preview.appendChild(mapContainer);
+
+    } catch (error) {
+        console.error('Failed to show map preview:', error);
+        preview.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-text">Map preview unavailable</div>
+                <div class="empty-hint">${error.message}</div>
+            </div>
+        `;
+    }
 }

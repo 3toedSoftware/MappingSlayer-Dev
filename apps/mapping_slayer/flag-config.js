@@ -119,7 +119,7 @@ export function migrateDotToFlags(dot) {
 // Get all symbols including custom icons
 export function getAllSymbols() {
     const symbols = [...FLAG_SYMBOLS];
-    
+
     // Add custom icons from the library
     if (window.appState && window.appState.customIconLibrary) {
         window.appState.customIconLibrary.forEach(icon => {
@@ -131,6 +131,6 @@ export function getAllSymbols() {
             });
         });
     }
-    
+
     return symbols;
 }
