@@ -39,17 +39,7 @@ export function openFlagModal(markerTypeCode = null) {
     // Initialize global flags if needed
     const flagConfig = initializeGlobalFlags();
 
-    // Update modal header to show global flags
-    const markerTypeSpan = modal.querySelector('.ms-flag-modal-marker-type');
-    if (markerTypeSpan) {
-        markerTypeSpan.textContent = 'All Marker Types';
-    }
 
-    // Update preview dot color to neutral
-    const previewDot = modal.querySelector('.ms-flag-preview-dot');
-    if (previewDot) {
-        previewDot.style.background = '#888888';
-    }
 
     // Update each corner's configuration
     Object.keys(FLAG_POSITIONS).forEach(key => {
@@ -100,62 +90,8 @@ export function handleFlagSymbolNavigation(position, direction) {
 
     flagConfig[position].symbol = newSymbol;
     updateFlagCornerUI(position, flagConfig[position]);
-
-    // Update preview on the dot
-    updateFlagPreviewOnDot();
 }
 
-// Update flag preview on the center dot
-function updateFlagPreviewOnDot() {
-    // No longer checking for current marker type since flags are global
-
-    const previewDot = document.querySelector('.ms-flag-preview-dot');
-    if (!previewDot) return;
-
-    // Remove existing flag previews
-    previewDot.querySelectorAll('.ms-dot-flag-preview').forEach(el => el.remove());
-
-    const flagConfig = appState.globalFlagConfiguration;
-    if (!flagConfig) return;
-
-    // Add flag previews for each position
-    Object.keys(FLAG_POSITIONS).forEach(key => {
-        const position = FLAG_POSITIONS[key];
-        const config = flagConfig[position];
-
-        if (config.symbol) {
-            const symbolInfo = getSymbolInfo(config.symbol);
-            const flagEl = document.createElement('div');
-            flagEl.className = `ms-dot-flag-preview ms-dot-flag-preview-${position}`;
-            flagEl.textContent = symbolInfo.symbol;
-            flagEl.style.position = 'absolute';
-            flagEl.style.fontSize = '16px';
-            flagEl.style.lineHeight = '1';
-
-            // Position the flag
-            switch (position) {
-                case 'topLeft':
-                    flagEl.style.top = '-12px';
-                    flagEl.style.left = '-12px';
-                    break;
-                case 'topRight':
-                    flagEl.style.top = '-12px';
-                    flagEl.style.right = '-12px';
-                    break;
-                case 'bottomLeft':
-                    flagEl.style.bottom = '-12px';
-                    flagEl.style.left = '-12px';
-                    break;
-                case 'bottomRight':
-                    flagEl.style.bottom = '-12px';
-                    flagEl.style.right = '-12px';
-                    break;
-            }
-
-            previewDot.appendChild(flagEl);
-        }
-    });
-}
 
 // Save flag configuration
 export function saveFlagConfiguration() {

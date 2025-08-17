@@ -84,7 +84,8 @@
             "Bash(git init:*)",
             "Bash(npm run format:check:*)",
             "Bash(npm run format:*)",
-            "Bash(git add:*)"
+            "Bash(git add:*)",
+            "Bash(git commit:*)"
         ],
         "deny": [],
         "defaultMode": "acceptEdits",

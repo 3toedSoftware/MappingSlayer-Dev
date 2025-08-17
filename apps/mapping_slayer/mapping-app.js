@@ -366,7 +366,6 @@ class MappingSlayerApp extends SlayerAppBase {
                 <div class="ms-modal-content ms-flag-modal-content">
                     <div class="ms-modal-header">
                         <span>Flag Customization</span>
-                        <span class="ms-flag-modal-marker-type"></span>
                         <button class="ms-modal-close" onclick="closeFlagModal()">&times;</button>
                     </div>
                     <div class="ms-modal-body ms-flag-modal-body">
@@ -386,9 +385,6 @@ class MappingSlayerApp extends SlayerAppBase {
                                     <div class="ms-flag-symbol-display" data-position="topRight"></div>
                                     <button class="ms-flag-next-btn" data-position="topRight">&gt;</button>
                                 </div>
-                            </div>
-                            <div class="ms-flag-center-dot">
-                                <div class="ms-flag-preview-dot"></div>
                             </div>
                             <div class="ms-flag-corner ms-flag-bottom-left">
                                 <input type="text" class="ms-flag-name-input" placeholder="Flag 3" data-position="bottomLeft">
