@@ -21,6 +21,7 @@ export const appState = {
     activeMarkerType: null, // This will be the marker type CODE
     // flagConfigurations: {}, // DEPRECATED - Now using single global flag configuration
     globalFlagConfiguration: null, // Single shared flag configuration for all marker types
+    customIconLibrary: [], // Array of custom uploaded icons {id, name, data}
     isPanning: false,
     dragTarget: null,
     dragStart: { x: 0, y: 0 },
@@ -272,6 +273,14 @@ export function triggerManualSync() {
     }
     debouncedSync();
 }
+
+// Initialize custom icon library if not present
+if (!appState.customIconLibrary) {
+    appState.customIconLibrary = [];
+}
+
+// Store state reference globally
+window.appState = appState;
 
 // Re-export UndoManager for convenience
 export { UndoManager, CommandUndoManager };

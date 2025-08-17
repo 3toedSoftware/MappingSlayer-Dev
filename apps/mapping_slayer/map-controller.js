@@ -309,15 +309,17 @@ function createDotElement(dot) {
                     positionStyles = `bottom: ${flagOffset}px; right: ${flagOffset}px;`;
                 }
 
-                // Check for custom icon first
-                if (config && config.customIcon) {
+                // Get symbol info which now handles both emoji and custom icons
+                const symbolToUse = config && config.symbol ? config.symbol : 'checkmark';
+                const symbolInfo = getSymbolInfo(symbolToUse);
+                
+                if (symbolInfo && symbolInfo.isCustom) {
+                    // Custom icon - display as image
                     flagsHTML += `<div class="ms-dot-flag ms-dot-flag-${positionClass}" style="${positionStyles}">
-                        <img src="${config.customIcon}" style="width: ${flagSize}px; height: ${flagSize}px; object-fit: contain;" alt="Flag">
+                        <img src="${symbolInfo.symbol}" style="width: ${flagSize}px; height: ${flagSize}px; object-fit: contain;" alt="${symbolInfo.label}">
                     </div>`;
-                } else {
-                    // Use configured symbol or default checkmark if no symbol configured
-                    const symbolToUse = config && config.symbol ? config.symbol : 'checkmark';
-                    const symbolInfo = getSymbolInfo(symbolToUse);
+                } else if (symbolInfo && symbolInfo.symbol) {
+                    // Regular emoji symbol
                     flagsHTML += `<div class="ms-dot-flag ms-dot-flag-${positionClass}" style="font-size: ${flagSize}px; ${positionStyles}">${symbolInfo.symbol}</div>`;
                 }
             }

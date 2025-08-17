@@ -1167,6 +1167,7 @@ class MappingSlayerApp extends SlayerAppBase {
                 markerTypes: this.appState.markerTypes,
                 // flagConfigurations: this.appState.flagConfigurations, // DEPRECATED - now using globalFlagConfiguration
                 globalFlagConfiguration: this.appState.globalFlagConfiguration,
+                customIconLibrary: this.appState.customIconLibrary || [],
                 nextInternalId: this.appState.nextInternalId,
                 dotSize: this.appState.dotSize,
                 currentPdfPage: this.appState.currentPdfPage,
@@ -1344,6 +1345,13 @@ class MappingSlayerApp extends SlayerAppBase {
         if (!this.appState.globalFlagConfiguration) {
             const { getDefaultFlagConfig } = await import('./flag-config.js');
             this.appState.globalFlagConfiguration = getDefaultFlagConfig();
+        }
+        
+        // Import custom icon library
+        if (stateToImport.customIconLibrary) {
+            this.appState.customIconLibrary = stateToImport.customIconLibrary;
+        } else if (!this.appState.customIconLibrary) {
+            this.appState.customIconLibrary = [];
         }
 
         this.appState.nextInternalId = stateToImport.nextInternalId || 1;

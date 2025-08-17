@@ -72,14 +72,18 @@ function updateFlagCornerUI(position, config) {
         `.ms-flag-symbol-display[data-position="${position}"]`
     );
     if (symbolDisplay) {
-        // Check if there's a custom icon
-        if (config.customIcon) {
-            symbolDisplay.innerHTML = `<img src="${config.customIcon}" alt="Custom icon">`;
+        const symbolInfo = getSymbolInfo(config.symbol);
+        
+        // Check if it's a custom icon (base64 data URL)
+        if (symbolInfo && symbolInfo.isCustom) {
+            symbolDisplay.innerHTML = `<img src="${symbolInfo.symbol}" alt="${symbolInfo.label}">`;
+            symbolDisplay.classList.add('ms-flag-active');
+        } else if (symbolInfo && symbolInfo.symbol) {
+            symbolDisplay.textContent = symbolInfo.symbol;
             symbolDisplay.classList.add('ms-flag-active');
         } else {
-            const symbolInfo = getSymbolInfo(config.symbol);
-            symbolDisplay.textContent = symbolInfo.symbol || '';
-            symbolDisplay.classList.toggle('ms-flag-active', config.symbol !== null);
+            symbolDisplay.textContent = '';
+            symbolDisplay.classList.remove('ms-flag-active');
         }
     }
 }
@@ -90,9 +94,6 @@ export function handleFlagSymbolNavigation(position, direction) {
 
     const flagConfig = appState.globalFlagConfiguration;
     if (!flagConfig || !flagConfig[position]) return;
-
-    // Clear custom icon when navigating symbols
-    flagConfig[position].customIcon = null;
 
     const currentSymbol = flagConfig[position].symbol;
     const newSymbol =
@@ -165,11 +166,25 @@ export function handleCustomIconUpload(position, file) {
     // Convert to base64
     const reader = new FileReader();
     reader.onload = function(e) {
+        // Generate unique ID for the custom icon
+        const iconId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const iconName = file.name.replace(/\.[^/.]+$/, ''); // Remove extension
+        
+        // Add to custom icon library if not already there
+        const existingIcon = appState.customIconLibrary.find(icon => icon.data === e.target.result);
+        
+        if (!existingIcon) {
+            appState.customIconLibrary.push({
+                id: iconId,
+                name: iconName,
+                data: e.target.result
+            });
+        }
+        
+        // Set the symbol to the custom icon ID
         const flagConfig = appState.globalFlagConfiguration;
         if (flagConfig && flagConfig[position]) {
-            // Clear symbol when custom icon is uploaded
-            flagConfig[position].symbol = null;
-            flagConfig[position].customIcon = e.target.result;
+            flagConfig[position].symbol = existingIcon ? existingIcon.id : iconId;
             updateFlagCornerUI(position, flagConfig[position]);
         }
     };

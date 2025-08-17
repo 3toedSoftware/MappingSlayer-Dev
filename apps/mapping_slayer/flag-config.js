@@ -73,21 +73,26 @@ export function getDefaultFlagConfig() {
 
 // Get the next symbol in the cycle for a given position
 export function getNextSymbol(currentSymbol) {
-    const currentIndex = FLAG_SYMBOLS.findIndex(s => s.value === currentSymbol);
-    const nextIndex = (currentIndex + 1) % FLAG_SYMBOLS.length;
-    return FLAG_SYMBOLS[nextIndex].value;
+    // Build combined list of symbols and custom icons
+    const allSymbols = getAllSymbols();
+    const currentIndex = allSymbols.findIndex(s => s.value === currentSymbol);
+    const nextIndex = (currentIndex + 1) % allSymbols.length;
+    return allSymbols[nextIndex].value;
 }
 
 // Get the previous symbol in the cycle
 export function getPreviousSymbol(currentSymbol) {
-    const currentIndex = FLAG_SYMBOLS.findIndex(s => s.value === currentSymbol);
-    const prevIndex = currentIndex <= 0 ? FLAG_SYMBOLS.length - 1 : currentIndex - 1;
-    return FLAG_SYMBOLS[prevIndex].value;
+    // Build combined list of symbols and custom icons
+    const allSymbols = getAllSymbols();
+    const currentIndex = allSymbols.findIndex(s => s.value === currentSymbol);
+    const prevIndex = currentIndex <= 0 ? allSymbols.length - 1 : currentIndex - 1;
+    return allSymbols[prevIndex].value;
 }
 
 // Get symbol display info
 export function getSymbolInfo(symbolValue) {
-    return FLAG_SYMBOLS.find(s => s.value === symbolValue) || FLAG_SYMBOLS[0];
+    const allSymbols = getAllSymbols();
+    return allSymbols.find(s => s.value === symbolValue) || allSymbols[0];
 }
 
 // Initialize flag values for a dot (now stores boolean values)
@@ -109,4 +114,23 @@ export function migrateDotToFlags(dot) {
         // Installed is kept as a separate property, not migrated to flags
     }
     return dot;
+}
+
+// Get all symbols including custom icons
+export function getAllSymbols() {
+    const symbols = [...FLAG_SYMBOLS];
+    
+    // Add custom icons from the library
+    if (window.appState && window.appState.customIconLibrary) {
+        window.appState.customIconLibrary.forEach(icon => {
+            symbols.push({
+                symbol: icon.data, // Base64 data URL
+                label: icon.name,
+                value: icon.id,
+                isCustom: true
+            });
+        });
+    }
+    
+    return symbols;
 }
