@@ -2841,6 +2841,8 @@ body {
 
 .ms-flag-modal-body {
     padding: 15px;
+    max-height: none;
+    overflow-y: visible;
 }
 
 .ms-flag-visual-container {
