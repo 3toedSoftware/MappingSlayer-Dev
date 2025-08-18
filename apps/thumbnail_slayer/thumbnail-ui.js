@@ -297,7 +297,7 @@ function handleSpreadsheetClick(e) {
     // Location cell click - highlight thumbnail
     if (e.target.classList.contains('cell-location')) {
         selectRowAndThumbnail(itemId);
-        scrollToThumbnail(itemId);
+        // scrollToThumbnail(itemId); // TODO: Implement if needed
         return;
     }
 
@@ -533,15 +533,15 @@ function openEditModal(item) {
                 </div>
                 <div class="edit-fields">
                     ${textFields
-        .map(field => {
-            const fieldValue = item[field.fieldName] || '';
-            const displayName = field.displayName || field.fieldName;
-            // For now, we'll show fields as not required in the UI
-            // TODO: Update to use signType.isFieldRequired(field.fieldName) when sign type is available
-            const isRequired = '';
-            const maxLength = field.maxLength || 100;
+                        .map(field => {
+                            const fieldValue = item[field.fieldName] || '';
+                            const displayName = field.displayName || field.fieldName;
+                            // For now, we'll show fields as not required in the UI
+                            // TODO: Update to use signType.isFieldRequired(field.fieldName) when sign type is available
+                            const isRequired = '';
+                            const maxLength = field.maxLength || 100;
 
-            return `
+                            return `
                             <div class="edit-field-group">
                                 <label for="field-${field.fieldName}">
                                     ${displayName}${isRequired}
@@ -558,8 +558,8 @@ function openEditModal(item) {
                                 />
                             </div>
                         `;
-        })
-        .join('')}
+                        })
+                        .join('')}
                 </div>
             </div>
             <div class="edit-modal-footer">
@@ -870,7 +870,7 @@ function setupPreviewToggleHandlers() {
             thumbnailState.previewMode = 'sign';
             signToggle.classList.remove('btn-secondary');
             mapToggle.classList.add('btn-secondary');
-            previewTitle.textContent = 'Sign Preview';
+            previewTitle.textContent = 'Thumbnail Preview';
 
             // Refresh preview if item is selected
             if (thumbnailState.selectedItemId) {
@@ -902,23 +902,34 @@ async function showMapLocationPreview(item) {
     if (!preview) return;
 
     try {
-        // Show loading state
-        preview.innerHTML = `
-            <div class="map-preview-loading">
-                <div class="loading-spinner"></div>
-                <div class="loading-text">Loading map preview...</div>
-            </div>
-        `;
+        const pageNum = item.pageNumber || 1;
+        const cacheKey = `page_${pageNum}`;
 
-        // Request PDF page image from Mapping Slayer
-        const response = await window.appBridge.sendRequest('mapping_slayer', {
-            type: 'get-page-image',
-            pageNumber: item.pageNumber || 1,
-            scale: 1.5 // Good balance of quality and performance
-        });
+        // Check if we have cached data for this page
+        let response = thumbnailState.mapPreviewCache.get(cacheKey);
 
-        if (!response || response.error) {
-            throw new Error(response?.error || 'Failed to get map data');
+        if (!response) {
+            // Show loading state only if we need to fetch
+            preview.innerHTML = `
+                <div class="map-preview-loading">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading map preview...</div>
+                </div>
+            `;
+
+            // Request PDF page image from Mapping Slayer
+            response = await window.appBridge.sendRequest('mapping_slayer', {
+                type: 'get-page-image',
+                pageNumber: pageNum,
+                scale: 1.5 // Good balance of quality and performance
+            });
+
+            if (!response || response.error) {
+                throw new Error(response?.error || 'Failed to get map data');
+            }
+
+            // Cache the response for future use
+            thumbnailState.mapPreviewCache.set(cacheKey, response);
         }
 
         // Create the map preview container
@@ -983,8 +994,8 @@ async function showMapLocationPreview(item) {
             `;
 
             // Position the dot
-            const dotPosX = imageOffsetX + (dotX * displayScale) - 8; // -8 for half dot width
-            const dotPosY = imageOffsetY + (dotY * displayScale) - 8; // -8 for half dot height
+            const dotPosX = imageOffsetX + dotX * displayScale - 8; // -8 for half dot width
+            const dotPosY = imageOffsetY + dotY * displayScale - 8; // -8 for half dot height
 
             dot.style.left = `${dotPosX}px`;
             dot.style.top = `${dotPosY}px`;
@@ -1017,7 +1028,6 @@ async function showMapLocationPreview(item) {
         mapContainer.appendChild(mapImage);
         preview.innerHTML = '';
         preview.appendChild(mapContainer);
-
     } catch (error) {
         console.error('Failed to show map preview:', error);
         preview.innerHTML = `

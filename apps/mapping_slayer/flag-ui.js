@@ -102,7 +102,7 @@ export function handleFlagSymbolNavigation(position, direction) {
 }
 
 // Save flag configuration
-export function saveFlagConfiguration() {
+export async function saveFlagConfiguration() {
     // No longer checking for current marker type since flags are global
 
     const flagConfig = appState.globalFlagConfiguration;
@@ -121,6 +121,10 @@ export function saveFlagConfiguration() {
 
     // Trigger update of all dots with this marker type
     updateAllDotsWithMarkerType(currentMarkerTypeForFlags);
+
+    // Mark project as dirty since flag configuration changed
+    const { setDirtyState } = await import('./state.js');
+    setDirtyState();
 
     closeFlagModal();
 }

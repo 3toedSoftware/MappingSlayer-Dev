@@ -36,6 +36,9 @@ export const thumbnailState = {
     lastSync: null,
     previewMode: 'sign', // 'sign' or 'map'
 
+    // Map preview cache
+    mapPreviewCache: new Map(), // Cache page images to avoid reloading
+
     // Statistics
     totalSigns: 0
 };
@@ -164,6 +167,13 @@ export function regenerateProductionItems() {
 }
 
 /**
+ * Clear the map preview cache
+ */
+export function clearMapPreviewCache() {
+    thumbnailState.mapPreviewCache.clear();
+}
+
+/**
  * Get filtered production items
  */
 export function getFilteredItems() {
@@ -283,7 +293,9 @@ export function deserializeState(data) {
     if (data.sortBy) thumbnailState.sortBy = data.sortBy;
     if (data.viewMode) thumbnailState.viewMode = data.viewMode;
     if (data.thumbnailSize) thumbnailState.thumbnailSize = data.thumbnailSize;
-    if (data.showLocationNumbers !== undefined) {thumbnailState.showLocationNumbers = data.showLocationNumbers;}
+    if (data.showLocationNumbers !== undefined) {
+        thumbnailState.showLocationNumbers = data.showLocationNumbers;
+    }
     if (data.showMessages !== undefined) thumbnailState.showMessages = data.showMessages;
     if (data.showSignType !== undefined) thumbnailState.showSignType = data.showSignType;
     if (data.lastSync) thumbnailState.lastSync = data.lastSync;

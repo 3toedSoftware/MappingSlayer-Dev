@@ -101,6 +101,10 @@ class ThumbnailSyncAdapter {
 
                 this.processLocationData(locationsResponse.locations);
                 // No longer need to fetch flag states separately - they're included now!
+
+                // Clear map preview cache when new data is loaded
+                const { clearMapPreviewCache } = await import('./thumbnail-state.js');
+                clearMapPreviewCache();
             }
 
             // Fetch all available templates from Design Slayer
