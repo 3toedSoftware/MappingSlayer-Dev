@@ -4389,9 +4389,11 @@ function escapeRegExp(string) {
 }
 
 function zoomToFitDots(dotIds) {
+    console.log('[zoomToFitDots] Called with', dotIds.length, 'dot IDs');
     if (dotIds.length === 0) return;
 
     const dots = dotIds.map(id => getCurrentPageDots().get(id)).filter(dot => dot);
+    console.log('[zoomToFitDots] Found', dots.length, 'valid dots');
     if (dots.length === 0) return;
 
     // Calculate bounds of all dots
@@ -4415,7 +4417,20 @@ function zoomToFitDots(dotIds) {
     maxY += padding;
 
     // Calculate required scale and position
-    const containerRect = document.getElementById('map-container').getBoundingClientRect();
+    const container = document.getElementById('map-container');
+    if (!container) {
+        console.log('[zoomToFitDots] Container not found');
+        return;
+    }
+    
+    const containerRect = container.getBoundingClientRect();
+    if (containerRect.width === 0 || containerRect.height === 0) {
+        console.log('[zoomToFitDots] Container has no size, retrying...');
+        // Retry after a short delay
+        setTimeout(() => zoomToFitDots(dotIds), 100);
+        return;
+    }
+    
     const scaleX = containerRect.width / (maxX - minX);
     const scaleY = containerRect.height / (maxY - minY);
     const scale = Math.min(scaleX, scaleY, 2); // Cap at 2x zoom
@@ -4428,7 +4443,16 @@ function zoomToFitDots(dotIds) {
     appState.mapTransform.x = containerRect.width / 2 - centerX * scale;
     appState.mapTransform.y = containerRect.height / 2 - centerY * scale;
 
+    console.log('[zoomToFitDots] Setting transform:', {
+        scale: scale,
+        x: appState.mapTransform.x,
+        y: appState.mapTransform.y,
+        bounds: { minX, maxX, minY, maxY },
+        container: { width: containerRect.width, height: containerRect.height }
+    });
+
     applyMapTransform();
+    console.log('[zoomToFitDots] Completed');
 }
 
 function updateRecentSearches(searchTerm) {
@@ -5845,7 +5869,8 @@ export {
     performRenumber,
     updateRecentSearches,
     resetKeyboardShortcutsFlag,
-    renderAnnotationLines
+    renderAnnotationLines,
+    zoomToFitDots
 };
 
 // Function to reset keyboard shortcuts flag during app deactivation

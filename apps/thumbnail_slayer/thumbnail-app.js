@@ -144,7 +144,7 @@ class ThumbnailSlayerApp extends SlayerAppBase {
                             <div class="panel-header">
                                 <h3 id="preview-title">Sign Preview</h3>
                                 <div class="preview-toggle-controls">
-                                    <button class="btn btn-compact" id="toggle-sign-preview" data-mode="sign">Sign</button>
+                                    <button class="btn btn-compact" id="toggle-sign-preview" data-mode="sign">Thumbnail</button>
                                     <button class="btn btn-compact btn-secondary" id="toggle-map-preview" data-mode="map">Map Location</button>
                                 </div>
                             </div>

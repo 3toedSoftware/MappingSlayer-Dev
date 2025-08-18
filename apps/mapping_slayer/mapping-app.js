@@ -17,9 +17,10 @@ import {
     addViewToggleEventListeners,
     addButtonEventListeners,
     setupModalEventListeners,
-    updateAllSectionsForCurrentPage
+    updateAllSectionsForCurrentPage,
+    zoomToFitDots
 } from './ui.js';
-import { withoutAutoSync, triggerManualSync } from './state.js';
+import { withoutAutoSync, triggerManualSync, getCurrentPageDots } from './state.js';
 
 class MappingSlayerApp extends SlayerAppBase {
     constructor() {
@@ -995,12 +996,30 @@ class MappingSlayerApp extends SlayerAppBase {
             }
         }
 
+        // Reset transform but don't apply yet - let zoom-to-fit handle it
         this.appState.mapTransform = { x: 0, y: 0, scale: 1 };
-        applyMapTransform();
 
         await renderPDFPage(1);
 
         await renderDotsForCurrentPage();
+
+        // Zoom to fit all dots on the page if there are any
+        const currentPageDots = getCurrentPageDots();
+        console.log('[Zoom-to-fit] Checking dots after load:', currentPageDots ? currentPageDots.size : 'null');
+        if (currentPageDots && currentPageDots.size > 0) {
+            const allDotIds = Array.from(currentPageDots.keys());
+            console.log('[Zoom-to-fit] Calling zoomToFitDots with', allDotIds.length, 'dots');
+            
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                zoomToFitDots(allDotIds);
+                console.log('[Zoom-to-fit] Transform after zoom:', this.appState.mapTransform);
+            }, 100);
+        } else {
+            console.log('[Zoom-to-fit] No dots found, using default view');
+            // Apply default transform only if no dots
+            applyMapTransform();
+        }
 
         // Apply any saved crops for the first page
         if (this.cropTool) {
@@ -1528,6 +1547,22 @@ class MappingSlayerApp extends SlayerAppBase {
                 'marker types with other apps'
             );
             await this.syncAdapter.syncMarkerTypes(window.appBridge);
+        }
+
+        // Auto zoom-to-fit after importing project data
+        console.log('[Zoom-to-fit] Checking for dots after import...');
+        const currentPageDots = getCurrentPageDots();
+        if (currentPageDots && currentPageDots.size > 0) {
+            const allDotIds = Array.from(currentPageDots.keys());
+            console.log('[Zoom-to-fit] Found', allDotIds.length, 'dots after import, zooming to fit...');
+            
+            // Delay to ensure DOM is ready after import
+            setTimeout(() => {
+                zoomToFitDots(allDotIds);
+                console.log('[Zoom-to-fit] Zoom-to-fit completed after import');
+            }, 200);
+        } else {
+            console.log('[Zoom-to-fit] No dots found after import');
         }
     }
 
