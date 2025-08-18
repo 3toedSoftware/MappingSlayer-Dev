@@ -1,4 +1,5 @@
 // ui.js - Fixed version with proper syntax
+/* global Pickr, EyeDropper */
 
 // Import the state system
 import {
@@ -5092,6 +5093,11 @@ async function handleScheduleUpdate(e) {
 
             for (const [internalId, dot] of dotsOnPage) {
                 if (dot.locationNumber === locationNumber) {
+                    // Update marker type if it has changed
+                    if (dot.markerType !== markerTypeCode) {
+                        dot.markerType = markerTypeCode;
+                    }
+
                     // Update dot properties
                     dot.message = values[columnIndices.message] || '';
 
@@ -5099,13 +5105,10 @@ async function handleScheduleUpdate(e) {
                         dot.message2 = values[columnIndices.message2] || '';
                     }
 
-                    // vinylBacker and codeRequired columns have been removed
-
+                    // Update installed status
                     if (columnIndices.installed !== -1) {
                         const installedValue = values[columnIndices.installed]?.toUpperCase();
-                        if (!dot.flags) dot.flags = initializeDotFlags();
-                        dot.flags[FLAG_POSITIONS.BOTTOM_RIGHT] =
-                            installedValue === 'YES' || installedValue === 'TRUE';
+                        dot.installed = installedValue === 'YES' || installedValue === 'TRUE';
                     }
 
                     // Handle new flag columns

@@ -1,6 +1,7 @@
 // export.js
+/* global pako */
 
-import { appState, getCurrentPageDots, getDotsForPage } from './state.js';
+import { appState, getDotsForPage } from './state.js';
 import { getActiveFilters, showCSVStatus } from './ui.js';
 import { getSymbolInfo, FLAG_POSITIONS, migrateDotToFlags } from './flag-config.js';
 
@@ -888,7 +889,7 @@ function createMessageSchedule() {
         flagHeaders.push('FLAG 1', 'FLAG 2', 'FLAG 3', 'FLAG 4');
     }
 
-    let csvContent = `MARKER TYPE CODE,MARKER TYPE NAME,MESSAGE 1,MESSAGE 2,LOCATION NUMBER,MAP PAGE,PAGE LABEL,${flagHeaders.join(',')},NOTES\n`;
+    let csvContent = `MARKER TYPE CODE,MARKER TYPE NAME,MESSAGE 1,MESSAGE 2,LOCATION NUMBER,MAP PAGE,PAGE LABEL,${flagHeaders.join(',')},INSTALLED,NOTES\n`;
     allVisibleDots.forEach(dot => {
         // Migrate old properties to new flag system if needed
         migrateDotToFlags(dot);
@@ -913,6 +914,7 @@ function createMessageSchedule() {
             dot.page,
             `"${pageLabel.replace(/"/g, '""')}"`,
             ...flagValues,
+            dot.installed ? 'YES' : 'NO',
             `"${(dot.notes || '').replace(/"/g, '""')}"`
         ].join(',');
         csvContent += row + '\n';
