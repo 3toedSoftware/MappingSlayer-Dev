@@ -17,9 +17,10 @@ import {
     addViewToggleEventListeners,
     addButtonEventListeners,
     setupModalEventListeners,
-    updateAllSectionsForCurrentPage
+    updateAllSectionsForCurrentPage,
+    zoomToFitAllDots
 } from './ui.js';
-import { withoutAutoSync, triggerManualSync } from './state.js';
+import { withoutAutoSync, triggerManualSync, getCurrentPageDots } from './state.js';
 
 class MappingSlayerApp extends SlayerAppBase {
     constructor() {
@@ -1011,6 +1012,16 @@ class MappingSlayerApp extends SlayerAppBase {
         setupMapInteraction();
 
         updateAllSectionsForCurrentPage();
+        
+        // Zoom to fit all dots when loading a project file
+        if (loadedData.isProject && loadedData.projectData) {
+            const dots = getCurrentPageDots();
+            if (dots && dots.size > 0) {
+                setTimeout(() => {
+                    zoomToFitAllDots();
+                }, 100);
+            }
+        }
 
         this.uiModule.updatePageInfo();
 

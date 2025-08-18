@@ -4431,6 +4431,15 @@ function zoomToFitDots(dotIds) {
     applyMapTransform();
 }
 
+function zoomToFitAllDots() {
+    const dots = getCurrentPageDots();
+    if (!dots || dots.size === 0) return;
+    
+    // Get all dot IDs
+    const dotIds = Array.from(dots.keys());
+    zoomToFitDots(dotIds);
+}
+
 function updateRecentSearches(searchTerm) {
     appState.recentSearches = appState.recentSearches.filter(s => s !== searchTerm);
     appState.recentSearches.unshift(searchTerm);
@@ -5826,6 +5835,7 @@ export {
     isCollision,
     handleMarkerTypeCodeChange,
     handleMarkerTypeNameChange,
+    zoomToFitAllDots,
     deleteMarkerType,
     handleDesignReferenceUpload,
     handleDesignReferenceDelete,
