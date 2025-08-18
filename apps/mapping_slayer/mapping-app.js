@@ -1176,6 +1176,12 @@ class MappingSlayerApp extends SlayerAppBase {
                 scrapeVerticalTolerance: this.appState.scrapeVerticalTolerance,
                 annotationLines: this.serializeAnnotationLines(this.appState.annotationLines),
                 showAnnotationEndpoints: this.appState.showAnnotationEndpoints,
+                // Include crop data
+                cropData: this.cropTool ? {
+                    cropBoundsPerPage: Array.from(this.cropTool.cropBoundsPerPage.entries()),
+                    globalCropBounds: this.cropTool.globalCropBounds,
+                    cropAllPages: this.cropTool.cropAllPages
+                } : null,
                 // Include PDF data
                 sourcePdfBase64: pdfBase64,
                 sourcePdfName: this.appState.sourcePdfName
@@ -1398,6 +1404,29 @@ class MappingSlayerApp extends SlayerAppBase {
             !this.appState.activeMarkerType
         ) {
             this.appState.activeMarkerType = Object.keys(this.appState.markerTypes)[0];
+        }
+
+        // Import crop data if available
+        if (stateToImport.cropData && this.cropTool) {
+            // Clear existing crop data
+            this.cropTool.cropBoundsPerPage.clear();
+            
+            // Restore crop bounds per page
+            if (stateToImport.cropData.cropBoundsPerPage) {
+                stateToImport.cropData.cropBoundsPerPage.forEach(([pageNum, bounds]) => {
+                    this.cropTool.cropBoundsPerPage.set(pageNum, bounds);
+                });
+            }
+            
+            // Restore global crop bounds
+            if (stateToImport.cropData.globalCropBounds) {
+                this.cropTool.globalCropBounds = stateToImport.cropData.globalCropBounds;
+            }
+            
+            // Restore crop all pages setting
+            if (stateToImport.cropData.cropAllPages !== undefined) {
+                this.cropTool.cropAllPages = stateToImport.cropData.cropAllPages;
+            }
         }
 
         // Load PDF if available
