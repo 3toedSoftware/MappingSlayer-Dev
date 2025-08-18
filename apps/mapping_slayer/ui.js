@@ -2857,15 +2857,6 @@ async function changePage(pageNum) {
     updateAllSectionsForCurrentPage();
     updatePageInfo();
     updatePageLabelInput();
-    
-    // Zoom to fit dots on the new page if there are any
-    const dots = getCurrentPageDots();
-    if (dots && dots.size > 0) {
-        // Small delay to ensure canvas is ready
-        setTimeout(() => {
-            zoomToFitAllDots();
-        }, 100);
-    }
 
     // Dispatch page changed event
     document.dispatchEvent(new CustomEvent('pageChanged'));
@@ -4440,15 +4431,6 @@ function zoomToFitDots(dotIds) {
     applyMapTransform();
 }
 
-function zoomToFitAllDots() {
-    const dots = getCurrentPageDots();
-    if (!dots || dots.size === 0) return;
-    
-    // Get all dot IDs
-    const dotIds = Array.from(dots.keys());
-    zoomToFitDots(dotIds);
-}
-
 function updateRecentSearches(searchTerm) {
     appState.recentSearches = appState.recentSearches.filter(s => s !== searchTerm);
     appState.recentSearches.unshift(searchTerm);
@@ -5844,7 +5826,6 @@ export {
     isCollision,
     handleMarkerTypeCodeChange,
     handleMarkerTypeNameChange,
-    zoomToFitAllDots,
     deleteMarkerType,
     handleDesignReferenceUpload,
     handleDesignReferenceDelete,
