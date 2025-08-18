@@ -3293,7 +3293,7 @@ function setupModalEventListeners() {
     }
 
     // Character Warning Modal Event Listeners
-    const characterWarningModal = document.getElementById('character-warning-modal');
+    const characterWarningModal = document.getElementById('mapping-slayer-character-warning-modal');
     const proceedCharacterChangesBtn = document.getElementById('proceed-character-changes-btn');
     const cancelCharacterChangesBtn = document.getElementById('cancel-character-changes-btn');
 
