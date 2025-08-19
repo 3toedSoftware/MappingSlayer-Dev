@@ -921,7 +921,7 @@ async function showMapLocationPreview(item) {
             response = await window.appBridge.sendRequest('mapping_slayer', {
                 type: 'get-page-image',
                 pageNumber: pageNum,
-                scale: 2 // Higher quality for zooming
+                scale: 1.5 // Good balance of quality and performance
             });
 
             if (!response || response.error) {
@@ -932,122 +932,49 @@ async function showMapLocationPreview(item) {
             thumbnailState.mapPreviewCache.set(cacheKey, response);
         }
 
-        // Get marker color from sign type
-        let markerColor = '#f07727'; // Default orange
-        if (item.signType) {
-            // Request sign type details from Mapping Slayer
-            const signTypeResponse = await window.appBridge.sendRequest('mapping_slayer', {
-                type: 'get-sign-type-details',
-                code: item.signType
-            });
-            if (signTypeResponse && signTypeResponse.signType) {
-                markerColor = signTypeResponse.signType.color || markerColor;
-            }
-        }
-
-        // Create the map preview container with pan/zoom support
+        // Create the map preview container
         const mapContainer = document.createElement('div');
         mapContainer.className = 'map-preview-container';
         mapContainer.style.cssText = `
             position: relative;
             width: 100%;
             height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
-            cursor: grab;
-            background: #2a2a2a;
-        `;
-
-        // Create viewport for pan/zoom
-        const viewport = document.createElement('div');
-        viewport.className = 'map-viewport';
-        viewport.style.cssText = `
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform-origin: center center;
-            transition: none;
         `;
 
         // Create the map image
         const mapImage = document.createElement('img');
         mapImage.src = response.imageData;
         mapImage.style.cssText = `
-            display: block;
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
             background: #fff;
-            user-select: none;
-            -webkit-user-drag: none;
+            border: 1px solid #555;
         `;
-
-        // Pan and zoom state
-        let scale = 1;
-        let panX = 0;
-        let panY = 0;
-        let isPanning = false;
-        let startX = 0;
-        let startY = 0;
 
         // Calculate dot position on the scaled image
         const scaleRatio = response.scale;
         const dotX = (item.x || 0) * scaleRatio;
         const dotY = (item.y || 0) * scaleRatio;
 
-        // Function to update transform
-        function updateTransform() {
-            viewport.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-        }
-
-        // Function to zoom to dot location
-        function zoomToDot() {
-            const containerRect = mapContainer.getBoundingClientRect();
-            const imageWidth = response.dimensions.width;
-            const imageHeight = response.dimensions.height;
-            
-            // Calculate the display scale of the image
-            const displayScale = Math.min(
-                containerRect.width / imageWidth,
-                containerRect.height / imageHeight
-            );
-            
-            // Calculate displayed dimensions
-            const displayedWidth = imageWidth * displayScale;
-            const displayedHeight = imageHeight * displayScale;
-            
-            // Calculate image offset (centering)
-            const imageOffsetX = (containerRect.width - displayedWidth) / 2;
-            const imageOffsetY = (containerRect.height - displayedHeight) / 2;
-            
-            // Calculate dot position in display coordinates
-            const dotDisplayX = imageOffsetX + (dotX * displayScale);
-            const dotDisplayY = imageOffsetY + (dotY * displayScale);
-            
-            // Set zoom level (2x zoom for good visibility)
-            scale = 2;
-            
-            // Calculate pan to center the dot
-            panX = (containerRect.width / 2) - (dotDisplayX * scale);
-            panY = (containerRect.height / 2) - (dotDisplayY * scale);
-            
-            updateTransform();
-        }
-
         mapImage.onload = () => {
             // Get the actual displayed size of the image
+            const imageRect = mapImage.getBoundingClientRect();
             const containerRect = mapContainer.getBoundingClientRect();
-            const imageWidth = response.dimensions.width;
-            const imageHeight = response.dimensions.height;
 
             // Calculate the scale between original image and displayed image
             const displayScale = Math.min(
-                containerRect.width / imageWidth,
-                containerRect.height / imageHeight
+                containerRect.width / response.dimensions.width,
+                containerRect.height / response.dimensions.height
             );
 
             // Calculate the displayed image size and position
-            const displayedWidth = imageWidth * displayScale;
-            const displayedHeight = imageHeight * displayScale;
+            const displayedWidth = response.dimensions.width * displayScale;
+            const displayedHeight = response.dimensions.height * displayScale;
             const imageOffsetX = (containerRect.width - displayedWidth) / 2;
             const imageOffsetY = (containerRect.height - displayedHeight) / 2;
 
@@ -1056,76 +983,24 @@ async function showMapLocationPreview(item) {
             dot.className = 'map-preview-dot';
             dot.style.cssText = `
                 position: absolute;
-                width: 20px;
-                height: 20px;
-                background: ${markerColor};
+                width: 16px;
+                height: 16px;
+                background: #f07727;
                 border: 3px solid #fff;
                 border-radius: 50%;
-                box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 30px ${markerColor}66;
+                box-shadow: 0 0 10px rgba(240, 119, 39, 0.8);
                 z-index: 10;
                 pointer-events: none;
-                transform: translate(-50%, -50%);
             `;
 
             // Position the dot
-            const dotPosX = imageOffsetX + dotX * displayScale;
-            const dotPosY = imageOffsetY + dotY * displayScale;
+            const dotPosX = imageOffsetX + dotX * displayScale - 8; // -8 for half dot width
+            const dotPosY = imageOffsetY + dotY * displayScale - 8; // -8 for half dot height
 
             dot.style.left = `${dotPosX}px`;
             dot.style.top = `${dotPosY}px`;
 
-            viewport.appendChild(dot);
-
-            // Add zoom controls
-            const controls = document.createElement('div');
-            controls.className = 'map-controls';
-            controls.style.cssText = `
-                position: absolute;
-                bottom: 10px;
-                right: 10px;
-                display: flex;
-                gap: 5px;
-                z-index: 30;
-            `;
-
-            const createButton = (text, onClick) => {
-                const btn = document.createElement('button');
-                btn.textContent = text;
-                btn.style.cssText = `
-                    padding: 8px 12px;
-                    background: rgba(0, 0, 0, 0.8);
-                    color: #fff;
-                    border: 1px solid #555;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-size: 14px;
-                `;
-                btn.onclick = onClick;
-                return btn;
-            };
-
-            controls.appendChild(createButton('Reset', () => {
-                scale = 1;
-                panX = 0;
-                panY = 0;
-                updateTransform();
-            }));
-
-            controls.appendChild(createButton('Zoom In', () => {
-                scale = Math.min(scale * 1.5, 5);
-                updateTransform();
-            }));
-
-            controls.appendChild(createButton('Zoom Out', () => {
-                scale = Math.max(scale / 1.5, 0.5);
-                updateTransform();
-            }));
-
-            controls.appendChild(createButton('Go to Dot', () => {
-                zoomToDot();
-            }));
-
-            mapContainer.appendChild(controls);
+            mapContainer.appendChild(dot);
 
             // Add location info overlay
             const infoOverlay = document.createElement('div');
@@ -1144,58 +1019,13 @@ async function showMapLocationPreview(item) {
             infoOverlay.innerHTML = `
                 <div><strong>Location ${item.locationNumber}</strong></div>
                 <div>${response.pageName}</div>
-                <div>Sign Type: ${item.signType || 'N/A'}</div>
                 <div>Coordinates: ${Math.round(item.x || 0)}, ${Math.round(item.y || 0)}</div>
             `;
 
             mapContainer.appendChild(infoOverlay);
-
-            // Zoom to dot initially
-            setTimeout(() => zoomToDot(), 100);
         };
 
-        // Mouse wheel zoom
-        mapContainer.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const delta = e.deltaY > 0 ? 0.9 : 1.1;
-            const newScale = Math.max(0.5, Math.min(5, scale * delta));
-            
-            // Get mouse position relative to container
-            const rect = mapContainer.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            
-            // Adjust pan to zoom towards mouse position
-            panX = mouseX - (mouseX - panX) * (newScale / scale);
-            panY = mouseY - (mouseY - panY) * (newScale / scale);
-            
-            scale = newScale;
-            updateTransform();
-        });
-
-        // Pan functionality
-        mapContainer.addEventListener('mousedown', (e) => {
-            isPanning = true;
-            startX = e.clientX - panX;
-            startY = e.clientY - panY;
-            mapContainer.style.cursor = 'grabbing';
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isPanning) return;
-            e.preventDefault();
-            panX = e.clientX - startX;
-            panY = e.clientY - startY;
-            updateTransform();
-        });
-
-        window.addEventListener('mouseup', () => {
-            isPanning = false;
-            mapContainer.style.cursor = 'grab';
-        });
-
-        viewport.appendChild(mapImage);
-        mapContainer.appendChild(viewport);
+        mapContainer.appendChild(mapImage);
         preview.innerHTML = '';
         preview.appendChild(mapContainer);
     } catch (error) {
