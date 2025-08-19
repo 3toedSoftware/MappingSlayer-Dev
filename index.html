@@ -170,6 +170,10 @@
 
                     // Initialize the save manager
                     await saveManager.initialize();
+                    
+                    // Make saveManager globally available for apps
+                    window.saveManager = saveManager;
+                    console.log('📊 [Main] SaveManager made globally available');
 
                     // Create a global suite object for navigation
                     window.slayerSuite = {

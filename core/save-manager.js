@@ -305,6 +305,39 @@ class SaveManager {
     }
 
     /**
+     * Load a file with a file handle (e.g., from drag-and-drop with handle support)
+     * This enables the SAVE button for silent saves
+     */
+    async loadFileWithHandle(file, fileHandle) {
+        console.log('📊 [SaveManager] loadFileWithHandle called');
+        console.log('📊 [SaveManager] File:', file.name);
+        console.log('📊 [SaveManager] FileHandle:', fileHandle ? 'YES' : 'NO');
+        
+        if (fileHandle) {
+            this.fileHandle = fileHandle;
+            console.log('📊 [FileHandle SAVED from drag-drop]:', {
+                exists: !!this.fileHandle,
+                type: this.fileHandle.constructor.name,
+                name: file.name
+            });
+            
+            // Store the file handle for persistent access
+            try {
+                await fileHandleStore.set(this.fileHandleKey, fileHandle);
+                console.log('📊 [SaveManager] FileHandle stored in IndexedDB');
+            } catch (err) {
+                console.log('📊 [SaveManager] Could not store file handle:', err.message);
+            }
+        } else {
+            this.fileHandle = null;
+            console.log('📊 [SaveManager] No file handle provided');
+        }
+        
+        // Load the file
+        await this.loadFile(file);
+    }
+
+    /**
      * Load a file
      */
     async loadFile(file) {

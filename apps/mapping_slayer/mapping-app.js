@@ -645,6 +645,12 @@ class MappingSlayerApp extends SlayerAppBase {
             // Initialize tolerance inputs
             const { updateToleranceInputs } = await import('./scrape.js');
             updateToleranceInputs();
+            
+            // Check if SaveManager is available
+            console.log('📊 [Mapping] window.saveManager available:', !!window.saveManager);
+            if (window.saveManager) {
+                console.log('📊 [Mapping] SaveManager is ready for file handle support');
+            }
         })();
     }
 
@@ -691,12 +697,70 @@ class MappingSlayerApp extends SlayerAppBase {
         const uploadArea = this.container.querySelector('#upload-area');
         const fileInput = this.container.querySelector('#file-input');
         if (uploadArea && fileInput) {
-            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('click', async () => {
+                // For .slayer files, try to use File System Access API for SAVE support
+                if ('showOpenFilePicker' in window) {
+                    try {
+                        const [fileHandle] = await window.showOpenFilePicker({
+                            types: [
+                                {
+                                    description: 'Supported Files',
+                                    accept: {
+                                        'application/pdf': ['.pdf'],
+                                        'application/json': ['.slayer', '.map', '.json']
+                                    }
+                                }
+                            ],
+                            multiple: false
+                        });
+
+                        const file = await fileHandle.getFile();
+                        console.log('📊 [Click Upload] File selected with handle:', file.name);
+
+                        // Special handling for .slayer files with file handle
+                        if (file.name.toLowerCase().endsWith('.slayer')) {
+                            console.log('📊 [Click Upload] .slayer file, checking saveManager...');
+                            console.log('📊 [Click Upload] window.saveManager available:', !!window.saveManager);
+                            
+                            if (window.saveManager) {
+                                console.log('📊 [Click Upload] Loading .slayer file WITH file handle for SAVE support');
+                                await window.saveManager.loadFileWithHandle(file, fileHandle);
+                                return;
+                            } else {
+                                console.log('📊 [Click Upload] SaveManager not available, will use regular load');
+                            }
+                        }
+
+                        // For other files or if SaveManager not available, use regular load
+                        await this.loadFile(file);
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            // User cancelled, do nothing
+                            return;
+                        }
+                        // Fall back to regular file input if API fails
+                        console.log('📊 [Click Upload] File System Access API failed, using fallback');
+                        fileInput.click();
+                    }
+                } else {
+                    // Fallback for browsers without File System Access API
+                    fileInput.click();
+                }
+            });
 
             const handleFileChange = async e => {
                 const file = e.target.files[0];
                 if (file) {
-                    await this.loadFile(file);
+                    // This is the fallback path - no file handle available
+                    console.log('📊 [Click Upload Fallback] File selected without handle:', file.name);
+                    
+                    // For .slayer files without handle, use SaveManager's loadFileDirectly
+                    if (file.name.toLowerCase().endsWith('.slayer') && window.saveManager) {
+                        console.log('📊 [Click Upload Fallback] Loading .slayer file WITHOUT file handle');
+                        await window.saveManager.loadFileDirectly(file);
+                    } else {
+                        await this.loadFile(file);
+                    }
                 }
             };
             fileInput.addEventListener('change', handleFileChange);
@@ -715,9 +779,61 @@ class MappingSlayerApp extends SlayerAppBase {
             uploadArea.addEventListener('drop', async e => {
                 e.preventDefault();
                 e.currentTarget.classList.remove('ms-dragover');
-                const file = e.dataTransfer.files[0];
+                
+                // Try to get file handle for .slayer files (enables SAVE button)
+                let fileHandle = null;
+                let file = null;
+                
+                // Check if we can get a file system handle (for SAVE functionality)
+                if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+                    const item = e.dataTransfer.items[0];
+                    
+                    // Try to get file handle if available (Chrome 86+)
+                    if (item.getAsFileSystemHandle) {
+                        try {
+                            const handle = await item.getAsFileSystemHandle();
+                            if (handle.kind === 'file') {
+                                fileHandle = handle;
+                                file = await fileHandle.getFile();
+                                console.log('📊 [Drag-Drop] Got file handle for:', file.name);
+                            }
+                        } catch (err) {
+                            console.log('📊 [Drag-Drop] Could not get file handle:', err.message);
+                        }
+                    }
+                    
+                    // Fallback to regular file if no handle
+                    if (!file && item.getAsFile) {
+                        file = item.getAsFile();
+                    }
+                } else {
+                    // Fallback for older browsers
+                    file = e.dataTransfer.files[0];
+                }
+                
                 if (file) {
                     console.log('📄 File dropped:', file.name);
+
+                    // Special handling for .slayer files with file handle
+                    if (file.name.toLowerCase().endsWith('.slayer')) {
+                        console.log('📊 [Drag-Drop] .slayer file detected');
+                        console.log('📊 [Drag-Drop] fileHandle available:', !!fileHandle);
+                        console.log('📊 [Drag-Drop] window.saveManager available:', !!window.saveManager);
+                        
+                        if (fileHandle && window.saveManager) {
+                            console.log('📊 [Drag-Drop] Loading .slayer file WITH file handle for SAVE support');
+                            // Load through SaveManager with file handle
+                            await window.saveManager.loadFileWithHandle(file, fileHandle);
+                            return;
+                        } else if (window.saveManager) {
+                            console.log('📊 [Drag-Drop] Loading .slayer file WITHOUT file handle (no SAVE support)');
+                            // Load through SaveManager without file handle
+                            await window.saveManager.loadFileDirectly(file);
+                            return;
+                        } else {
+                            console.log('📊 [Drag-Drop] SaveManager not available, falling back to regular load');
+                        }
+                    }
 
                     // Check if it's a PDF and we already have a PDF loaded
                     if (file.name.toLowerCase().endsWith('.pdf') && this.appState.pdfDoc) {
