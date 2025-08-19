@@ -81,9 +81,13 @@ export const appState = {
 
 export function setDirtyState() {
     appState.isDirty = true;
+    console.log('📊 [Mapping] setDirtyState called - broadcasting project:dirty');
     // Broadcast to save manager
     if (appBridge) {
         appBridge.broadcast('project:dirty');
+        console.log('📊 [Mapping] project:dirty broadcast sent');
+    } else {
+        console.log('📊 [Mapping] WARNING: appBridge not available to broadcast dirty state');
     }
 }
 

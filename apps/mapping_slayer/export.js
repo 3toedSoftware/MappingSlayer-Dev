@@ -702,7 +702,7 @@ async function exportToBluebeam() {
     } finally {
         exportBtn.disabled = false;
         exportBtn.textContent = originalText;
-        
+
         // Ensure the character warning modal is hidden
         const modal = document.getElementById('mapping-slayer-character-warning-modal');
         if (modal) {

@@ -533,15 +533,15 @@ function openEditModal(item) {
                 </div>
                 <div class="edit-fields">
                     ${textFields
-                        .map(field => {
-                            const fieldValue = item[field.fieldName] || '';
-                            const displayName = field.displayName || field.fieldName;
-                            // For now, we'll show fields as not required in the UI
-                            // TODO: Update to use signType.isFieldRequired(field.fieldName) when sign type is available
-                            const isRequired = '';
-                            const maxLength = field.maxLength || 100;
+        .map(field => {
+            const fieldValue = item[field.fieldName] || '';
+            const displayName = field.displayName || field.fieldName;
+            // For now, we'll show fields as not required in the UI
+            // TODO: Update to use signType.isFieldRequired(field.fieldName) when sign type is available
+            const isRequired = '';
+            const maxLength = field.maxLength || 100;
 
-                            return `
+            return `
                             <div class="edit-field-group">
                                 <label for="field-${field.fieldName}">
                                     ${displayName}${isRequired}
@@ -558,8 +558,8 @@ function openEditModal(item) {
                                 />
                             </div>
                         `;
-                        })
-                        .join('')}
+        })
+        .join('')}
                 </div>
             </div>
             <div class="edit-modal-footer">

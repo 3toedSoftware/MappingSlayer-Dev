@@ -4422,7 +4422,7 @@ function zoomToFitDots(dotIds) {
         console.log('[zoomToFitDots] Container not found');
         return;
     }
-    
+
     const containerRect = container.getBoundingClientRect();
     if (containerRect.width === 0 || containerRect.height === 0) {
         console.log('[zoomToFitDots] Container has no size, retrying...');
@@ -4430,7 +4430,7 @@ function zoomToFitDots(dotIds) {
         setTimeout(() => zoomToFitDots(dotIds), 100);
         return;
     }
-    
+
     const scaleX = containerRect.width / (maxX - minX);
     const scaleY = containerRect.height / (maxY - minY);
     const scale = Math.min(scaleX, scaleY, 2); // Cap at 2x zoom

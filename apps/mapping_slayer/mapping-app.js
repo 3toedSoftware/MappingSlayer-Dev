@@ -945,21 +945,28 @@ class MappingSlayerApp extends SlayerAppBase {
             return;
         }
 
-        // Handle .slayer files - delegate to suite-level project manager
+        // Handle .slayer files - delegate to suite-level save manager
         if (loadedData.isSlayerFile && loadedData.requiresSuiteHandling) {
-            console.log('🔄 Delegating .slayer file to suite project manager');
+            console.log('🔄 Delegating .slayer file to suite save manager');
             if (uploadArea) uploadArea.innerHTML = '<div>🔄 Loading suite project...</div>';
 
-            // Import the project manager and load the file
-            const { projectManager } = await import('../../core/project-manager.js');
-            const success = await projectManager.load(loadedData.file);
-
-            if (success) {
+            // Use SaveManager to load the file (which won't have a file handle from drag-drop)
+            if (window.saveManager) {
+                await window.saveManager.loadFileDirectly(loadedData.file);
                 if (uploadArea) {uploadArea.innerHTML = '<div>✅ Suite project loaded successfully!</div>';}
-                console.log('✅ .slayer file loaded successfully');
+                console.log('✅ .slayer file loaded successfully via SaveManager');
             } else {
-                if (uploadArea) {uploadArea.innerHTML = '<div>❌ Failed to load suite project.</div>';}
-                console.error('❌ Failed to load .slayer file');
+                // Fallback to project manager if SaveManager not available
+                const { projectManager } = await import('../../core/project-manager.js');
+                const success = await projectManager.load(loadedData.file);
+
+                if (success) {
+                    if (uploadArea) {uploadArea.innerHTML = '<div>✅ Suite project loaded successfully!</div>';}
+                    console.log('✅ .slayer file loaded successfully');
+                } else {
+                    if (uploadArea) {uploadArea.innerHTML = '<div>❌ Failed to load suite project.</div>';}
+                    console.error('❌ Failed to load .slayer file');
+                }
             }
             return;
         }
@@ -1009,7 +1016,7 @@ class MappingSlayerApp extends SlayerAppBase {
         if (currentPageDots && currentPageDots.size > 0) {
             const allDotIds = Array.from(currentPageDots.keys());
             console.log('[Zoom-to-fit] Calling zoomToFitDots with', allDotIds.length, 'dots');
-            
+
             // Small delay to ensure DOM is ready
             setTimeout(() => {
                 zoomToFitDots(allDotIds);
@@ -1429,19 +1436,19 @@ class MappingSlayerApp extends SlayerAppBase {
         if (stateToImport.cropData && this.cropTool) {
             // Clear existing crop data
             this.cropTool.cropBoundsPerPage.clear();
-            
+
             // Restore crop bounds per page
             if (stateToImport.cropData.cropBoundsPerPage) {
                 stateToImport.cropData.cropBoundsPerPage.forEach(([pageNum, bounds]) => {
                     this.cropTool.cropBoundsPerPage.set(pageNum, bounds);
                 });
             }
-            
+
             // Restore global crop bounds
             if (stateToImport.cropData.globalCropBounds) {
                 this.cropTool.globalCropBounds = stateToImport.cropData.globalCropBounds;
             }
-            
+
             // Restore crop all pages setting
             if (stateToImport.cropData.cropAllPages !== undefined) {
                 this.cropTool.cropAllPages = stateToImport.cropData.cropAllPages;
@@ -1555,7 +1562,7 @@ class MappingSlayerApp extends SlayerAppBase {
         if (currentPageDots && currentPageDots.size > 0) {
             const allDotIds = Array.from(currentPageDots.keys());
             console.log('[Zoom-to-fit] Found', allDotIds.length, 'dots after import, zooming to fit...');
-            
+
             // Delay to ensure DOM is ready after import
             setTimeout(() => {
                 zoomToFitDots(allDotIds);
