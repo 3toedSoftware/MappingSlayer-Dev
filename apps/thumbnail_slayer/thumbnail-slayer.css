@@ -267,22 +267,24 @@ body {
     animation: dotPulse 2s ease-in-out infinite;
 }
 
-.map-preview-info {
-    font-family: 'Helvetica', Arial, sans-serif;
-    line-height: 1.4;
-}
+/* map-preview-info removed - info shown in spreadsheet */
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes dotPulse {
-    0%, 100% { 
+    0%,
+    100% {
         transform: scale(1);
         box-shadow: 0 0 10px rgba(240, 119, 39, 0.8);
     }
-    50% { 
+    50% {
         transform: scale(1.2);
         box-shadow: 0 0 20px rgba(240, 119, 39, 1);
     }

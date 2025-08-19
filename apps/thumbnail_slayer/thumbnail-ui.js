@@ -533,15 +533,15 @@ function openEditModal(item) {
                 </div>
                 <div class="edit-fields">
                     ${textFields
-        .map(field => {
-            const fieldValue = item[field.fieldName] || '';
-            const displayName = field.displayName || field.fieldName;
-            // For now, we'll show fields as not required in the UI
-            // TODO: Update to use signType.isFieldRequired(field.fieldName) when sign type is available
-            const isRequired = '';
-            const maxLength = field.maxLength || 100;
+                        .map(field => {
+                            const fieldValue = item[field.fieldName] || '';
+                            const displayName = field.displayName || field.fieldName;
+                            // For now, we'll show fields as not required in the UI
+                            // TODO: Update to use signType.isFieldRequired(field.fieldName) when sign type is available
+                            const isRequired = '';
+                            const maxLength = field.maxLength || 100;
 
-            return `
+                            return `
                             <div class="edit-field-group">
                                 <label for="field-${field.fieldName}">
                                     ${displayName}${isRequired}
@@ -558,8 +558,8 @@ function openEditModal(item) {
                                 />
                             </div>
                         `;
-        })
-        .join('')}
+                        })
+                        .join('')}
                 </div>
             </div>
             <div class="edit-modal-footer">
@@ -957,7 +957,11 @@ async function showMapLocationPreview(item) {
         `;
 
         // Calculate dot position on the scaled image
-        const scaleRatio = response.scale;
+        // The dots are stored at 4x scale in Mapping Slayer
+        // We need to convert from 4x coordinates to the requested scale
+        const originalScale = 4.0; // Mapping Slayer's pdfScale
+        const requestedScale = response.scale || 1.5;
+        const scaleRatio = requestedScale / originalScale;
         const dotX = (item.x || 0) * scaleRatio;
         const dotY = (item.y || 0) * scaleRatio;
 
@@ -1002,27 +1006,7 @@ async function showMapLocationPreview(item) {
 
             mapContainer.appendChild(dot);
 
-            // Add location info overlay
-            const infoOverlay = document.createElement('div');
-            infoOverlay.className = 'map-preview-info';
-            infoOverlay.style.cssText = `
-                position: absolute;
-                top: 10px;
-                left: 10px;
-                background: rgba(0, 0, 0, 0.8);
-                color: #fff;
-                padding: 8px 12px;
-                border-radius: 4px;
-                font-size: 12px;
-                z-index: 20;
-            `;
-            infoOverlay.innerHTML = `
-                <div><strong>Location ${item.locationNumber}</strong></div>
-                <div>${response.pageName}</div>
-                <div>Coordinates: ${Math.round(item.x || 0)}, ${Math.round(item.y || 0)}</div>
-            `;
-
-            mapContainer.appendChild(infoOverlay);
+            // Info overlay removed - information is visible in the spreadsheet
         };
 
         mapContainer.appendChild(mapImage);
