@@ -58,6 +58,21 @@ export function initializeUI(handlers) {
     setupSplitViewHandlers(handlers);
     setupActionHandlers(handlers);
     updateAllUI();
+    
+    // Globally prevent middle-click scrolling
+    document.addEventListener('mousedown', e => {
+        if (e.button === 1) {
+            e.preventDefault();
+            return false;
+        }
+    }, true);
+    
+    document.addEventListener('auxclick', e => {
+        if (e.button === 1) {
+            e.preventDefault();
+            return false;
+        }
+    }, true);
 }
 
 /**
@@ -181,6 +196,9 @@ function updateSpreadsheet() {
             flag4: flags.bottomRight,
             installed: item.installed || false,
             notes: item.notes || '',
+            // Include position data for map preview
+            x: item.x,
+            y: item.y,
             // Keep original item reference for rendering
             _originalItem: item
         };
@@ -193,6 +211,18 @@ function updateSpreadsheet() {
 
     // Make selectRowAndThumbnail globally available for the spreadsheet
     window.selectRowAndThumbnail = selectRowAndThumbnail;
+    
+    // Add middle-click handler for zooming to dot
+    window.handleMiddleClickZoom = (itemId) => {
+        console.log('🔶 handleMiddleClickZoom called:', {
+            itemId,
+            previewMode: thumbnailState.previewMode,
+            isMapMode: thumbnailState.previewMode === 'map'
+        });
+        if (thumbnailState.previewMode === 'map') {
+            selectRowAndThumbnail(itemId, true); // true = zoom to dot
+        }
+    };
 
     // Make the thumbnail app available for syncing
     if (window.thumbnailApp) {
@@ -389,8 +419,16 @@ function makeSpreadsheetCellEditable(cell, item) {
 
 /**
  * Select row and corresponding thumbnail
+ * @param {string} itemId - The item ID to select
+ * @param {boolean} zoomToDot - Whether to zoom to dot (for middle-click)
  */
-function selectRowAndThumbnail(itemId) {
+function selectRowAndThumbnail(itemId, zoomToDot = false) {
+    console.log('🔵 selectRowAndThumbnail called:', {
+        itemId,
+        zoomToDot,
+        caller: new Error().stack.split('\n')[2]
+    });
+    
     // Update selected state
     thumbnailState.selectedItemId = itemId;
 
@@ -400,13 +438,21 @@ function selectRowAndThumbnail(itemId) {
     });
 
     // Show single preview for selected item
-    showSinglePreview(itemId);
+    showSinglePreview(itemId, zoomToDot);
 }
 
 /**
  * Show single preview for selected item
+ * @param {string} itemId - The item ID to show
+ * @param {boolean} zoomToDot - Whether to zoom to dot (for middle-click)
  */
-async function showSinglePreview(itemId) {
+async function showSinglePreview(itemId, zoomToDot = false) {
+    console.log('🟢 showSinglePreview called:', {
+        itemId,
+        zoomToDot,
+        previewMode: thumbnailState.previewMode
+    });
+    
     const preview = dom.previewContainer;
     if (!preview) return;
 
@@ -421,14 +467,23 @@ async function showSinglePreview(itemId) {
         return;
     }
 
-    // Use original item if it's a transformed spreadsheet item
+    // Use original item if it's a transformed spreadsheet item, but keep the x/y from the spreadsheet item
     const renderItem = item._originalItem || item;
+    // Ensure we have the position data
+    if (item.x !== undefined) renderItem.x = item.x;
+    if (item.y !== undefined) renderItem.y = item.y;
 
     // Check preview mode and show appropriate preview
     const previewMode = thumbnailState.previewMode || 'sign';
 
+    console.log('🟡 Preview mode check:', {
+        previewMode,
+        willShowMap: previewMode === 'map',
+        zoomToDot
+    });
+
     if (previewMode === 'map') {
-        await showMapLocationPreview(renderItem);
+        await showMapLocationPreview(renderItem, zoomToDot);
     } else {
         // Clear and render sign preview directly to the preview container
         preview.innerHTML = '';
@@ -895,18 +950,135 @@ function setupPreviewToggleHandlers() {
 }
 
 /**
- * Show Map Location Preview for selected item
+ * Apply transform to map content
  */
-async function showMapLocationPreview(item) {
+function applyMapTransform(mapContent, transform) {
+    mapContent.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
+}
+
+
+/**
+ * Setup map interaction handlers
+ */
+function setupMapInteraction(mapContainer, mapContent) {
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let initialTransform = { x: 0, y: 0 };
+
+    // Mouse wheel zoom
+    mapContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const rect = mapContainer.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
+        const transform = thumbnailState.mapTransform;
+        const oldScale = transform.scale;
+        const newScale = Math.max(0.1, Math.min(5, oldScale * scaleFactor));
+        
+        // Zoom from mouse position
+        transform.x = mouseX - (mouseX - transform.x) * (newScale / oldScale);
+        transform.y = mouseY - (mouseY - transform.y) * (newScale / oldScale);
+        transform.scale = newScale;
+        
+        applyMapTransform(mapContent, transform);
+    });
+
+    // Mouse down - start panning with middle button only
+    mapContainer.addEventListener('mousedown', (e) => {
+        if (e.button === 1) { // Middle button for panning
+            e.preventDefault();
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            initialTransform = { 
+                x: thumbnailState.mapTransform.x, 
+                y: thumbnailState.mapTransform.y 
+            };
+            mapContainer.style.cursor = 'grabbing';
+            mapContent.style.transition = 'none';
+        } else if (e.button === 0) {
+            // Left button - do nothing (no panning)
+            e.preventDefault();
+        }
+    });
+
+    // Mouse move - pan if dragging
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            
+            thumbnailState.mapTransform.x = initialTransform.x + dx;
+            thumbnailState.mapTransform.y = initialTransform.y + dy;
+            
+            applyMapTransform(mapContent, thumbnailState.mapTransform);
+        }
+    });
+
+    // Mouse up - stop panning
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            mapContainer.style.cursor = 'default';
+            mapContent.style.transition = 'transform 0.3s ease-out';
+        }
+    });
+
+    // Prevent context menu on right click
+    mapContainer.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+}
+
+/**
+ * Show Map Location Preview for selected item
+ * @param {Object} item - The item to show
+ * @param {boolean} zoomToDot - Whether to zoom to the dot location
+ */
+async function showMapLocationPreview(item, zoomToDot = false) {
     const preview = dom.previewContainer;
     if (!preview) return;
 
     try {
         const pageNum = item.pageNumber || 1;
-        const cacheKey = `page_${pageNum}`;
+        
+        // Initialize state if needed
+        if (!thumbnailState.mapTransform) {
+            thumbnailState.mapTransform = { x: 0, y: 0, scale: 1 };
+        }
+        if (thumbnailState.isPanning === undefined) {
+            thumbnailState.isPanning = false;
+        }
+        if (!thumbnailState.panStart) {
+            thumbnailState.panStart = { x: 0, y: 0 };
+        }
+        
+        console.log('🔴 showMapLocationPreview called:', {
+            itemId: item.id,
+            zoomToDot,
+            hasExistingTransform: !!thumbnailState.mapTransform,
+            existingTransform: thumbnailState.mapTransform,
+            hasInitializedMap: thumbnailState.hasInitializedMap,
+            currentPageNum: thumbnailState.currentPageNum
+        });
 
-        // Check if we have cached data for this page
-        let response = thumbnailState.mapPreviewCache.get(cacheKey);
+        // Check if we already have a map displayed for the same page
+        const existingMapContainer = preview.querySelector('.map-preview-container');
+        const needsNewMap = !existingMapContainer || thumbnailState.currentPageNum !== pageNum;
+        
+        console.log('🔴 Map state check:', {
+            hasExistingMap: !!existingMapContainer,
+            currentPage: thumbnailState.currentPageNum,
+            newPage: pageNum,
+            needsNewMap
+        });
+        
+        // Get page data (cache per page, not per item)
+        const pageCacheKey = `page_${pageNum}`;
+        let response = thumbnailState.mapPreviewCache.get(pageCacheKey);
 
         if (!response) {
             // Show loading state only if we need to fetch
@@ -929,7 +1101,7 @@ async function showMapLocationPreview(item) {
             }
 
             // Cache the response for future use
-            thumbnailState.mapPreviewCache.set(cacheKey, response);
+            thumbnailState.mapPreviewCache.set(pageCacheKey, response);
         }
 
         // Create the map preview container
@@ -939,22 +1111,31 @@ async function showMapLocationPreview(item) {
             position: relative;
             width: 100%;
             height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
+            cursor: default;
+            user-select: none;
+        `;
+
+        // Create a content wrapper for transformation
+        const mapContent = document.createElement('div');
+        mapContent.className = 'map-preview-content';
+        mapContent.style.cssText = `
+            position: absolute;
+            transform-origin: 0 0;
+            transition: transform 0.3s ease-out;
+            will-change: transform;
         `;
 
         // Create the map image
         const mapImage = document.createElement('img');
         mapImage.src = response.imageData;
         mapImage.style.cssText = `
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+            display: block;
             background: #fff;
             border: 1px solid #555;
+            pointer-events: none;
         `;
+        mapImage.draggable = false;
 
         // Calculate dot position on the scaled image
         // The dots are stored at 4x scale in Mapping Slayer
@@ -964,54 +1145,162 @@ async function showMapLocationPreview(item) {
         const scaleRatio = requestedScale / originalScale;
         const dotX = (item.x || 0) * scaleRatio;
         const dotY = (item.y || 0) * scaleRatio;
+        
+        console.log('Map preview item data:', {
+            itemId: item.id,
+            locationNumber: item.locationNumber,
+            x: item.x,
+            y: item.y,
+            pageNumber: item.pageNumber,
+            dotX,
+            dotY,
+            requestedScale,
+            scaleRatio,
+            imageDimensions: response.dimensions
+        });
 
-        mapImage.onload = () => {
-            // Get the actual displayed size of the image
-            const imageRect = mapImage.getBoundingClientRect();
+        // Create and position the dot (outside of onload)
+        const dot = document.createElement('div');
+        dot.className = 'map-preview-dot';
+        dot.style.cssText = `
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #f07727;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(240, 119, 39, 0.8);
+            z-index: 10;
+            pointer-events: none;
+            left: ${dotX - 8}px;
+            top: ${dotY - 8}px;
+        `;
+
+        // Function to setup the map view
+        const setupMapView = () => {
             const containerRect = mapContainer.getBoundingClientRect();
+            const imgWidth = mapImage.naturalWidth || response.dimensions.width;
+            const imgHeight = mapImage.naturalHeight || response.dimensions.height;
 
-            // Calculate the scale between original image and displayed image
-            const displayScale = Math.min(
-                containerRect.width / response.dimensions.width,
-                containerRect.height / response.dimensions.height
-            );
+            console.log('🟣 setupMapView called:', {
+                zoomToDot,
+                hasInitializedMap: thumbnailState.hasInitializedMap,
+                currentTransform: thumbnailState.mapTransform,
+                containerSize: { width: containerRect.width, height: containerRect.height },
+                imageSize: { width: imgWidth, height: imgHeight }
+            });
 
-            // Calculate the displayed image size and position
-            const displayedWidth = response.dimensions.width * displayScale;
-            const displayedHeight = response.dimensions.height * displayScale;
-            const imageOffsetX = (containerRect.width - displayedWidth) / 2;
-            const imageOffsetY = (containerRect.height - displayedHeight) / 2;
+            if (zoomToDot) {
+                // Zoom to dot when requested (middle-click)
+                const zoomLevel = 2.0;
+                
+                // Calculate transform to center on the dot
+                thumbnailState.mapTransform = {
+                    scale: zoomLevel,
+                    // Center the dot in the container
+                    x: (containerRect.width / 2) - (dotX * zoomLevel),
+                    y: (containerRect.height / 2) - (dotY * zoomLevel)
+                };
 
-            // Create and position the dot
-            const dot = document.createElement('div');
-            dot.className = 'map-preview-dot';
-            dot.style.cssText = `
-                position: absolute;
-                width: 16px;
-                height: 16px;
-                background: #f07727;
-                border: 3px solid #fff;
-                border-radius: 50%;
-                box-shadow: 0 0 10px rgba(240, 119, 39, 0.8);
-                z-index: 10;
-                pointer-events: none;
-            `;
-
-            // Position the dot
-            const dotPosX = imageOffsetX + dotX * displayScale - 8; // -8 for half dot width
-            const dotPosY = imageOffsetY + dotY * displayScale - 8; // -8 for half dot height
-
-            dot.style.left = `${dotPosX}px`;
-            dot.style.top = `${dotPosY}px`;
-
-            mapContainer.appendChild(dot);
-
-            // Info overlay removed - information is visible in the spreadsheet
+                console.log('🟣 ZOOMING to dot (middle-click):', {
+                    dotX, dotY,
+                    zoomLevel,
+                    newTransform: thumbnailState.mapTransform
+                });
+                
+                // Apply the zoom transform
+                applyMapTransform(mapContent, thumbnailState.mapTransform);
+            } else if (!thumbnailState.mapTransform || !thumbnailState.hasInitializedMap) {
+                // Very first time - initialize with full view
+                const scale = Math.min(
+                    containerRect.width / imgWidth,
+                    containerRect.height / imgHeight
+                ) * 0.9; // 90% to leave some margin
+                
+                thumbnailState.mapTransform = {
+                    scale: scale,
+                    x: (containerRect.width - imgWidth * scale) / 2,
+                    y: (containerRect.height - imgHeight * scale) / 2
+                };
+                
+                thumbnailState.hasInitializedMap = true;
+                console.log('🟣 INITIALIZING map view (first time):', {
+                    newTransform: thumbnailState.mapTransform
+                });
+                applyMapTransform(mapContent, thumbnailState.mapTransform);
+            } else {
+                // Regular click - keep existing transform, don't change anything
+                console.log('🟣 KEEPING existing transform (left-click):', {
+                    existingTransform: thumbnailState.mapTransform
+                });
+                applyMapTransform(mapContent, thumbnailState.mapTransform);
+            }
         };
 
-        mapContainer.appendChild(mapImage);
+        // If we already have a map for this page, just update the dot
+        if (!needsNewMap && existingMapContainer) {
+            console.log('🔴 Updating existing map - just moving dot');
+            
+            // Find and update the existing dot
+            const existingDot = existingMapContainer.querySelector('.map-preview-dot');
+            if (existingDot) {
+                existingDot.style.left = `${dotX - 8}px`;
+                existingDot.style.top = `${dotY - 8}px`;
+            } else {
+                // Add the dot if it doesn't exist
+                const mapContent = existingMapContainer.querySelector('.map-preview-content');
+                if (mapContent) {
+                    mapContent.appendChild(dot);
+                }
+            }
+            
+            // ONLY zoom/pan if specifically requested (middle-click)
+            if (zoomToDot) {
+                const containerRect = existingMapContainer.getBoundingClientRect();
+                const zoomLevel = 2.0;
+                
+                thumbnailState.mapTransform = {
+                    scale: zoomLevel,
+                    x: (containerRect.width / 2) - (dotX * zoomLevel),
+                    y: (containerRect.height / 2) - (dotY * zoomLevel)
+                };
+                
+                console.log('🔴 ZOOMING to dot on existing map (middle-click)');
+                const mapContent = existingMapContainer.querySelector('.map-preview-content');
+                if (mapContent) {
+                    applyMapTransform(mapContent, thumbnailState.mapTransform);
+                }
+            } else {
+                console.log('🔴 NOT moving map (left-click) - just updating dot position');
+            }
+            
+            // Don't rebuild the map, just return
+            return;
+        }
+        
+        // Otherwise, build a new map
+        console.log('🔴 Building new map container');
+        
+        mapContent.appendChild(mapImage);
+        mapContent.appendChild(dot); // Add dot after image
+        mapContainer.appendChild(mapContent);
+
+        // Add mouse event handlers for pan and zoom
+        setupMapInteraction(mapContainer, mapContent);
+
         preview.innerHTML = '';
         preview.appendChild(mapContainer);
+        
+        // Store current page
+        thumbnailState.currentPageNum = pageNum;
+
+        // Setup on load or immediately if already loaded, after container is in DOM
+        if (mapImage.complete) {
+            // Use setTimeout to ensure container dimensions are calculated
+            setTimeout(setupMapView, 0);
+        } else {
+            mapImage.onload = () => setTimeout(setupMapView, 0);
+        }
     } catch (error) {
         console.error('Failed to show map preview:', error);
         preview.innerHTML = `
