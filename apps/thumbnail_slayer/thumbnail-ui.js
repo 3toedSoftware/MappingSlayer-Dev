@@ -5,11 +5,8 @@
 
 import {
     thumbnailState,
-    getFilteredItems,
-    getSignTypes,
-    getPageNumbers
+    getFilteredItems
 } from './thumbnail-state.js';
-import { syncAllData } from './data-integration.js';
 import { thumbnailSyncAdapter } from './thumbnail-sync.js';
 import { viewportManager } from './viewport-manager.js';
 import { thumbnailSpreadsheet } from './thumbnail-spreadsheet.js';
@@ -249,55 +246,6 @@ function updateSpreadsheet() {
 /**
  * Create spreadsheet row for an item
  */
-function createSpreadsheetRow(item) {
-    const row = document.createElement('tr');
-    row.dataset.itemId = item.id;
-    row.className = 'spreadsheet-row';
-
-    // Location cell (clickable)
-    const locationCell = document.createElement('td');
-    locationCell.className = 'cell-location';
-    locationCell.textContent = item.locationNumber;
-    locationCell.title = 'Click to highlight thumbnail';
-    row.appendChild(locationCell);
-
-    // Type cell
-    const typeCell = document.createElement('td');
-    typeCell.className = 'cell-type';
-    typeCell.textContent =
-        `${item.signTypeCode || ''} ${item.signTypeName || ''}`.trim() || 'Default';
-    row.appendChild(typeCell);
-
-    // Message 1 cell (editable)
-    const message1Cell = document.createElement('td');
-    message1Cell.className = 'cell-message cell-editable';
-    message1Cell.textContent = item.message1 || '';
-    message1Cell.dataset.field = 'message1';
-    message1Cell.title = 'Click to edit';
-    row.appendChild(message1Cell);
-
-    // Message 2 cell (editable)
-    const message2Cell = document.createElement('td');
-    message2Cell.className = 'cell-message cell-editable';
-    message2Cell.textContent = item.message2 || '';
-    message2Cell.dataset.field = 'message2';
-    message2Cell.title = 'Click to edit';
-    row.appendChild(message2Cell);
-
-    // Sheet cell
-    const sheetCell = document.createElement('td');
-    sheetCell.className = 'cell-sheet';
-    sheetCell.textContent = item.sheetName;
-    row.appendChild(sheetCell);
-
-    // Page cell
-    const pageCell = document.createElement('td');
-    pageCell.className = 'cell-sheet';
-    pageCell.textContent = item.pageNumber;
-    row.appendChild(pageCell);
-
-    return row;
-}
 
 /**
  * Setup spreadsheet handlers
@@ -309,17 +257,6 @@ function setupSpreadsheetHandlers() {
 /**
  * Setup spreadsheet row interaction handlers
  */
-function setupSpreadsheetRowHandlers() {
-    if (!dom.spreadsheetGrid) return;
-
-    // Remove existing handlers to prevent duplicates
-    dom.spreadsheetGrid.removeEventListener('click', handleSpreadsheetClick);
-    dom.spreadsheetGrid.removeEventListener('dblclick', handleSpreadsheetDoubleClick);
-
-    // Add delegated event handlers
-    dom.spreadsheetGrid.addEventListener('click', handleSpreadsheetClick);
-    dom.spreadsheetGrid.addEventListener('dblclick', handleSpreadsheetDoubleClick);
-}
 
 /**
  * Handle spreadsheet click events
@@ -503,12 +440,6 @@ async function showSinglePreview(itemId, zoomToDot = false) {
 /**
  * Scroll to spreadsheet row in left panel
  */
-function scrollToSpreadsheetRow(itemId) {
-    const row = document.querySelector(`.spreadsheet-row[data-item-id="${itemId}"]`);
-    if (row && dom.spreadsheetGrid) {
-        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}
 
 /**
  * Setup thumbnail handlers for split view
@@ -748,24 +679,6 @@ async function updateThumbnailGrid() {
 /**
  * Create split view thumbnail element (simplified version without icons)
  */
-function createSplitViewThumbnail(item) {
-    const thumbnailElement = document.createElement('div');
-    thumbnailElement.className = 'thumbnail-item';
-    thumbnailElement.dataset.itemId = item.id;
-
-    // Image container with overlays
-    const imageContainer = document.createElement('div');
-    imageContainer.className = 'thumbnail-image';
-
-    // Overlays removed - location badge, text overlay, and type badge no longer rendered
-
-    thumbnailElement.appendChild(imageContainer);
-
-    // Render the actual sign thumbnail asynchronously
-    renderThumbnailImage(item, imageContainer);
-
-    return thumbnailElement;
-}
 
 /**
  * Render thumbnail image for an item
@@ -849,16 +762,10 @@ async function updateThumbnailForItem(itemId) {
 /**
  * Setup event handlers for thumbnails in split view
  */
-function setupThumbnailEventHandlers() {
-    // Removed - single preview doesn't need click handlers
-}
 
 /**
  * Handle thumbnail click events in split view
  */
-function handleThumbnailClickSplitView(e) {
-    // Removed - no longer needed for single preview
-}
 
 // Note: Old thumbnail interaction handlers removed - simplified for split view
 

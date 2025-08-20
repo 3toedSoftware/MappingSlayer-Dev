@@ -4896,36 +4896,6 @@ function generateErrorLog(skippedRows) {
     URL.revokeObjectURL(url);
 }
 
-function generateDeletionLog(deletedDots) {
-    const timestamp = new Date().toLocaleString();
-    let logContent = 'MAPPING SLAYER - DELETION LOG\n';
-    logContent += `Generated on: ${timestamp}\n\n`;
-    logContent += `Total Locations Deleted: ${deletedDots.length}\n\n`;
-    logContent +=
-        'The following locations were not found in the imported CSV and have been deleted from the map:\n\n';
-
-    deletedDots.forEach((dot, index) => {
-        logContent += `${index + 1}. Location #${dot.locationNumber} on Page ${dot.page}\n`;
-        logContent += `   Marker Type: ${dot.markerTypeCode} - ${dot.markerTypeName}\n`;
-        logContent += `   Message 1: ${dot.message}\n`;
-        if (dot.message2) logContent += `   Message 2: ${dot.message2}\n`;
-        logContent += '\n';
-    });
-
-    const blob = new Blob([logContent], { type: 'text/plain;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute(
-        'download',
-        `Deletion_Log_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.txt`
-    );
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-}
 
 async function handleScheduleUpdate(e) {
     const file = e.target.files[0];
@@ -5468,17 +5438,6 @@ function deleteField(markerTypeCode, fieldName, formGroup) {
     setDirtyState();
 }
 
-// Toggle text fields manager for a marker type
-function toggleTextFieldsManager(markerTypeCode, itemElement) {
-    const existingManager = itemElement.querySelector('.ms-text-fields-manager');
-
-    if (existingManager) {
-        existingManager.remove();
-    } else {
-        const manager = createTextFieldsManager(markerTypeCode);
-        itemElement.appendChild(manager);
-    }
-}
 
 // Create text fields manager UI
 function createTextFieldsManager(markerTypeCode) {

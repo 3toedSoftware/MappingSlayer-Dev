@@ -7,7 +7,6 @@ import {
     renderDotsForCurrentPage,
     updateSingleDot,
     setupMapInteraction,
-    centerOnDot,
     clearPDFCache
 } from './map-controller.js';
 import {

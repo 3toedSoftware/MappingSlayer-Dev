@@ -619,7 +619,7 @@ class DesignSlayerApp extends SlayerAppBase {
         });
     }
 
-    startPan(e, onUpdate) {
+    startPan(e, _onUpdate) {
         updateState({ isPanning: true, lastPanPoint: { x: e.clientX, y: e.clientY } });
         const faceCanvas = document.getElementById('face-canvas');
         if (faceCanvas) {
