@@ -47,7 +47,7 @@ class SaveManager {
      */
     setupEventHandlers() {
         console.log('📊 [SaveManager] Setting up event handlers...');
-        
+
         const saveBtn = document.getElementById('save-project-btn');
         const saveAsBtn = document.getElementById('save-as-project-btn');
         const loadBtn = document.getElementById('load-project-btn');
@@ -74,18 +74,18 @@ class SaveManager {
 
         // Listen for project dirty state
         console.log('📊 [SaveManager] Subscribing to appBridge events...');
-        appBridge.subscribe('project:dirty', (data) => {
+        appBridge.subscribe('project:dirty', data => {
             console.log('📊 [SaveManager] Received project:dirty event', data);
             this.hasUnsavedChanges = true;
             this.updateSaveButton();
         });
 
-        appBridge.subscribe('project:saved', (data) => {
+        appBridge.subscribe('project:saved', data => {
             console.log('📊 [SaveManager] Received project:saved event', data);
             this.hasUnsavedChanges = false;
             this.updateSaveButton();
         });
-        
+
         console.log('📊 [SaveManager] Event subscriptions complete');
 
         // Initial button state
@@ -292,14 +292,14 @@ class SaveManager {
      */
     async loadFileDirectly(file) {
         console.log('🐛 loadFileDirectly called with:', file.name);
-        
+
         // Clear file handle since this is a direct load without File System Access API
         this.fileHandle = null;
         console.log('🐛 fileHandle cleared (direct load cannot do silent saves)');
-        
+
         // Load the file
         await this.loadFile(file);
-        
+
         // Enable Save As button, disable Save button
         this.updateSaveButtons();
     }
@@ -312,7 +312,7 @@ class SaveManager {
         console.log('📊 [SaveManager] loadFileWithHandle called');
         console.log('📊 [SaveManager] File:', file.name);
         console.log('📊 [SaveManager] FileHandle:', fileHandle ? 'YES' : 'NO');
-        
+
         if (fileHandle) {
             this.fileHandle = fileHandle;
             console.log('📊 [FileHandle SAVED from drag-drop]:', {
@@ -320,7 +320,7 @@ class SaveManager {
                 type: this.fileHandle.constructor.name,
                 name: file.name
             });
-            
+
             // Store the file handle for persistent access
             try {
                 await fileHandleStore.set(this.fileHandleKey, fileHandle);
@@ -332,7 +332,7 @@ class SaveManager {
             this.fileHandle = null;
             console.log('📊 [SaveManager] No file handle provided');
         }
-        
+
         // Load the file
         await this.loadFile(file);
     }
@@ -378,11 +378,15 @@ class SaveManager {
             this.projectName = file.name.replace('.slayer', '');
             // Note: fileHandle is set in load() method when using File System Access API
             this.updateProjectDisplay();
-            
+
             // Enable save button if we have a file handle
             this.hasUnsavedChanges = false; // Just loaded, no changes yet
             this.updateSaveButton();
-            console.log('🐛 After load - fileHandle exists:', !!this.fileHandle, 'Save button updated');
+            console.log(
+                '🐛 After load - fileHandle exists:',
+                !!this.fileHandle,
+                'Save button updated'
+            );
 
             // Switch to first successfully loaded app
             if (results.success.length > 0) {
@@ -529,7 +533,7 @@ class SaveManager {
         if (saveBtn) {
             // Disable save button if no file handle (never saved) or no unsaved changes
             const shouldDisable = !this.fileHandle || !this.hasUnsavedChanges;
-            
+
             console.log('📊 [SAVE Button Update]', {
                 fileHandle: !!this.fileHandle,
                 fileHandleType: this.fileHandle ? this.fileHandle.constructor.name : 'null',
@@ -537,11 +541,11 @@ class SaveManager {
                 shouldDisable: shouldDisable,
                 projectName: this.projectName
             });
-            
+
             saveBtn.disabled = shouldDisable;
             saveBtn.style.opacity = shouldDisable ? '0.5' : '1';
             saveBtn.style.cursor = shouldDisable ? 'not-allowed' : 'pointer';
-            
+
             console.log('📊 [SAVE Button State]', saveBtn.disabled ? 'DISABLED' : 'ENABLED');
         } else {
             console.log('📊 [SAVE Button Update] Button not found in DOM');
@@ -553,7 +557,7 @@ class SaveManager {
      */
     updateSaveButtons() {
         this.updateSaveButton();
-        
+
         // Save As button should always be enabled after a file is loaded
         const saveAsBtn = document.getElementById('save-as-project-btn');
         if (saveAsBtn) {

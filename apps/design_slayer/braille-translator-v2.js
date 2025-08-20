@@ -234,7 +234,11 @@ export function testBrailleTranslation() {
             }
         });
     } else {
-        console.error('[BRAILLE V2] Cannot run tests - translator not ready');
+        console.log('[BRAILLE V2] Translator not ready yet - will run tests when ready');
+        // Schedule to run tests when translator is ready
+        waitForReady().then(() => {
+            testBrailleTranslation();
+        });
     }
 }
 

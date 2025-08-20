@@ -1,7 +1,14 @@
 // flag-config.js - Customizable flag system for Mapping Slayer
 
 // Allowed file types for custom icons
-export const ALLOWED_ICON_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/gif', 'image/webp'];
+export const ALLOWED_ICON_TYPES = [
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'image/svg+xml',
+    'image/gif',
+    'image/webp'
+];
 export const ALLOWED_ICON_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp'];
 
 // Available symbols/emojis for flag indicators

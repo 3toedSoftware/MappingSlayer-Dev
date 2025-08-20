@@ -509,6 +509,15 @@ export class DesignSVG {
         const width = rect.width;
         const height = rect.height;
 
+        // Ensure we have valid dimensions before rendering
+        const gridWidth = width - this.RULER_SIZE;
+        const gridHeight = height - this.RULER_SIZE;
+
+        if (gridWidth <= 0 || gridHeight <= 0) {
+            // Container too small to render grid
+            return;
+        }
+
         // Get major interval only - grid lines only at major tick marks
         const majorInterval = this.getInterval();
 
@@ -524,7 +533,7 @@ export class DesignSVG {
 
         // Apply grid pattern to a single rectangle
         this.gridGroup
-            .rect(width - this.RULER_SIZE, height - this.RULER_SIZE)
+            .rect(gridWidth, gridHeight)
             .move(this.RULER_SIZE, this.RULER_SIZE)
             .fill('url(#gridPattern)')
             .attr('pointer-events', 'none')

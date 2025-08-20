@@ -1,267 +1,300 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Save Functionality Test</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #1a1a1a;
-            color: #fff;
-        }
-        .test-section {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #444;
-            border-radius: 5px;
-        }
-        .status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 3px;
-        }
-        .info {
-            background: #2d3a5a;
-            border: 1px solid #2196f3;
-        }
-        .success {
-            background: #2d5a2d;
-            border: 1px solid #4caf50;
-        }
-        .warning {
-            background: #5a4d2d;
-            border: 1px solid #ff9800;
-        }
-        button {
-            padding: 10px 20px;
-            margin: 5px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #45a049;
-        }
-        button:disabled {
-            background: #666;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-        #log {
-            background: #0a0a0a;
-            padding: 10px;
-            border-radius: 4px;
-            max-height: 400px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 12px;
-        }
-        .log-entry {
-            margin: 2px 0;
-            padding: 2px;
-        }
-        .highlight {
-            background: #333;
-            padding: 2px 4px;
-            border-radius: 2px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Save Functionality Test for .slayer Files</h1>
-    
-    <div class="test-section">
-        <h2>Test Instructions</h2>
-        <div class="status info">
-            <h3>How to Test SAVE Button Functionality:</h3>
-            <ol>
-                <li><strong>Method 1: Using LOAD Button (Recommended)</strong>
-                    <ul>
-                        <li>Click the LOAD button in the main suite toolbar</li>
-                        <li>Select a .slayer file</li>
-                        <li>✅ SAVE button should remain disabled until you make changes</li>
-                        <li>Make any change (add a dot, edit something)</li>
-                        <li>✅ SAVE button should become enabled</li>
-                        <li>Click SAVE - it should save silently without dialog</li>
-                    </ul>
-                </li>
-                <li><strong>Method 2: Drag & Drop (Limited)</strong>
-                    <ul>
-                        <li>Drag a .slayer file into Mapping Slayer</li>
-                        <li>⚠️ SAVE button will remain disabled (no file handle)</li>
-                        <li>Only SAVE AS will work</li>
-                    </ul>
-                </li>
-            </ol>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Save Functionality Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                background: #1a1a1a;
+                color: #fff;
+            }
+            .test-section {
+                margin: 20px 0;
+                padding: 15px;
+                border: 1px solid #444;
+                border-radius: 5px;
+            }
+            .status {
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 3px;
+            }
+            .info {
+                background: #2d3a5a;
+                border: 1px solid #2196f3;
+            }
+            .success {
+                background: #2d5a2d;
+                border: 1px solid #4caf50;
+            }
+            .warning {
+                background: #5a4d2d;
+                border: 1px solid #ff9800;
+            }
+            button {
+                padding: 10px 20px;
+                margin: 5px;
+                background: #4caf50;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            button:hover {
+                background: #45a049;
+            }
+            button:disabled {
+                background: #666;
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+            #log {
+                background: #0a0a0a;
+                padding: 10px;
+                border-radius: 4px;
+                max-height: 400px;
+                overflow-y: auto;
+                font-family: monospace;
+                font-size: 12px;
+            }
+            .log-entry {
+                margin: 2px 0;
+                padding: 2px;
+            }
+            .highlight {
+                background: #333;
+                padding: 2px 4px;
+                border-radius: 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Save Functionality Test for .slayer Files</h1>
+
+        <div class="test-section">
+            <h2>Test Instructions</h2>
+            <div class="status info">
+                <h3>How to Test SAVE Button Functionality:</h3>
+                <ol>
+                    <li>
+                        <strong>Method 1: Using LOAD Button (Recommended)</strong>
+                        <ul>
+                            <li>Click the LOAD button in the main suite toolbar</li>
+                            <li>Select a .slayer file</li>
+                            <li>✅ SAVE button should remain disabled until you make changes</li>
+                            <li>Make any change (add a dot, edit something)</li>
+                            <li>✅ SAVE button should become enabled</li>
+                            <li>Click SAVE - it should save silently without dialog</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Method 2: Drag & Drop (Limited)</strong>
+                        <ul>
+                            <li>Drag a .slayer file into Mapping Slayer</li>
+                            <li>⚠️ SAVE button will remain disabled (no file handle)</li>
+                            <li>Only SAVE AS will work</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
         </div>
-    </div>
 
-    <div class="test-section">
-        <h2>Test Controls</h2>
-        <button onclick="checkCurrentState()">Check Current State</button>
-        <button onclick="simulateChange()">Simulate Change (Mark Dirty)</button>
-        <button onclick="clearLog()">Clear Log</button>
-    </div>
-
-    <div class="test-section">
-        <h2>Current State Monitor</h2>
-        <div id="state-monitor">
-            <div>Save Manager: <span id="sm-status" class="highlight">Not Loaded</span></div>
-            <div>File Handle: <span id="fh-status" class="highlight">None</span></div>
-            <div>Project Name: <span id="pn-status" class="highlight">None</span></div>
-            <div>Has Unsaved Changes: <span id="uc-status" class="highlight">false</span></div>
-            <div>SAVE Button: <span id="sb-status" class="highlight">Unknown</span></div>
-            <div>SAVE AS Button: <span id="sab-status" class="highlight">Unknown</span></div>
+        <div class="test-section">
+            <h2>Test Controls</h2>
+            <button onclick="checkCurrentState()">Check Current State</button>
+            <button onclick="simulateChange()">Simulate Change (Mark Dirty)</button>
+            <button onclick="clearLog()">Clear Log</button>
         </div>
-    </div>
 
-    <div class="test-section">
-        <h2>Debug Log</h2>
-        <div id="log"></div>
-    </div>
+        <div class="test-section">
+            <h2>Current State Monitor</h2>
+            <div id="state-monitor">
+                <div>Save Manager: <span id="sm-status" class="highlight">Not Loaded</span></div>
+                <div>File Handle: <span id="fh-status" class="highlight">None</span></div>
+                <div>Project Name: <span id="pn-status" class="highlight">None</span></div>
+                <div>Has Unsaved Changes: <span id="uc-status" class="highlight">false</span></div>
+                <div>SAVE Button: <span id="sb-status" class="highlight">Unknown</span></div>
+                <div>SAVE AS Button: <span id="sab-status" class="highlight">Unknown</span></div>
+            </div>
+        </div>
 
-    <script>
-        function log(message, type = 'info') {
-            const logDiv = document.getElementById('log');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            const timestamp = new Date().toLocaleTimeString();
-            const color = type === 'error' ? '#ff6b6b' : type === 'success' ? '#51cf66' : type === 'warning' ? '#ffd43b' : '#74c0fc';
-            entry.innerHTML = `<span style="color: ${color}">[${timestamp}]</span> ${message}`;
-            logDiv.appendChild(entry);
-            logDiv.scrollTop = logDiv.scrollHeight;
-            console.log(`[${type}] ${message}`);
-        }
+        <div class="test-section">
+            <h2>Debug Log</h2>
+            <div id="log"></div>
+        </div>
 
-        function clearLog() {
-            document.getElementById('log').innerHTML = '';
-            log('Log cleared');
-        }
+        <script>
+            function log(message, type = 'info') {
+                const logDiv = document.getElementById('log');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                const timestamp = new Date().toLocaleTimeString();
+                const color =
+                    type === 'error'
+                        ? '#ff6b6b'
+                        : type === 'success'
+                          ? '#51cf66'
+                          : type === 'warning'
+                            ? '#ffd43b'
+                            : '#74c0fc';
+                entry.innerHTML = `<span style="color: ${color}">[${timestamp}]</span> ${message}`;
+                logDiv.appendChild(entry);
+                logDiv.scrollTop = logDiv.scrollHeight;
+                console.log(`[${type}] ${message}`);
+            }
 
-        async function checkCurrentState() {
-            log('Checking current state...');
-            
-            try {
-                // Check if we're in the main suite context
-                if (window.parent && window.parent !== window) {
-                    log('Running in iframe, checking parent window...', 'warning');
-                    return;
-                }
+            function clearLog() {
+                document.getElementById('log').innerHTML = '';
+                log('Log cleared');
+            }
 
-                // Check SaveManager
-                if (window.saveManager) {
-                    log('SaveManager found', 'success');
-                    
-                    const hasFileHandle = !!window.saveManager.fileHandle;
-                    const projectName = window.saveManager.projectName || 'None';
-                    const hasUnsavedChanges = window.saveManager.hasUnsavedChanges;
-                    
-                    document.getElementById('sm-status').textContent = 'Loaded';
-                    document.getElementById('sm-status').style.color = '#51cf66';
-                    
-                    document.getElementById('fh-status').textContent = hasFileHandle ? 'Yes' : 'No';
-                    document.getElementById('fh-status').style.color = hasFileHandle ? '#51cf66' : '#ff6b6b';
-                    
-                    document.getElementById('pn-status').textContent = projectName;
-                    
-                    document.getElementById('uc-status').textContent = hasUnsavedChanges ? 'true' : 'false';
-                    document.getElementById('uc-status').style.color = hasUnsavedChanges ? '#ffd43b' : '#74c0fc';
-                    
-                    log(`File Handle: ${hasFileHandle ? 'Yes' : 'No'}`, hasFileHandle ? 'success' : 'warning');
-                    log(`Project Name: ${projectName}`);
-                    log(`Has Unsaved Changes: ${hasUnsavedChanges}`);
-                    
-                    if (hasFileHandle) {
-                        log('File handle details:', 'info');
-                        log(`  Type: ${window.saveManager.fileHandle.constructor.name}`);
-                        log(`  Kind: ${window.saveManager.fileHandle.kind || 'N/A'}`);
+            async function checkCurrentState() {
+                log('Checking current state...');
+
+                try {
+                    // Check if we're in the main suite context
+                    if (window.parent && window.parent !== window) {
+                        log('Running in iframe, checking parent window...', 'warning');
+                        return;
                     }
-                } else {
-                    log('SaveManager not found', 'error');
-                    document.getElementById('sm-status').textContent = 'Not Found';
-                    document.getElementById('sm-status').style.color = '#ff6b6b';
-                }
 
-                // Check buttons
-                const saveBtn = document.getElementById('save-project-btn');
-                const saveAsBtn = document.getElementById('save-as-project-btn');
-                
-                if (saveBtn) {
-                    const isDisabled = saveBtn.disabled;
-                    document.getElementById('sb-status').textContent = isDisabled ? 'Disabled' : 'Enabled';
-                    document.getElementById('sb-status').style.color = isDisabled ? '#ff6b6b' : '#51cf66';
-                    log(`SAVE button: ${isDisabled ? 'Disabled' : 'Enabled'}`, isDisabled ? 'warning' : 'success');
-                } else {
-                    document.getElementById('sb-status').textContent = 'Not Found';
-                    log('SAVE button not found', 'error');
-                }
-                
-                if (saveAsBtn) {
-                    const isDisabled = saveAsBtn.disabled;
-                    document.getElementById('sab-status').textContent = isDisabled ? 'Disabled' : 'Enabled';
-                    document.getElementById('sab-status').style.color = isDisabled ? '#ff6b6b' : '#51cf66';
-                    log(`SAVE AS button: ${isDisabled ? 'Disabled' : 'Enabled'}`, isDisabled ? 'warning' : 'success');
-                } else {
-                    document.getElementById('sab-status').textContent = 'Not Found';
-                    log('SAVE AS button not found', 'error');
-                }
+                    // Check SaveManager
+                    if (window.saveManager) {
+                        log('SaveManager found', 'success');
 
-                // Check appBridge
+                        const hasFileHandle = !!window.saveManager.fileHandle;
+                        const projectName = window.saveManager.projectName || 'None';
+                        const hasUnsavedChanges = window.saveManager.hasUnsavedChanges;
+
+                        document.getElementById('sm-status').textContent = 'Loaded';
+                        document.getElementById('sm-status').style.color = '#51cf66';
+
+                        document.getElementById('fh-status').textContent = hasFileHandle
+                            ? 'Yes'
+                            : 'No';
+                        document.getElementById('fh-status').style.color = hasFileHandle
+                            ? '#51cf66'
+                            : '#ff6b6b';
+
+                        document.getElementById('pn-status').textContent = projectName;
+
+                        document.getElementById('uc-status').textContent = hasUnsavedChanges
+                            ? 'true'
+                            : 'false';
+                        document.getElementById('uc-status').style.color = hasUnsavedChanges
+                            ? '#ffd43b'
+                            : '#74c0fc';
+
+                        log(
+                            `File Handle: ${hasFileHandle ? 'Yes' : 'No'}`,
+                            hasFileHandle ? 'success' : 'warning'
+                        );
+                        log(`Project Name: ${projectName}`);
+                        log(`Has Unsaved Changes: ${hasUnsavedChanges}`);
+
+                        if (hasFileHandle) {
+                            log('File handle details:', 'info');
+                            log(`  Type: ${window.saveManager.fileHandle.constructor.name}`);
+                            log(`  Kind: ${window.saveManager.fileHandle.kind || 'N/A'}`);
+                        }
+                    } else {
+                        log('SaveManager not found', 'error');
+                        document.getElementById('sm-status').textContent = 'Not Found';
+                        document.getElementById('sm-status').style.color = '#ff6b6b';
+                    }
+
+                    // Check buttons
+                    const saveBtn = document.getElementById('save-project-btn');
+                    const saveAsBtn = document.getElementById('save-as-project-btn');
+
+                    if (saveBtn) {
+                        const isDisabled = saveBtn.disabled;
+                        document.getElementById('sb-status').textContent = isDisabled
+                            ? 'Disabled'
+                            : 'Enabled';
+                        document.getElementById('sb-status').style.color = isDisabled
+                            ? '#ff6b6b'
+                            : '#51cf66';
+                        log(
+                            `SAVE button: ${isDisabled ? 'Disabled' : 'Enabled'}`,
+                            isDisabled ? 'warning' : 'success'
+                        );
+                    } else {
+                        document.getElementById('sb-status').textContent = 'Not Found';
+                        log('SAVE button not found', 'error');
+                    }
+
+                    if (saveAsBtn) {
+                        const isDisabled = saveAsBtn.disabled;
+                        document.getElementById('sab-status').textContent = isDisabled
+                            ? 'Disabled'
+                            : 'Enabled';
+                        document.getElementById('sab-status').style.color = isDisabled
+                            ? '#ff6b6b'
+                            : '#51cf66';
+                        log(
+                            `SAVE AS button: ${isDisabled ? 'Disabled' : 'Enabled'}`,
+                            isDisabled ? 'warning' : 'success'
+                        );
+                    } else {
+                        document.getElementById('sab-status').textContent = 'Not Found';
+                        log('SAVE AS button not found', 'error');
+                    }
+
+                    // Check appBridge
+                    if (window.appBridge) {
+                        log('AppBridge is available', 'success');
+                    } else {
+                        log('AppBridge not found', 'error');
+                    }
+                } catch (error) {
+                    log(`Error checking state: ${error.message}`, 'error');
+                }
+            }
+
+            function simulateChange() {
+                log('Simulating project change...');
+
                 if (window.appBridge) {
-                    log('AppBridge is available', 'success');
+                    window.appBridge.broadcast('project:dirty');
+                    log('Broadcast project:dirty event', 'success');
+
+                    // Check state after a short delay
+                    setTimeout(() => {
+                        log('Checking state after change...');
+                        checkCurrentState();
+                    }, 100);
                 } else {
-                    log('AppBridge not found', 'error');
+                    log('Cannot simulate change - appBridge not found', 'error');
                 }
-
-            } catch (error) {
-                log(`Error checking state: ${error.message}`, 'error');
             }
-        }
 
-        function simulateChange() {
-            log('Simulating project change...');
-            
-            if (window.appBridge) {
-                window.appBridge.broadcast('project:dirty');
-                log('Broadcast project:dirty event', 'success');
-                
-                // Check state after a short delay
+            // Auto-check on load
+            window.addEventListener('load', () => {
+                log('Test page loaded');
+                log('Open this page at: http://localhost:8080/test-save-functionality.html');
+
+                // Check if we're in the right context
                 setTimeout(() => {
-                    log('Checking state after change...');
                     checkCurrentState();
-                }, 100);
-            } else {
-                log('Cannot simulate change - appBridge not found', 'error');
+                }, 1000);
+            });
+
+            // Listen for changes
+            if (window.appBridge) {
+                window.appBridge.subscribe('project:dirty', () => {
+                    log('Received project:dirty event', 'warning');
+                    checkCurrentState();
+                });
+
+                window.appBridge.subscribe('project:saved', () => {
+                    log('Received project:saved event', 'success');
+                    checkCurrentState();
+                });
             }
-        }
-
-        // Auto-check on load
-        window.addEventListener('load', () => {
-            log('Test page loaded');
-            log('Open this page at: http://localhost:8080/test-save-functionality.html');
-            
-            // Check if we're in the right context
-            setTimeout(() => {
-                checkCurrentState();
-            }, 1000);
-        });
-
-        // Listen for changes
-        if (window.appBridge) {
-            window.appBridge.subscribe('project:dirty', () => {
-                log('Received project:dirty event', 'warning');
-                checkCurrentState();
-            });
-            
-            window.appBridge.subscribe('project:saved', () => {
-                log('Received project:saved event', 'success');
-                checkCurrentState();
-            });
-        }
-    </script>
-</body>
+        </script>
+    </body>
 </html>

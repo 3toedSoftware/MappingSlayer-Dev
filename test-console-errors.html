@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Console Error Test Page</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 50px auto;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+            .container {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                color: #333;
+                border-bottom: 2px solid #007bff;
+                padding-bottom: 10px;
+            }
+            button {
+                background: #007bff;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                margin: 5px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            button:hover {
+                background: #0056b3;
+            }
+            .error-button {
+                background: #dc3545;
+            }
+            .error-button:hover {
+                background: #c82333;
+            }
+            .warning-button {
+                background: #ffc107;
+                color: #333;
+            }
+            .warning-button:hover {
+                background: #e0a800;
+            }
+            #output {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 5px;
+                border: 1px solid #dee2e6;
+                min-height: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Console Error Test Page</h1>
+            <p>
+                This page demonstrates various console outputs and errors for testing Chrome
+                DevTools MCP integration.
+            </p>
+
+            <h2>Test Console Outputs:</h2>
+            <button onclick="testConsoleLog()">Test Console Log</button>
+            <button onclick="testConsoleInfo()">Test Console Info</button>
+            <button class="warning-button" onclick="testConsoleWarn()">Test Console Warning</button>
+            <button class="error-button" onclick="testConsoleError()">Test Console Error</button>
+
+            <h2>Test JavaScript Errors:</h2>
+            <button class="error-button" onclick="triggerReferenceError()">
+                Trigger Reference Error
+            </button>
+            <button class="error-button" onclick="triggerTypeError()">Trigger Type Error</button>
+            <button class="error-button" onclick="triggerSyntaxError()">
+                Trigger Syntax Error
+            </button>
+            <button class="error-button" onclick="triggerNetworkError()">
+                Trigger Network Error
+            </button>
+
+            <h2>Test Async Errors:</h2>
+            <button class="error-button" onclick="triggerPromiseRejection()">
+                Trigger Promise Rejection
+            </button>
+            <button class="error-button" onclick="triggerAsyncError()">Trigger Async Error</button>
+
+            <div id="output">
+                <strong>Output:</strong><br />
+                Click buttons above to generate console outputs and errors.
+            </div>
+        </div>
+
+        <script>
+            // Initialize with a console log
+            console.log('Test page initialized at', new Date().toISOString());
+
+            // Also trigger an immediate error to test
+            console.error('Initial test error - this is intentional!');
+
+            function updateOutput(message) {
+                const output = document.getElementById('output');
+                output.innerHTML += `<br>${new Date().toLocaleTimeString()}: ${message}`;
+            }
+
+            function testConsoleLog() {
+                const message = 'This is a regular console.log message';
+                console.log(message);
+                updateOutput(`✓ Logged: ${message}`);
+            }
+
+            function testConsoleInfo() {
+                const message = 'This is an informational console.info message';
+                console.info(message);
+                updateOutput(`ℹ️ Info: ${message}`);
+            }
+
+            function testConsoleWarn() {
+                const message = 'This is a warning console.warn message';
+                console.warn(message);
+                updateOutput(`⚠️ Warning: ${message}`);
+            }
+
+            function testConsoleError() {
+                const message = 'This is an error console.error message';
+                console.error(message);
+                updateOutput(`❌ Error: ${message}`);
+            }
+
+            function triggerReferenceError() {
+                try {
+                    // This will cause a ReferenceError
+                    nonExistentVariable.doSomething();
+                } catch (e) {
+                    console.error('ReferenceError caught:', e.message);
+                    updateOutput(`❌ ReferenceError: ${e.message}`);
+                    throw e; // Re-throw to show in console
+                }
+            }
+
+            function triggerTypeError() {
+                try {
+                    // This will cause a TypeError
+                    const obj = null;
+                    obj.someMethod();
+                } catch (e) {
+                    console.error('TypeError caught:', e.message);
+                    updateOutput(`❌ TypeError: ${e.message}`);
+                    throw e; // Re-throw to show in console
+                }
+            }
+
+            function triggerSyntaxError() {
+                try {
+                    // This will cause a SyntaxError when evaluated
+                    eval('const x = {');
+                } catch (e) {
+                    console.error('SyntaxError caught:', e.message);
+                    updateOutput(`❌ SyntaxError: ${e.message}`);
+                }
+            }
+
+            function triggerNetworkError() {
+                // Attempt to fetch a non-existent resource
+                fetch('https://nonexistent-domain-12345.com/api/data')
+                    .then(response => response.json())
+                    .catch(error => {
+                        console.error('Network error:', error);
+                        updateOutput(`❌ Network Error: ${error.message}`);
+                    });
+            }
+
+            function triggerPromiseRejection() {
+                const promise = new Promise((resolve, reject) => {
+                    reject(new Error('Unhandled promise rejection!'));
+                });
+
+                // Don't handle the rejection, let it bubble up
+                promise.then(() => {
+                    console.log('This should not run');
+                });
+
+                updateOutput('❌ Triggered unhandled promise rejection (check console)');
+            }
+
+            async function triggerAsyncError() {
+                try {
+                    await new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            reject(new Error('Async operation failed!'));
+                        }, 100);
+                    });
+                } catch (e) {
+                    console.error('Async error:', e.message);
+                    updateOutput(`❌ Async Error: ${e.message}`);
+                    throw e; // Re-throw to show in console
+                }
+            }
+
+            // Listen for unhandled errors
+            window.addEventListener('error', event => {
+                console.error('Global error handler:', event.error);
+            });
+
+            // Listen for unhandled promise rejections
+            window.addEventListener('unhandledrejection', event => {
+                console.error('Unhandled promise rejection:', event.reason);
+            });
+        </script>
+    </body>
+</html>

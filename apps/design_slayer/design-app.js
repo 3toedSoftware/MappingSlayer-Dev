@@ -401,6 +401,26 @@ class DesignSlayerApp extends SlayerAppBase {
 
         // Update element dropdown with dynamic fields from Thumbnail Slayer
         await this.updateElementDropdownWithFields();
+
+        // If fields weren't available, listen for Thumbnail Slayer registration
+        if (window.appBridge) {
+            const registeredApps = window.appBridge.getRegisteredApps();
+            if (!registeredApps.includes('thumbnail_slayer')) {
+                // Listen for app registration event
+                const handleAppRegistered = event => {
+                    if (event.detail && event.detail.appName === 'thumbnail_slayer') {
+                        console.log('Thumbnail Slayer registered - updating fields dropdown');
+                        this.updateElementDropdownWithFields();
+                        // Remove listener after handling
+                        window.appBridge.eventBus.removeEventListener(
+                            'app:registered',
+                            handleAppRegistered
+                        );
+                    }
+                };
+                window.appBridge.eventBus.addEventListener('app:registered', handleAppRegistered);
+            }
+        }
     }
 
     /**
@@ -2377,6 +2397,13 @@ class DesignSlayerApp extends SlayerAppBase {
         try {
             if (!window.appBridge) {
                 console.warn('App bridge not available - cannot fetch fields');
+                return [];
+            }
+
+            // Check if Thumbnail Slayer is registered
+            const registeredApps = window.appBridge.getRegisteredApps();
+            if (!registeredApps.includes('thumbnail_slayer')) {
+                console.log('Thumbnail Slayer not yet registered - will retry later');
                 return [];
             }
 

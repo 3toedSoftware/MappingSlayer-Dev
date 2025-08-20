@@ -1,194 +1,213 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drag-Drop File Handle Test</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #1a1a1a;
-            color: #fff;
-        }
-        .drop-zone {
-            width: 400px;
-            height: 200px;
-            border: 3px dashed #666;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px auto;
-            transition: all 0.3s;
-            background: #2a2a2a;
-        }
-        .drop-zone.dragover {
-            border-color: #4CAF50;
-            background: #1f3a1f;
-        }
-        .status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            background: #333;
-            font-family: monospace;
-        }
-        .success {
-            background: #2d5a2d;
-            border: 1px solid #4caf50;
-        }
-        .error {
-            background: #5a2d2d;
-            border: 1px solid #f44336;
-        }
-        .info {
-            background: #2d3a5a;
-            border: 1px solid #2196f3;
-        }
-        code {
-            background: #444;
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Drag-Drop File Handle Test</h1>
-    
-    <div class="drop-zone" id="dropZone">
-        <div>
-            <p>Drop a .slayer file here</p>
-            <small>Testing FileSystemHandle support</small>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Drag-Drop File Handle Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                background: #1a1a1a;
+                color: #fff;
+            }
+            .drop-zone {
+                width: 400px;
+                height: 200px;
+                border: 3px dashed #666;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 20px auto;
+                transition: all 0.3s;
+                background: #2a2a2a;
+            }
+            .drop-zone.dragover {
+                border-color: #4caf50;
+                background: #1f3a1f;
+            }
+            .status {
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+                background: #333;
+                font-family: monospace;
+            }
+            .success {
+                background: #2d5a2d;
+                border: 1px solid #4caf50;
+            }
+            .error {
+                background: #5a2d2d;
+                border: 1px solid #f44336;
+            }
+            .info {
+                background: #2d3a5a;
+                border: 1px solid #2196f3;
+            }
+            code {
+                background: #444;
+                padding: 2px 6px;
+                border-radius: 3px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Drag-Drop File Handle Test</h1>
+
+        <div class="drop-zone" id="dropZone">
+            <div>
+                <p>Drop a .slayer file here</p>
+                <small>Testing FileSystemHandle support</small>
+            </div>
         </div>
-    </div>
 
-    <div id="status" class="status info">
-        Ready to test drag-and-drop file handles...
-    </div>
+        <div id="status" class="status info">Ready to test drag-and-drop file handles...</div>
 
-    <div id="results"></div>
+        <div id="results"></div>
 
-    <h2>Browser Support</h2>
-    <div id="support"></div>
+        <h2>Browser Support</h2>
+        <div id="support"></div>
 
-    <script>
-        const dropZone = document.getElementById('dropZone');
-        const status = document.getElementById('status');
-        const results = document.getElementById('results');
-        const support = document.getElementById('support');
+        <script>
+            const dropZone = document.getElementById('dropZone');
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            const support = document.getElementById('support');
 
-        // Check browser support
-        const supportInfo = [];
-        if ('showOpenFilePicker' in window) {
-            supportInfo.push('✅ File System Access API (showOpenFilePicker)');
-        } else {
-            supportInfo.push('❌ File System Access API (showOpenFilePicker)');
-        }
+            // Check browser support
+            const supportInfo = [];
+            if ('showOpenFilePicker' in window) {
+                supportInfo.push('✅ File System Access API (showOpenFilePicker)');
+            } else {
+                supportInfo.push('❌ File System Access API (showOpenFilePicker)');
+            }
 
-        if (window.DataTransferItem && DataTransferItem.prototype.getAsFileSystemHandle) {
-            supportInfo.push('✅ DataTransferItem.getAsFileSystemHandle()');
-        } else {
-            supportInfo.push('❌ DataTransferItem.getAsFileSystemHandle()');
-        }
+            if (window.DataTransferItem && DataTransferItem.prototype.getAsFileSystemHandle) {
+                supportInfo.push('✅ DataTransferItem.getAsFileSystemHandle()');
+            } else {
+                supportInfo.push('❌ DataTransferItem.getAsFileSystemHandle()');
+            }
 
-        support.innerHTML = supportInfo.map(s => `<div class="status ${s.includes('✅') ? 'success' : 'error'}">${s}</div>`).join('');
+            support.innerHTML = supportInfo
+                .map(
+                    s => `<div class="status ${s.includes('✅') ? 'success' : 'error'}">${s}</div>`
+                )
+                .join('');
 
-        // Drag and drop handlers
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
+            // Drag and drop handlers
+            dropZone.addEventListener('dragover', e => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
 
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-        });
+            dropZone.addEventListener('dragleave', e => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            });
 
-        dropZone.addEventListener('drop', async (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
+            dropZone.addEventListener('drop', async e => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
 
-            status.className = 'status info';
-            status.textContent = 'Processing dropped file...';
-            results.innerHTML = '';
+                status.className = 'status info';
+                status.textContent = 'Processing dropped file...';
+                results.innerHTML = '';
 
-            const resultsData = [];
+                const resultsData = [];
 
-            // Method 1: Using DataTransferItem.getAsFileSystemHandle()
-            if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-                const item = e.dataTransfer.items[0];
-                
-                resultsData.push('<h3>DataTransferItem Analysis:</h3>');
-                resultsData.push(`<code>item.kind:</code> ${item.kind}`);
-                resultsData.push(`<code>item.type:</code> ${item.type || 'not specified'}`);
-                
-                // Try to get file system handle
-                if (item.getAsFileSystemHandle) {
-                    try {
-                        const handle = await item.getAsFileSystemHandle();
-                        
-                        resultsData.push('<div class="status success">✅ Got FileSystemHandle!</div>');
-                        resultsData.push(`<code>handle.kind:</code> ${handle.kind}`);
-                        resultsData.push(`<code>handle.name:</code> ${handle.name}`);
-                        resultsData.push(`<code>handle.constructor.name:</code> ${handle.constructor.name}`);
-                        
-                        if (handle.kind === 'file') {
-                            const file = await handle.getFile();
+                // Method 1: Using DataTransferItem.getAsFileSystemHandle()
+                if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+                    const item = e.dataTransfer.items[0];
+
+                    resultsData.push('<h3>DataTransferItem Analysis:</h3>');
+                    resultsData.push(`<code>item.kind:</code> ${item.kind}`);
+                    resultsData.push(`<code>item.type:</code> ${item.type || 'not specified'}`);
+
+                    // Try to get file system handle
+                    if (item.getAsFileSystemHandle) {
+                        try {
+                            const handle = await item.getAsFileSystemHandle();
+
+                            resultsData.push(
+                                '<div class="status success">✅ Got FileSystemHandle!</div>'
+                            );
+                            resultsData.push(`<code>handle.kind:</code> ${handle.kind}`);
+                            resultsData.push(`<code>handle.name:</code> ${handle.name}`);
+                            resultsData.push(
+                                `<code>handle.constructor.name:</code> ${handle.constructor.name}`
+                            );
+
+                            if (handle.kind === 'file') {
+                                const file = await handle.getFile();
+                                resultsData.push(`<code>file.name:</code> ${file.name}`);
+                                resultsData.push(`<code>file.size:</code> ${file.size} bytes`);
+                                resultsData.push(
+                                    `<code>file.type:</code> ${file.type || 'not specified'}`
+                                );
+
+                                // Test if we can write back to it
+                                if (handle.createWritable) {
+                                    resultsData.push(
+                                        '<div class="status success">✅ File handle supports writing (SAVE button would work!)</div>'
+                                    );
+                                } else {
+                                    resultsData.push(
+                                        '<div class="status error">❌ File handle does not support writing</div>'
+                                    );
+                                }
+                            }
+
+                            status.className = 'status success';
+                            status.innerHTML =
+                                '✅ Successfully got file handle! SAVE button functionality would work.';
+                        } catch (err) {
+                            resultsData.push(
+                                `<div class="status error">❌ Error getting handle: ${err.message}</div>`
+                            );
+                            status.className = 'status error';
+                            status.innerHTML = `❌ Could not get file handle: ${err.message}`;
+                        }
+                    } else {
+                        resultsData.push(
+                            '<div class="status error">❌ getAsFileSystemHandle() not available</div>'
+                        );
+                    }
+
+                    // Also try regular file access
+                    if (item.getAsFile) {
+                        const file = item.getAsFile();
+                        if (file) {
+                            resultsData.push('<h4>Regular File Access:</h4>');
                             resultsData.push(`<code>file.name:</code> ${file.name}`);
                             resultsData.push(`<code>file.size:</code> ${file.size} bytes`);
-                            resultsData.push(`<code>file.type:</code> ${file.type || 'not specified'}`);
-                            
-                            // Test if we can write back to it
-                            if (handle.createWritable) {
-                                resultsData.push('<div class="status success">✅ File handle supports writing (SAVE button would work!)</div>');
-                            } else {
-                                resultsData.push('<div class="status error">❌ File handle does not support writing</div>');
-                            }
                         }
-                        
-                        status.className = 'status success';
-                        status.innerHTML = '✅ Successfully got file handle! SAVE button functionality would work.';
-                    } catch (err) {
-                        resultsData.push(`<div class="status error">❌ Error getting handle: ${err.message}</div>`);
-                        status.className = 'status error';
-                        status.innerHTML = `❌ Could not get file handle: ${err.message}`;
-                    }
-                } else {
-                    resultsData.push('<div class="status error">❌ getAsFileSystemHandle() not available</div>');
-                }
-                
-                // Also try regular file access
-                if (item.getAsFile) {
-                    const file = item.getAsFile();
-                    if (file) {
-                        resultsData.push('<h4>Regular File Access:</h4>');
-                        resultsData.push(`<code>file.name:</code> ${file.name}`);
-                        resultsData.push(`<code>file.size:</code> ${file.size} bytes`);
                     }
                 }
-            }
 
-            // Method 2: Using DataTransfer.files (fallback)
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                const file = e.dataTransfer.files[0];
-                resultsData.push('<h3>DataTransfer.files (Fallback):</h3>');
-                resultsData.push(`<code>file.name:</code> ${file.name}`);
-                resultsData.push(`<code>file.size:</code> ${file.size} bytes`);
-                resultsData.push('<div class="status warning">⚠️ No file handle available via this method</div>');
-            }
+                // Method 2: Using DataTransfer.files (fallback)
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    resultsData.push('<h3>DataTransfer.files (Fallback):</h3>');
+                    resultsData.push(`<code>file.name:</code> ${file.name}`);
+                    resultsData.push(`<code>file.size:</code> ${file.size} bytes`);
+                    resultsData.push(
+                        '<div class="status warning">⚠️ No file handle available via this method</div>'
+                    );
+                }
 
-            results.innerHTML = resultsData.join('<br>');
-        });
+                results.innerHTML = resultsData.join('<br>');
+            });
 
-        // Add keyboard shortcut to open console
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'F12') {
-                console.log('=== Drag-Drop File Handle Test ===');
-                console.log('Drop a file to test FileSystemHandle support');
-                console.log('If successful, SAVE button functionality will work');
-            }
-        });
-    </script>
-</body>
+            // Add keyboard shortcut to open console
+            document.addEventListener('keydown', e => {
+                if (e.key === 'F12') {
+                    console.log('=== Drag-Drop File Handle Test ===');
+                    console.log('Drop a file to test FileSystemHandle support');
+                    console.log('If successful, SAVE button functionality will work');
+                }
+            });
+        </script>
+    </body>
 </html>

@@ -645,7 +645,7 @@ class MappingSlayerApp extends SlayerAppBase {
             // Initialize tolerance inputs
             const { updateToleranceInputs } = await import('./scrape.js');
             updateToleranceInputs();
-            
+
             // Check if SaveManager is available
             console.log('📊 [Mapping] window.saveManager available:', !!window.saveManager);
             if (window.saveManager) {
@@ -720,14 +720,21 @@ class MappingSlayerApp extends SlayerAppBase {
                         // Special handling for .slayer files with file handle
                         if (file.name.toLowerCase().endsWith('.slayer')) {
                             console.log('📊 [Click Upload] .slayer file, checking saveManager...');
-                            console.log('📊 [Click Upload] window.saveManager available:', !!window.saveManager);
-                            
+                            console.log(
+                                '📊 [Click Upload] window.saveManager available:',
+                                !!window.saveManager
+                            );
+
                             if (window.saveManager) {
-                                console.log('📊 [Click Upload] Loading .slayer file WITH file handle for SAVE support');
+                                console.log(
+                                    '📊 [Click Upload] Loading .slayer file WITH file handle for SAVE support'
+                                );
                                 await window.saveManager.loadFileWithHandle(file, fileHandle);
                                 return;
                             } else {
-                                console.log('📊 [Click Upload] SaveManager not available, will use regular load');
+                                console.log(
+                                    '📊 [Click Upload] SaveManager not available, will use regular load'
+                                );
                             }
                         }
 
@@ -739,7 +746,9 @@ class MappingSlayerApp extends SlayerAppBase {
                             return;
                         }
                         // Fall back to regular file input if API fails
-                        console.log('📊 [Click Upload] File System Access API failed, using fallback');
+                        console.log(
+                            '📊 [Click Upload] File System Access API failed, using fallback'
+                        );
                         fileInput.click();
                     }
                 } else {
@@ -752,11 +761,16 @@ class MappingSlayerApp extends SlayerAppBase {
                 const file = e.target.files[0];
                 if (file) {
                     // This is the fallback path - no file handle available
-                    console.log('📊 [Click Upload Fallback] File selected without handle:', file.name);
-                    
+                    console.log(
+                        '📊 [Click Upload Fallback] File selected without handle:',
+                        file.name
+                    );
+
                     // For .slayer files without handle, use SaveManager's loadFileDirectly
                     if (file.name.toLowerCase().endsWith('.slayer') && window.saveManager) {
-                        console.log('📊 [Click Upload Fallback] Loading .slayer file WITHOUT file handle');
+                        console.log(
+                            '📊 [Click Upload Fallback] Loading .slayer file WITHOUT file handle'
+                        );
                         await window.saveManager.loadFileDirectly(file);
                     } else {
                         await this.loadFile(file);
@@ -779,15 +793,15 @@ class MappingSlayerApp extends SlayerAppBase {
             uploadArea.addEventListener('drop', async e => {
                 e.preventDefault();
                 e.currentTarget.classList.remove('ms-dragover');
-                
+
                 // Try to get file handle for .slayer files (enables SAVE button)
                 let fileHandle = null;
                 let file = null;
-                
+
                 // Check if we can get a file system handle (for SAVE functionality)
                 if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
                     const item = e.dataTransfer.items[0];
-                    
+
                     // Try to get file handle if available (Chrome 86+)
                     if (item.getAsFileSystemHandle) {
                         try {
@@ -801,7 +815,7 @@ class MappingSlayerApp extends SlayerAppBase {
                             console.log('📊 [Drag-Drop] Could not get file handle:', err.message);
                         }
                     }
-                    
+
                     // Fallback to regular file if no handle
                     if (!file && item.getAsFile) {
                         file = item.getAsFile();
@@ -810,7 +824,7 @@ class MappingSlayerApp extends SlayerAppBase {
                     // Fallback for older browsers
                     file = e.dataTransfer.files[0];
                 }
-                
+
                 if (file) {
                     console.log('📄 File dropped:', file.name);
 
@@ -818,20 +832,29 @@ class MappingSlayerApp extends SlayerAppBase {
                     if (file.name.toLowerCase().endsWith('.slayer')) {
                         console.log('📊 [Drag-Drop] .slayer file detected');
                         console.log('📊 [Drag-Drop] fileHandle available:', !!fileHandle);
-                        console.log('📊 [Drag-Drop] window.saveManager available:', !!window.saveManager);
-                        
+                        console.log(
+                            '📊 [Drag-Drop] window.saveManager available:',
+                            !!window.saveManager
+                        );
+
                         if (fileHandle && window.saveManager) {
-                            console.log('📊 [Drag-Drop] Loading .slayer file WITH file handle for SAVE support');
+                            console.log(
+                                '📊 [Drag-Drop] Loading .slayer file WITH file handle for SAVE support'
+                            );
                             // Load through SaveManager with file handle
                             await window.saveManager.loadFileWithHandle(file, fileHandle);
                             return;
                         } else if (window.saveManager) {
-                            console.log('📊 [Drag-Drop] Loading .slayer file WITHOUT file handle (no SAVE support)');
+                            console.log(
+                                '📊 [Drag-Drop] Loading .slayer file WITHOUT file handle (no SAVE support)'
+                            );
                             // Load through SaveManager without file handle
                             await window.saveManager.loadFileDirectly(file);
                             return;
                         } else {
-                            console.log('📊 [Drag-Drop] SaveManager not available, falling back to regular load');
+                            console.log(
+                                '📊 [Drag-Drop] SaveManager not available, falling back to regular load'
+                            );
                         }
                     }
 
@@ -1057,7 +1080,9 @@ class MappingSlayerApp extends SlayerAppBase {
 
         if (!loadedData) {
             console.error('File loading failed.');
-            if (uploadArea) {uploadArea.innerHTML = '<div>❌ File loading failed. Please try again.</div>';}
+            if (uploadArea) {
+                uploadArea.innerHTML = '<div>❌ File loading failed. Please try again.</div>';
+            }
             return;
         }
 
@@ -1069,7 +1094,9 @@ class MappingSlayerApp extends SlayerAppBase {
             // Use SaveManager to load the file (which won't have a file handle from drag-drop)
             if (window.saveManager) {
                 await window.saveManager.loadFileDirectly(loadedData.file);
-                if (uploadArea) {uploadArea.innerHTML = '<div>✅ Suite project loaded successfully!</div>';}
+                if (uploadArea) {
+                    uploadArea.innerHTML = '<div>✅ Suite project loaded successfully!</div>';
+                }
                 console.log('✅ .slayer file loaded successfully via SaveManager');
             } else {
                 // Fallback to project manager if SaveManager not available
@@ -1077,10 +1104,14 @@ class MappingSlayerApp extends SlayerAppBase {
                 const success = await projectManager.load(loadedData.file);
 
                 if (success) {
-                    if (uploadArea) {uploadArea.innerHTML = '<div>✅ Suite project loaded successfully!</div>';}
+                    if (uploadArea) {
+                        uploadArea.innerHTML = '<div>✅ Suite project loaded successfully!</div>';
+                    }
                     console.log('✅ .slayer file loaded successfully');
                 } else {
-                    if (uploadArea) {uploadArea.innerHTML = '<div>❌ Failed to load suite project.</div>';}
+                    if (uploadArea) {
+                        uploadArea.innerHTML = '<div>❌ Failed to load suite project.</div>';
+                    }
                     console.error('❌ Failed to load .slayer file');
                 }
             }
@@ -1128,7 +1159,10 @@ class MappingSlayerApp extends SlayerAppBase {
 
         // Zoom to fit all dots on the page if there are any
         const currentPageDots = getCurrentPageDots();
-        console.log('[Zoom-to-fit] Checking dots after load:', currentPageDots ? currentPageDots.size : 'null');
+        console.log(
+            '[Zoom-to-fit] Checking dots after load:',
+            currentPageDots ? currentPageDots.size : 'null'
+        );
         if (currentPageDots && currentPageDots.size > 0) {
             const allDotIds = Array.from(currentPageDots.keys());
             console.log('[Zoom-to-fit] Calling zoomToFitDots with', allDotIds.length, 'dots');
@@ -1319,11 +1353,13 @@ class MappingSlayerApp extends SlayerAppBase {
                 annotationLines: this.serializeAnnotationLines(this.appState.annotationLines),
                 showAnnotationEndpoints: this.appState.showAnnotationEndpoints,
                 // Include crop data
-                cropData: this.cropTool ? {
-                    cropBoundsPerPage: Array.from(this.cropTool.cropBoundsPerPage.entries()),
-                    globalCropBounds: this.cropTool.globalCropBounds,
-                    cropAllPages: this.cropTool.cropAllPages
-                } : null,
+                cropData: this.cropTool
+                    ? {
+                        cropBoundsPerPage: Array.from(this.cropTool.cropBoundsPerPage.entries()),
+                        globalCropBounds: this.cropTool.globalCropBounds,
+                        cropAllPages: this.cropTool.cropAllPages
+                    }
+                    : null,
                 // Include PDF data
                 sourcePdfBase64: pdfBase64,
                 sourcePdfName: this.appState.sourcePdfName
@@ -1677,7 +1713,11 @@ class MappingSlayerApp extends SlayerAppBase {
         const currentPageDots = getCurrentPageDots();
         if (currentPageDots && currentPageDots.size > 0) {
             const allDotIds = Array.from(currentPageDots.keys());
-            console.log('[Zoom-to-fit] Found', allDotIds.length, 'dots after import, zooming to fit...');
+            console.log(
+                '[Zoom-to-fit] Found',
+                allDotIds.length,
+                'dots after import, zooming to fit...'
+            );
 
             // Delay to ensure DOM is ready after import
             setTimeout(() => {
@@ -1879,10 +1919,18 @@ class MappingSlayerApp extends SlayerAppBase {
                     }
 
                     // Update individual flag fields
-                    if (query.updates.topLeft !== undefined) {foundDot.flags.topLeft = query.updates.topLeft;}
-                    if (query.updates.topRight !== undefined) {foundDot.flags.topRight = query.updates.topRight;}
-                    if (query.updates.bottomLeft !== undefined) {foundDot.flags.bottomLeft = query.updates.bottomLeft;}
-                    if (query.updates.bottomRight !== undefined) {foundDot.flags.bottomRight = query.updates.bottomRight;}
+                    if (query.updates.topLeft !== undefined) {
+                        foundDot.flags.topLeft = query.updates.topLeft;
+                    }
+                    if (query.updates.topRight !== undefined) {
+                        foundDot.flags.topRight = query.updates.topRight;
+                    }
+                    if (query.updates.bottomLeft !== undefined) {
+                        foundDot.flags.bottomLeft = query.updates.bottomLeft;
+                    }
+                    if (query.updates.bottomRight !== undefined) {
+                        foundDot.flags.bottomRight = query.updates.bottomRight;
+                    }
 
                     // Remove flag fields from updates to avoid direct assignment
                     const cleanedUpdates = { ...query.updates };
@@ -2011,9 +2059,9 @@ class MappingSlayerApp extends SlayerAppBase {
                             height: viewport.height
                         },
                         scale,
-                        pageName: this.appState.pageNames ?
-                            this.appState.pageNames.get(pageNum) || `Page ${pageNum}` :
-                            `Page ${pageNum}`
+                        pageName: this.appState.pageNames
+                            ? this.appState.pageNames.get(pageNum) || `Page ${pageNum}`
+                            : `Page ${pageNum}`
                     };
                 } catch (error) {
                     console.error('Error rendering PDF page:', error);

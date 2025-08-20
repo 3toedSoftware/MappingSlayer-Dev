@@ -10,7 +10,10 @@ if (window.saveManager) {
     if (window.saveManager.fileHandle) {
         console.log('    Type:', window.saveManager.fileHandle.constructor.name);
     }
-    console.log('  Has Unsaved Changes:', window.saveManager.hasUnsavedChanges ? 'YES ⚠️' : 'NO ✅');
+    console.log(
+        '  Has Unsaved Changes:',
+        window.saveManager.hasUnsavedChanges ? 'YES ⚠️' : 'NO ✅'
+    );
     console.log('  Project Name:', window.saveManager.projectName);
 } else {
     console.log('❌ SaveManager NOT found');
@@ -42,7 +45,7 @@ if (window.appBridge) {
 console.log('=== End State Check ===');
 
 // Test function to simulate a change
-window.testDirtyState = function() {
+window.testDirtyState = function () {
     console.log('🔧 Simulating dirty state...');
     if (window.appBridge) {
         window.appBridge.broadcast('project:dirty');

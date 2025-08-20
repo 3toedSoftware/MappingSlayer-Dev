@@ -58,21 +58,29 @@ export function initializeUI(handlers) {
     setupSplitViewHandlers(handlers);
     setupActionHandlers(handlers);
     updateAllUI();
-    
+
     // Globally prevent middle-click scrolling
-    document.addEventListener('mousedown', e => {
-        if (e.button === 1) {
-            e.preventDefault();
-            return false;
-        }
-    }, true);
-    
-    document.addEventListener('auxclick', e => {
-        if (e.button === 1) {
-            e.preventDefault();
-            return false;
-        }
-    }, true);
+    document.addEventListener(
+        'mousedown',
+        e => {
+            if (e.button === 1) {
+                e.preventDefault();
+                return false;
+            }
+        },
+        true
+    );
+
+    document.addEventListener(
+        'auxclick',
+        e => {
+            if (e.button === 1) {
+                e.preventDefault();
+                return false;
+            }
+        },
+        true
+    );
 }
 
 /**
@@ -211,9 +219,9 @@ function updateSpreadsheet() {
 
     // Make selectRowAndThumbnail globally available for the spreadsheet
     window.selectRowAndThumbnail = selectRowAndThumbnail;
-    
+
     // Add middle-click handler for zooming to dot
-    window.handleMiddleClickZoom = (itemId) => {
+    window.handleMiddleClickZoom = itemId => {
         console.log('🔶 handleMiddleClickZoom called:', {
             itemId,
             previewMode: thumbnailState.previewMode,
@@ -428,7 +436,7 @@ function selectRowAndThumbnail(itemId, zoomToDot = false) {
         zoomToDot,
         caller: new Error().stack.split('\n')[2]
     });
-    
+
     // Update selected state
     thumbnailState.selectedItemId = itemId;
 
@@ -452,7 +460,7 @@ async function showSinglePreview(itemId, zoomToDot = false) {
         zoomToDot,
         previewMode: thumbnailState.previewMode
     });
-    
+
     const preview = dom.previewContainer;
     if (!preview) return;
 
@@ -588,15 +596,15 @@ function openEditModal(item) {
                 </div>
                 <div class="edit-fields">
                     ${textFields
-                        .map(field => {
-                            const fieldValue = item[field.fieldName] || '';
-                            const displayName = field.displayName || field.fieldName;
-                            // For now, we'll show fields as not required in the UI
-                            // TODO: Update to use signType.isFieldRequired(field.fieldName) when sign type is available
-                            const isRequired = '';
-                            const maxLength = field.maxLength || 100;
+        .map(field => {
+            const fieldValue = item[field.fieldName] || '';
+            const displayName = field.displayName || field.fieldName;
+            // For now, we'll show fields as not required in the UI
+            // TODO: Update to use signType.isFieldRequired(field.fieldName) when sign type is available
+            const isRequired = '';
+            const maxLength = field.maxLength || 100;
 
-                            return `
+            return `
                             <div class="edit-field-group">
                                 <label for="field-${field.fieldName}">
                                     ${displayName}${isRequired}
@@ -613,8 +621,8 @@ function openEditModal(item) {
                                 />
                             </div>
                         `;
-                        })
-                        .join('')}
+        })
+        .join('')}
                 </div>
             </div>
             <div class="edit-modal-footer">
@@ -956,7 +964,6 @@ function applyMapTransform(mapContent, transform) {
     mapContent.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
 }
 
-
 /**
  * Setup map interaction handlers
  */
@@ -967,35 +974,36 @@ function setupMapInteraction(mapContainer, mapContent) {
     let initialTransform = { x: 0, y: 0 };
 
     // Mouse wheel zoom
-    mapContainer.addEventListener('wheel', (e) => {
+    mapContainer.addEventListener('wheel', e => {
         e.preventDefault();
         const rect = mapContainer.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
-        
+
         const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
         const transform = thumbnailState.mapTransform;
         const oldScale = transform.scale;
         const newScale = Math.max(0.1, Math.min(5, oldScale * scaleFactor));
-        
+
         // Zoom from mouse position
         transform.x = mouseX - (mouseX - transform.x) * (newScale / oldScale);
         transform.y = mouseY - (mouseY - transform.y) * (newScale / oldScale);
         transform.scale = newScale;
-        
+
         applyMapTransform(mapContent, transform);
     });
 
     // Mouse down - start panning with middle button only
-    mapContainer.addEventListener('mousedown', (e) => {
-        if (e.button === 1) { // Middle button for panning
+    mapContainer.addEventListener('mousedown', e => {
+        if (e.button === 1) {
+            // Middle button for panning
             e.preventDefault();
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
-            initialTransform = { 
-                x: thumbnailState.mapTransform.x, 
-                y: thumbnailState.mapTransform.y 
+            initialTransform = {
+                x: thumbnailState.mapTransform.x,
+                y: thumbnailState.mapTransform.y
             };
             mapContainer.style.cursor = 'grabbing';
             mapContent.style.transition = 'none';
@@ -1006,14 +1014,14 @@ function setupMapInteraction(mapContainer, mapContent) {
     });
 
     // Mouse move - pan if dragging
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', e => {
         if (isDragging) {
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
-            
+
             thumbnailState.mapTransform.x = initialTransform.x + dx;
             thumbnailState.mapTransform.y = initialTransform.y + dy;
-            
+
             applyMapTransform(mapContent, thumbnailState.mapTransform);
         }
     });
@@ -1028,7 +1036,7 @@ function setupMapInteraction(mapContainer, mapContent) {
     });
 
     // Prevent context menu on right click
-    mapContainer.addEventListener('contextmenu', (e) => {
+    mapContainer.addEventListener('contextmenu', e => {
         e.preventDefault();
     });
 }
@@ -1044,7 +1052,7 @@ async function showMapLocationPreview(item, zoomToDot = false) {
 
     try {
         const pageNum = item.pageNumber || 1;
-        
+
         // Initialize state if needed
         if (!thumbnailState.mapTransform) {
             thumbnailState.mapTransform = { x: 0, y: 0, scale: 1 };
@@ -1055,7 +1063,7 @@ async function showMapLocationPreview(item, zoomToDot = false) {
         if (!thumbnailState.panStart) {
             thumbnailState.panStart = { x: 0, y: 0 };
         }
-        
+
         console.log('🔴 showMapLocationPreview called:', {
             itemId: item.id,
             zoomToDot,
@@ -1068,14 +1076,14 @@ async function showMapLocationPreview(item, zoomToDot = false) {
         // Check if we already have a map displayed for the same page
         const existingMapContainer = preview.querySelector('.map-preview-container');
         const needsNewMap = !existingMapContainer || thumbnailState.currentPageNum !== pageNum;
-        
+
         console.log('🔴 Map state check:', {
             hasExistingMap: !!existingMapContainer,
             currentPage: thumbnailState.currentPageNum,
             newPage: pageNum,
             needsNewMap
         });
-        
+
         // Get page data (cache per page, not per item)
         const pageCacheKey = `page_${pageNum}`;
         let response = thumbnailState.mapPreviewCache.get(pageCacheKey);
@@ -1145,7 +1153,7 @@ async function showMapLocationPreview(item, zoomToDot = false) {
         const scaleRatio = requestedScale / originalScale;
         const dotX = (item.x || 0) * scaleRatio;
         const dotY = (item.y || 0) * scaleRatio;
-        
+
         console.log('Map preview item data:', {
             itemId: item.id,
             locationNumber: item.locationNumber,
@@ -1193,36 +1201,36 @@ async function showMapLocationPreview(item, zoomToDot = false) {
             if (zoomToDot) {
                 // Zoom to dot when requested (middle-click)
                 const zoomLevel = 2.0;
-                
+
                 // Calculate transform to center on the dot
                 thumbnailState.mapTransform = {
                     scale: zoomLevel,
                     // Center the dot in the container
-                    x: (containerRect.width / 2) - (dotX * zoomLevel),
-                    y: (containerRect.height / 2) - (dotY * zoomLevel)
+                    x: containerRect.width / 2 - dotX * zoomLevel,
+                    y: containerRect.height / 2 - dotY * zoomLevel
                 };
 
                 console.log('🟣 ZOOMING to dot (middle-click):', {
-                    dotX, dotY,
+                    dotX,
+                    dotY,
                     zoomLevel,
                     newTransform: thumbnailState.mapTransform
                 });
-                
+
                 // Apply the zoom transform
                 applyMapTransform(mapContent, thumbnailState.mapTransform);
             } else if (!thumbnailState.mapTransform || !thumbnailState.hasInitializedMap) {
                 // Very first time - initialize with full view
-                const scale = Math.min(
-                    containerRect.width / imgWidth,
-                    containerRect.height / imgHeight
-                ) * 0.9; // 90% to leave some margin
-                
+                const scale =
+                    Math.min(containerRect.width / imgWidth, containerRect.height / imgHeight) *
+                    0.9; // 90% to leave some margin
+
                 thumbnailState.mapTransform = {
                     scale: scale,
                     x: (containerRect.width - imgWidth * scale) / 2,
                     y: (containerRect.height - imgHeight * scale) / 2
                 };
-                
+
                 thumbnailState.hasInitializedMap = true;
                 console.log('🟣 INITIALIZING map view (first time):', {
                     newTransform: thumbnailState.mapTransform
@@ -1240,7 +1248,7 @@ async function showMapLocationPreview(item, zoomToDot = false) {
         // If we already have a map for this page, just update the dot
         if (!needsNewMap && existingMapContainer) {
             console.log('🔴 Updating existing map - just moving dot');
-            
+
             // Find and update the existing dot
             const existingDot = existingMapContainer.querySelector('.map-preview-dot');
             if (existingDot) {
@@ -1253,18 +1261,18 @@ async function showMapLocationPreview(item, zoomToDot = false) {
                     mapContent.appendChild(dot);
                 }
             }
-            
+
             // ONLY zoom/pan if specifically requested (middle-click)
             if (zoomToDot) {
                 const containerRect = existingMapContainer.getBoundingClientRect();
                 const zoomLevel = 2.0;
-                
+
                 thumbnailState.mapTransform = {
                     scale: zoomLevel,
-                    x: (containerRect.width / 2) - (dotX * zoomLevel),
-                    y: (containerRect.height / 2) - (dotY * zoomLevel)
+                    x: containerRect.width / 2 - dotX * zoomLevel,
+                    y: containerRect.height / 2 - dotY * zoomLevel
                 };
-                
+
                 console.log('🔴 ZOOMING to dot on existing map (middle-click)');
                 const mapContent = existingMapContainer.querySelector('.map-preview-content');
                 if (mapContent) {
@@ -1273,14 +1281,14 @@ async function showMapLocationPreview(item, zoomToDot = false) {
             } else {
                 console.log('🔴 NOT moving map (left-click) - just updating dot position');
             }
-            
+
             // Don't rebuild the map, just return
             return;
         }
-        
+
         // Otherwise, build a new map
         console.log('🔴 Building new map container');
-        
+
         mapContent.appendChild(mapImage);
         mapContent.appendChild(dot); // Add dot after image
         mapContainer.appendChild(mapContent);
@@ -1290,7 +1298,7 @@ async function showMapLocationPreview(item, zoomToDot = false) {
 
         preview.innerHTML = '';
         preview.appendChild(mapContainer);
-        
+
         // Store current page
         thumbnailState.currentPageNum = pageNum;
 

@@ -415,45 +415,50 @@ class ThumbnailSpreadsheet {
         });
 
         // Middle-click handler for zooming to dot in map view (using mousedown for better compatibility)
-        this.table.addEventListener('mousedown', e => {
-            if (e.button === 1) { // Middle button
-                console.log('🟠 Middle-click mousedown detected', {
-                    button: e.button,
-                    target: e.target,
-                    targetTag: e.target.tagName
-                });
-                
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const cell = e.target.closest('td');
-                if (!cell) {
-                    console.log('🟠 No cell found');
-                    return;
+        this.table.addEventListener(
+            'mousedown',
+            e => {
+                if (e.button === 1) {
+                    // Middle button
+                    console.log('🟠 Middle-click mousedown detected', {
+                        button: e.button,
+                        target: e.target,
+                        targetTag: e.target.tagName
+                    });
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const cell = e.target.closest('td');
+                    if (!cell) {
+                        console.log('🟠 No cell found');
+                        return;
+                    }
+
+                    const rowIndex = parseInt(cell.dataset.rowIndex);
+                    console.log('🟠 Row index from cell:', rowIndex);
+
+                    if (isNaN(rowIndex)) {
+                        console.log('🟠 Invalid row index');
+                        return;
+                    }
+
+                    const rowData = this.data[rowIndex];
+                    console.log('🟠 Middle-click on row:', {
+                        rowIndex,
+                        rowData,
+                        hasHandler: !!window.handleMiddleClickZoom
+                    });
+
+                    if (rowData && window.handleMiddleClickZoom) {
+                        window.handleMiddleClickZoom(rowData.id);
+                    }
+                    return false;
                 }
-                
-                const rowIndex = parseInt(cell.dataset.rowIndex);
-                console.log('🟠 Row index from cell:', rowIndex);
-                
-                if (isNaN(rowIndex)) {
-                    console.log('🟠 Invalid row index');
-                    return;
-                }
-                
-                const rowData = this.data[rowIndex];
-                console.log('🟠 Middle-click on row:', {
-                    rowIndex,
-                    rowData,
-                    hasHandler: !!window.handleMiddleClickZoom
-                });
-                
-                if (rowData && window.handleMiddleClickZoom) {
-                    window.handleMiddleClickZoom(rowData.id);
-                }
-                return false;
-            }
-        }, true); // Use capture phase
-        
+            },
+            true
+        ); // Use capture phase
+
         // Also prevent middle-click scroll
         this.table.addEventListener('auxclick', e => {
             if (e.button === 1) {

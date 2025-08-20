@@ -193,6 +193,60 @@ Automatically:
 - "fix: resolved canvas rendering issue in Mapping Slayer"
 - "feat: added grid snapping to Design Slayer"
 
+## Chrome DevTools Integration
+
+### MCP Server for Browser Console Access
+
+The Chrome DevTools MCP server is installed to allow direct access to browser console errors and debugging information.
+
+### Setup (Already Completed)
+
+The Chrome DevTools MCP server has been installed and configured:
+
+- Location: `C:\Users\iam3toed\Desktop\slayer-suite\chrome-devtools-mcp\`
+- Configuration: Added to Claude MCP servers
+- Port: 9222 (Chrome remote debugging port)
+
+### Using Chrome DevTools MCP
+
+When debugging browser issues:
+
+1. **Start Chrome with debugging enabled**:
+
+```bash
+# Windows
+start chrome --remote-debugging-port=9222 "http://localhost:8080"
+
+# Or with a specific profile
+chrome --remote-debugging-port=9222 --user-data-dir=temp-profile "http://localhost:8080"
+```
+
+2. **After restarting Claude Code session**, MCP tools will be available with `mcp__` prefix to:
+
+- Connect to running Chrome instances
+- Read console logs and errors directly
+- Execute JavaScript in browser context
+- Inspect DOM elements
+- Monitor network requests
+- Analyze performance metrics
+
+3. **Benefits**:
+
+- No need to copy/paste console errors
+- Direct access to browser debugging
+- Real-time monitoring of JavaScript errors
+- Automated error detection and analysis
+
+### Test Page Available
+
+A test page with various console outputs and errors is available at:
+
+```
+test-console-errors.html
+```
+
+This can be used to verify the Chrome DevTools MCP connection is working properly.
+
 ## Remember:
 
 - Always run tests after significant changes
@@ -203,3 +257,5 @@ Automatically:
 - Run ESLint (`npm run lint`) before commits
 - Use `npm run lint:fix` to maintain code consistency
 - Handle git commits when user requests with descriptive messages
+- Chrome DevTools MCP requires Claude Code restart to load MCP tools
+- Start Chrome with `--remote-debugging-port=9222` for console access

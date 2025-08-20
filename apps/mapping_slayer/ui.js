@@ -365,7 +365,9 @@ function updateFilterCheckboxesImmediate() {
                     e.target.closest(
                         'input, .pcr-app, .ms-color-picker-wrapper, .ms-delete-marker-type-btn, .ms-design-reference-square'
                     )
-                ) {return;}
+                ) {
+                    return;
+                }
                 e.preventDefault();
                 appState.activeMarkerType = markerTypeCode;
                 updateFilterCheckboxes();
@@ -377,7 +379,9 @@ function updateFilterCheckboxesImmediate() {
                     e.target.closest(
                         'input, .pcr-app, .ms-color-picker-wrapper, .ms-delete-marker-type-btn, .ms-design-reference-square'
                     )
-                ) {return;}
+                ) {
+                    return;
+                }
                 e.preventDefault();
                 e.stopPropagation();
                 selectAllDotsOfMarkerType(markerTypeCode);
@@ -1688,7 +1692,9 @@ function handleMapClick(e) {
         appState.isSelecting ||
         appState.isScraping ||
         !appState.pdfDoc
-    ) {return;}
+    ) {
+        return;
+    }
     if (appState.justFinishedSelecting) {
         appState.justFinishedSelecting = false;
         return;
@@ -5176,7 +5182,9 @@ async function handleScheduleUpdate(e) {
             let statusMessage = '';
             if (updatedCount > 0) statusMessage += `Updated ${updatedCount} locations. `;
             if (deletedCount > 0) statusMessage += `Deleted ${deletedCount} locations. `;
-            if (skippedRows.length > 0) {statusMessage += `${skippedRows.length} rows skipped (see error log)`;}
+            if (skippedRows.length > 0) {
+                statusMessage += `${skippedRows.length} rows skipped (see error log)`;
+            }
 
             showCSVStatus(`✅ ${statusMessage.trim()}`, true, 8000);
 
