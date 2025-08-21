@@ -4,6 +4,7 @@
 import { appState, getDotsForPage } from './state.js';
 import { getActiveFilters, showCSVStatus } from './ui.js';
 import { getSymbolInfo, FLAG_POSITIONS, migrateDotToFlags } from './flag-config.js';
+import { getFlagIconBase64, collectUniqueFlags, clearFlagIconCache } from './flag-icons-base64.js';
 
 // Character sanitization for Revu compatibility
 function sanitizeForRevu(text) {
@@ -331,8 +332,21 @@ function drawLegendWithJsPDF(pdf, dotsOnPage) {
     });
 }
 
-function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible) {
+async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible) {
     const effectiveMultiplier = appState.dotSize * 2;
+
+    // Pre-cache all flag icons for this page
+    const uniqueFlags = collectUniqueFlags(dotsOnPage);
+    const flagImageMap = new Map();
+
+    for (const [key, flagData] of uniqueFlags) {
+        const base64 = await getFlagIconBase64(flagData.flag, flagData.position);
+        if (base64) {
+            flagImageMap.set(key, base64);
+        }
+    }
+
+    // Now draw all dots with cached flag images
     dotsOnPage.forEach(dot => {
         const markerTypeInfo = appState.markerTypes[dot.markerType] || {
             color: '#ff0000',
@@ -351,65 +365,81 @@ function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible) {
         pdf.circle(pdfX, pdfY, radius, 'F');
 
         // Draw flag indicators
-        const flagConfig = appState.globalFlagConfiguration; // Now using global flags
         const flagOffset = radius + 6 * effectiveMultiplier;
 
-        if (dot.flags && flagConfig) {
+        if (dot.flags) {
+            const flagSize = 12 * effectiveMultiplier; // Size of flag icons
+
             // Top-left flag
-            if (dot.flags[FLAG_POSITIONS.TOP_LEFT] && flagConfig[FLAG_POSITIONS.TOP_LEFT]?.symbol) {
-                const symbolInfo = getSymbolInfo(flagConfig[FLAG_POSITIONS.TOP_LEFT].symbol);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setFontSize(8 * effectiveMultiplier);
-                pdf.setTextColor(255, 215, 0); // Gold color
-                pdf.text(symbolInfo.symbol, pdfX - flagOffset, pdfY - flagOffset, {
-                    align: 'center',
-                    baseline: 'middle'
-                });
+            if (dot.flags[FLAG_POSITIONS.TOP_LEFT]) {
+                const flag = dot.flags[FLAG_POSITIONS.TOP_LEFT];
+                const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_topLeft`;
+                const base64 = flagImageMap.get(key);
+
+                if (base64) {
+                    pdf.addImage(
+                        base64,
+                        'PNG',
+                        pdfX - flagOffset - flagSize / 2,
+                        pdfY - flagOffset - flagSize / 2,
+                        flagSize,
+                        flagSize
+                    );
+                }
             }
 
             // Top-right flag
-            if (
-                dot.flags[FLAG_POSITIONS.TOP_RIGHT] &&
-                flagConfig[FLAG_POSITIONS.TOP_RIGHT]?.symbol
-            ) {
-                const symbolInfo = getSymbolInfo(flagConfig[FLAG_POSITIONS.TOP_RIGHT].symbol);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setFontSize(8 * effectiveMultiplier);
-                pdf.setTextColor(0, 255, 0); // Green color
-                pdf.text(symbolInfo.symbol, pdfX + flagOffset, pdfY - flagOffset, {
-                    align: 'center',
-                    baseline: 'middle'
-                });
+            if (dot.flags[FLAG_POSITIONS.TOP_RIGHT]) {
+                const flag = dot.flags[FLAG_POSITIONS.TOP_RIGHT];
+                const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_topRight`;
+                const base64 = flagImageMap.get(key);
+
+                if (base64) {
+                    pdf.addImage(
+                        base64,
+                        'PNG',
+                        pdfX + flagOffset - flagSize / 2,
+                        pdfY - flagOffset - flagSize / 2,
+                        flagSize,
+                        flagSize
+                    );
+                }
             }
 
             // Bottom-left flag
-            if (
-                dot.flags[FLAG_POSITIONS.BOTTOM_LEFT] &&
-                flagConfig[FLAG_POSITIONS.BOTTOM_LEFT]?.symbol
-            ) {
-                const symbolInfo = getSymbolInfo(flagConfig[FLAG_POSITIONS.BOTTOM_LEFT].symbol);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setFontSize(8 * effectiveMultiplier);
-                pdf.setTextColor(0, 136, 255); // Blue color
-                pdf.text(symbolInfo.symbol, pdfX - flagOffset, pdfY + flagOffset, {
-                    align: 'center',
-                    baseline: 'middle'
-                });
+            if (dot.flags[FLAG_POSITIONS.BOTTOM_LEFT]) {
+                const flag = dot.flags[FLAG_POSITIONS.BOTTOM_LEFT];
+                const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_bottomLeft`;
+                const base64 = flagImageMap.get(key);
+
+                if (base64) {
+                    pdf.addImage(
+                        base64,
+                        'PNG',
+                        pdfX - flagOffset - flagSize / 2,
+                        pdfY + flagOffset - flagSize / 2,
+                        flagSize,
+                        flagSize
+                    );
+                }
             }
 
             // Bottom-right flag
-            if (
-                dot.flags[FLAG_POSITIONS.BOTTOM_RIGHT] &&
-                flagConfig[FLAG_POSITIONS.BOTTOM_RIGHT]?.symbol
-            ) {
-                const symbolInfo = getSymbolInfo(flagConfig[FLAG_POSITIONS.BOTTOM_RIGHT].symbol);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setFontSize(8 * effectiveMultiplier);
-                pdf.setTextColor(255, 0, 0); // Red color
-                pdf.text(symbolInfo.symbol, pdfX + flagOffset, pdfY + flagOffset, {
-                    align: 'center',
-                    baseline: 'middle'
-                });
+            if (dot.flags[FLAG_POSITIONS.BOTTOM_RIGHT]) {
+                const flag = dot.flags[FLAG_POSITIONS.BOTTOM_RIGHT];
+                const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_bottomRight`;
+                const base64 = flagImageMap.get(key);
+
+                if (base64) {
+                    pdf.addImage(
+                        base64,
+                        'PNG',
+                        pdfX + flagOffset - flagSize / 2,
+                        pdfY + flagOffset - flagSize / 2,
+                        flagSize,
+                        flagSize
+                    );
+                }
             }
         }
 
@@ -1037,7 +1067,7 @@ async function performPDFExport(exportType) {
                 chunkPdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
                 drawLegendWithJsPDF(chunkPdf, dotsToDraw);
                 drawAnnotationLinesWithJsPDF(chunkPdf, pageNum);
-                drawDotsWithJsPDF(chunkPdf, dotsToDraw, messagesVisible);
+                await drawDotsWithJsPDF(chunkPdf, dotsToDraw, messagesVisible);
             }
 
             // Create detail pages for this chunk only if requested
@@ -1142,6 +1172,8 @@ async function performPDFExport(exportType) {
         createPdfBtn.textContent = originalBtnText;
         createPdfBtn.classList.remove('ms-btn-processing');
         tempCanvas.remove();
+        // Clear flag icon cache to free memory
+        clearFlagIconCache();
     }
 }
 
