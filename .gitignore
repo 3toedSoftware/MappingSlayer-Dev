@@ -47,3 +47,7 @@ backups/
 .cache/
 .eslintcache
 .prettierignore
+
+# Chrome DevTools MCP folders
+Usersiam3toedchrome-devtools-mcp/
+chrome-devtools-mcp/
