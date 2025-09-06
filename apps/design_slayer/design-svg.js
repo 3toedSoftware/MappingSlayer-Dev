@@ -59,7 +59,7 @@ export class DesignSVG {
                 : '/apps/design_slayer/lib/svg.min.js';
             script.src = basePath;
             script.onload = resolve;
-            script.onerror = reject;
+            script.onerror = () => reject(new Error(`Failed to load SVG library from ${basePath}`));
             document.head.appendChild(script);
         });
     }
