@@ -208,10 +208,13 @@
                     });
 
                     // Setup suite logo handler to go to Mapping Slayer
-                    document.getElementById('suite-home-link').addEventListener('click', e => {
-                        e.preventDefault();
-                        window.slayerSuite.switchToApp('mapping_slayer');
-                    });
+                    const homeLink = document.getElementById('suite-home-link');
+                    if (homeLink) {
+                        homeLink.addEventListener('click', e => {
+                            e.preventDefault();
+                            window.slayerSuite.switchToApp('mapping_slayer');
+                        });
+                    }
 
                     // Save/load button handlers are now set up in saveManager.initialize()
 
