@@ -1663,17 +1663,17 @@ let isLongPress = false;
 function handleDotTouchStart(e) {
     const dotElement = e.target.closest('.ms-map-dot');
     if (!dotElement) return;
-    
+
     if (e.touches.length === 1) {
         const touch = e.touches[0];
         const dotId = dotElement.dataset.dotId;
         const dot = getCurrentPageDots().get(dotId);
-        
+
         if (dot) {
             touchDraggingDot = { element: dotElement, dot: dot, id: dotId };
             touchDragStartPos = { x: touch.clientX, y: touch.clientY };
             touchDragOriginalDotPos = { x: dot.x, y: dot.y };
-            
+
             // Start long press timer (500ms)
             isLongPress = false;
             longPressTimer = setTimeout(() => {
@@ -1682,23 +1682,23 @@ function handleDotTouchStart(e) {
                 if (navigator.vibrate) {
                     navigator.vibrate(50);
                 }
-                
+
                 // Open edit modal
                 clearSelection();
                 selectDot(dotId);
                 updateSelectionUI();
                 openEditModal(dotId);
-                
+
                 // Reset drag state since we're opening modal
                 touchDraggingDot = null;
                 dotElement.style.zIndex = '';
                 dotElement.style.opacity = '';
             }, 500);
-            
+
             // Add visual feedback
             dotElement.style.zIndex = '1000';
             dotElement.style.opacity = '0.8';
-            
+
             e.preventDefault();
             e.stopPropagation();
         }
@@ -1707,31 +1707,31 @@ function handleDotTouchStart(e) {
 
 function handleDotTouchMove(e) {
     if (!touchDraggingDot || e.touches.length !== 1) return;
-    
+
     const touch = e.touches[0];
     const deltaX = (touch.clientX - touchDragStartPos.x) / appState.mapTransform.scale;
     const deltaY = (touch.clientY - touchDragStartPos.y) / appState.mapTransform.scale;
-    
+
     // Cancel long press if user moves more than 10 pixels
     if (longPressTimer && (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10)) {
         clearTimeout(longPressTimer);
         longPressTimer = null;
     }
-    
+
     // Update dot position
     const newX = touchDragOriginalDotPos.x + deltaX;
     const newY = touchDragOriginalDotPos.y + deltaY;
-    
+
     // Update the dot's data
     touchDraggingDot.dot.x = newX;
     touchDraggingDot.dot.y = newY;
-    
+
     // Update the visual position
     const size = 20 * appState.dotSize * 2;
     const halfSize = size / 2;
     touchDraggingDot.element.style.left = `${newX - halfSize}px`;
     touchDraggingDot.element.style.top = `${newY - halfSize}px`;
-    
+
     e.preventDefault();
     e.stopPropagation();
 }
@@ -1742,28 +1742,28 @@ function handleDotTouchEnd(e) {
         clearTimeout(longPressTimer);
         longPressTimer = null;
     }
-    
+
     // If long press was triggered, don't do anything else
     if (isLongPress) {
         isLongPress = false;
         return;
     }
-    
+
     if (touchDraggingDot) {
         // Restore visual style
         touchDraggingDot.element.style.zIndex = '';
         touchDraggingDot.element.style.opacity = '';
-        
+
         // Check if dot was actually moved (more than 5px threshold)
         const movedX = Math.abs(touchDraggingDot.dot.x - touchDragOriginalDotPos.x);
         const movedY = Math.abs(touchDraggingDot.dot.y - touchDragOriginalDotPos.y);
-        
+
         if (movedX > 5 || movedY > 5) {
             // Dot was dragged - update and save
             import('./state.js').then(({ setDirtyState }) => {
                 setDirtyState();
             });
-            
+
             // Update any annotation lines
             import('./ui.js').then(({ renderAnnotationLines }) => {
                 renderAnnotationLines();
@@ -1779,7 +1779,7 @@ function handleDotTouchEnd(e) {
             }
             updateSelectionUI();
         }
-        
+
         touchDraggingDot = null;
     }
 }
@@ -1801,7 +1801,7 @@ function setupCanvasEventListeners() {
     // Handle right-click to open edit modal
     mapContent.addEventListener('contextmenu', handleContextMenu);
     mapContainer.addEventListener('contextmenu', handleContextMenu);
-    
+
     // Touch events for dot dragging
     mapContent.addEventListener('touchstart', handleDotTouchStart, { passive: false });
     mapContent.addEventListener('touchmove', handleDotTouchMove, { passive: false });
@@ -2933,7 +2933,7 @@ function importMarkerTypes() {
 
             // Check for conflicts
             const conflicts = Object.keys(importData.markerTypes).filter(code =>
-                appState.markerTypes.hasOwnProperty(code)
+                Object.prototype.hasOwnProperty.call(appState.markerTypes, code)
             );
 
             let message = `Import ${markerCount} marker type(s)?`;
@@ -3761,7 +3761,7 @@ function openEditModal(internalId) {
 
     const modal = document.getElementById('mapping-slayer-edit-modal');
     modal.style.display = 'block';
-    
+
     // Also show the gallery modal
     // Use setTimeout to ensure edit modal is fully rendered first
     setTimeout(() => {
@@ -3817,7 +3817,7 @@ function closeEditModal() {
         modal.style.display = 'none';
         appState.editingDot = null;
     }
-    
+
     // Also close the gallery modal
     closeGalleryModal();
 }
@@ -4015,7 +4015,7 @@ async function groupUpdateDots() {
             oldValues[field.fieldName] = dot[field.fieldName] || '';
         });
         Object.entries(dynamicFieldValues).forEach(([fieldName, value]) => {
-            if (!oldValues.hasOwnProperty(fieldName)) {
+            if (!Object.prototype.hasOwnProperty.call(oldValues, fieldName)) {
                 oldValues[fieldName] = dot[fieldName] || '';
             }
         });
@@ -5041,7 +5041,6 @@ function generateErrorLog(skippedRows) {
     URL.revokeObjectURL(url);
 }
 
-
 async function handleScheduleUpdate(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -5583,7 +5582,6 @@ function deleteField(markerTypeCode, fieldName, formGroup) {
     setDirtyState();
 }
 
-
 // Create text fields manager UI
 function createTextFieldsManager(markerTypeCode) {
     const markerType = appState.markerTypes[markerTypeCode];
@@ -5778,7 +5776,10 @@ function createTextFieldItem(field, index, markerTypeCode) {
 // Update field name in all dots of this marker type
 function updateFieldNameInDots(markerTypeCode, oldFieldName, newFieldName) {
     appState.allDots.forEach(dot => {
-        if (dot.markerType === markerTypeCode && dot.hasOwnProperty(oldFieldName)) {
+        if (
+            dot.markerType === markerTypeCode &&
+            Object.prototype.hasOwnProperty.call(dot, oldFieldName)
+        ) {
             dot[newFieldName] = dot[oldFieldName];
             delete dot[oldFieldName];
         }
@@ -5998,7 +5999,7 @@ function updateGalleryPosition() {
     const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
     const editModal = document.getElementById('mapping-slayer-edit-modal');
     if (!galleryModal || !editModal) return;
-    
+
     const editModalContent = editModal.querySelector('.ms-modal-content');
     if (editModalContent) {
         const editHeight = editModalContent.offsetHeight;
@@ -6007,14 +6008,14 @@ function updateGalleryPosition() {
             galleryContent.style.height = editHeight + 'px';
             galleryContent.style.minHeight = editHeight + 'px';
         }
-        
+
         // Position gallery 10px to the right of edit modal
         const editRect = editModalContent.getBoundingClientRect();
         const editTop = editRect.top;
         const editRight = editRect.right;
-        
+
         galleryModal.style.top = editTop + 'px';
-        galleryModal.style.left = (editRight + 10) + 'px'; // 10px gap
+        galleryModal.style.left = editRight + 10 + 'px'; // 10px gap
         galleryModal.style.transform = 'none'; // Remove any transforms
     }
 }
@@ -6022,27 +6023,27 @@ function updateGalleryPosition() {
 function openGalleryModal(dot) {
     const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
     if (!galleryModal) return;
-    
+
     // Store current dot reference
     currentGalleryDot = dot;
-    
+
     // Position the gallery
     updateGalleryPosition();
-    
+
     // Show the modal
     galleryModal.classList.add('ms-visible');
-    
+
     // Initialize gallery with dot's photos
     populateGallery(dot);
-    
+
     // Setup gallery event listeners if not already done
     setupGalleryEventListeners();
-    
+
     // Add resize listener with debouncing
     if (galleryResizeHandler) {
         window.removeEventListener('resize', galleryResizeHandler);
     }
-    
+
     let resizeTimeout;
     galleryResizeHandler = () => {
         clearTimeout(resizeTimeout);
@@ -6052,7 +6053,7 @@ function openGalleryModal(dot) {
             }
         }, 100); // Debounce by 100ms
     };
-    
+
     window.addEventListener('resize', galleryResizeHandler);
 }
 
@@ -6061,13 +6062,13 @@ function closeGalleryModal() {
     if (galleryModal) {
         galleryModal.classList.remove('ms-visible');
     }
-    
+
     // Clean up resize listener
     if (galleryResizeHandler) {
         window.removeEventListener('resize', galleryResizeHandler);
         galleryResizeHandler = null;
     }
-    
+
     // Clear current dot reference
     currentGalleryDot = null;
 }
@@ -6075,17 +6076,17 @@ function closeGalleryModal() {
 function populateGallery(dot) {
     const mainImage = document.getElementById('gallery-main-image');
     const thumbnails = document.querySelectorAll('.ms-gallery-thumb');
-    
+
     // Clear current content
     if (mainImage) {
         mainImage.innerHTML = '<span class="ms-gallery-placeholder">CURRENT PIC</span>';
     }
-    
+
     thumbnails.forEach(thumb => {
         thumb.innerHTML = '';
         thumb.classList.remove('active');
     });
-    
+
     // If dot has photos, display them
     if (dot.photos && dot.photos.length > 0) {
         dot.photos.forEach((photo, index) => {
@@ -6096,13 +6097,13 @@ function populateGallery(dot) {
                     img.src = photo.data;
                     img.alt = `Photo ${index + 1}`;
                     thumb.appendChild(img);
-                    
+
                     // Set first photo as active
                     if (index === 0) {
                         thumb.classList.add('active');
                         displayMainImage(photo.data, photo.id);
                     }
-                    
+
                     // Add click handler
                     thumb.onclick = () => {
                         thumbnails.forEach(t => t.classList.remove('active'));
@@ -6127,27 +6128,27 @@ function displayMainImage(imageSrc, photoId = null) {
 
 function deletePhotoFromGallery(photoId) {
     if (!currentGalleryDot) return;
-    
+
     if (!confirm('Delete this photo?')) return;
-    
+
     // Get the current dot
-    const dots = appState.dotsByPage.get(appState.currentPdfPage);
+    const dots = getCurrentPageDots();
     if (!dots) return;
-    
+
     const dot = dots.get(currentGalleryDot.internalId);
     if (!dot || !dot.photos) return;
-    
+
     // Find and remove the photo
-    const photoIndex = dot.photos.findIndex(p => p.id == photoId);
+    const photoIndex = dot.photos.findIndex(p => p.id === photoId);
     if (photoIndex !== -1) {
         dot.photos.splice(photoIndex, 1);
-        
+
         // Mark as dirty
         setDirtyState();
-        
+
         // Update gallery display
         populateGallery(dot);
-        
+
         console.log(`Photo deleted. Remaining photos: ${dot.photos.length}`);
     }
 }
@@ -6159,7 +6160,7 @@ function setupGalleryEventListeners() {
     // Only setup once
     if (window.galleryListenersSetup) return;
     window.galleryListenersSetup = true;
-    
+
     // Close button
     const closeBtn = document.getElementById('gallery-close-btn');
     if (closeBtn) {
@@ -6167,7 +6168,7 @@ function setupGalleryEventListeners() {
             closeEditModal(); // This will close both modals
         });
     }
-    
+
     // Add photo button
     const addBtn = document.getElementById('gallery-add-btn');
     if (addBtn) {
@@ -6180,14 +6181,14 @@ function setupGalleryEventListeners() {
 // Photo capture/upload functions
 function showPhotoOptions() {
     if (!currentGalleryDot) return;
-    
+
     // Check if dot already has 4 photos
     const dot = getCurrentPageDots().get(currentGalleryDot.internalId);
     if (dot && dot.photos && dot.photos.length >= 4) {
         alert('Maximum 4 photos per location reached.');
         return;
     }
-    
+
     // Create options modal
     const optionsModal = document.createElement('div');
     optionsModal.className = 'ms-photo-options-modal';
@@ -6208,37 +6209,37 @@ function showPhotoOptions() {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(optionsModal);
-    
+
     // Handle close button
     document.getElementById('close-photo-options').addEventListener('click', () => {
         optionsModal.remove();
     });
-    
+
     // Handle take photo button
     document.getElementById('take-photo-btn').addEventListener('click', () => {
         optionsModal.remove();
         openCameraCapture();
     });
-    
+
     // Handle choose file button
     const fileInput = document.getElementById('photo-file-input');
     document.getElementById('choose-file-btn').addEventListener('click', () => {
         fileInput.click();
     });
-    
+
     // Handle file selection
-    fileInput.addEventListener('change', async (e) => {
+    fileInput.addEventListener('change', async e => {
         const file = e.target.files[0];
         if (file) {
             optionsModal.remove();
             await processImageFile(file);
         }
     });
-    
+
     // Close on background click
-    optionsModal.addEventListener('click', (e) => {
+    optionsModal.addEventListener('click', e => {
         if (e.target === optionsModal) {
             optionsModal.remove();
         }
@@ -6264,14 +6265,14 @@ async function openCameraCapture() {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(cameraModal);
-    
+
     const video = document.getElementById('camera-video');
     const canvas = document.getElementById('camera-canvas');
     const ctx = canvas.getContext('2d');
     let stream = null;
-    
+
     try {
         // Request camera access (prefer back camera on mobile)
         stream = await navigator.mediaDevices.getUserMedia({
@@ -6281,35 +6282,38 @@ async function openCameraCapture() {
                 height: { ideal: 1080 }
             }
         });
-        
+
         video.srcObject = stream;
-        
+
         // Handle capture button
         document.getElementById('capture-btn').addEventListener('click', async () => {
             // Set canvas size to video size
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            
+
             // Draw video frame to canvas
             ctx.drawImage(video, 0, 0);
-            
+
             // Convert to blob
-            canvas.toBlob(async (blob) => {
-                // Stop camera
-                stream.getTracks().forEach(track => track.stop());
-                cameraModal.remove();
-                
-                // Process the captured image
-                await processImageBlob(blob);
-            }, 'image/jpeg', 0.9);
+            canvas.toBlob(
+                async blob => {
+                    // Stop camera
+                    stream.getTracks().forEach(track => track.stop());
+                    cameraModal.remove();
+
+                    // Process the captured image
+                    await processImageBlob(blob);
+                },
+                'image/jpeg',
+                0.9
+            );
         });
-        
+
         // Handle close button
         document.getElementById('close-camera').addEventListener('click', () => {
             stream.getTracks().forEach(track => track.stop());
             cameraModal.remove();
         });
-        
     } catch (error) {
         console.error('Camera access denied:', error);
         alert('Camera access denied or not available.');
@@ -6326,7 +6330,7 @@ async function processImageFile(file) {
 async function processImageBlob(blob) {
     // Compress image to max 500KB
     const compressedBlob = await compressImage(blob, 500);
-    
+
     // Convert to base64
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -6337,17 +6341,17 @@ async function processImageBlob(blob) {
 }
 
 async function compressImage(blob, maxSizeKB) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         const img = new Image();
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         img.onload = async () => {
             // Calculate new dimensions (max 1920px on longest side)
             let width = img.width;
             let height = img.height;
             const maxDimension = 1920;
-            
+
             if (width > height && width > maxDimension) {
                 height = (height / width) * maxDimension;
                 width = maxDimension;
@@ -6355,27 +6359,27 @@ async function compressImage(blob, maxSizeKB) {
                 width = (width / height) * maxDimension;
                 height = maxDimension;
             }
-            
+
             canvas.width = width;
             canvas.height = height;
-            
+
             // Draw resized image
             ctx.drawImage(img, 0, 0, width, height);
-            
+
             // Compress with reducing quality until under maxSizeKB
             let quality = 0.9;
             let compressedBlob;
-            
+
             do {
                 compressedBlob = await new Promise(resolve => {
                     canvas.toBlob(resolve, 'image/jpeg', quality);
                 });
                 quality -= 0.1;
             } while (compressedBlob.size > maxSizeKB * 1024 && quality > 0.1);
-            
+
             resolve(compressedBlob);
         };
-        
+
         // Create object URL and load image
         const url = URL.createObjectURL(blob);
         img.src = url;
@@ -6384,19 +6388,19 @@ async function compressImage(blob, maxSizeKB) {
 
 function addPhotoToDot(base64Data) {
     if (!currentGalleryDot) return;
-    
+
     // Get the current dot
-    const dots = appState.dotsByPage.get(appState.currentPdfPage);
+    const dots = getCurrentPageDots();
     if (!dots) return;
-    
+
     const dot = dots.get(currentGalleryDot.internalId);
     if (!dot) return;
-    
+
     // Initialize photos array if needed
     if (!dot.photos) {
         dot.photos = [];
     }
-    
+
     // Add photo (check max 4)
     if (dot.photos.length < 4) {
         dot.photos.push({
@@ -6404,13 +6408,13 @@ function addPhotoToDot(base64Data) {
             data: base64Data,
             timestamp: new Date().toISOString()
         });
-        
+
         // Mark as dirty for saving
         setDirtyState();
-        
+
         // Update gallery display
         populateGallery(dot);
-        
+
         console.log(`Photo added. Total photos: ${dot.photos.length}`);
     }
 }
