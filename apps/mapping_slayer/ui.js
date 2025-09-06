@@ -3761,6 +3761,9 @@ function openEditModal(internalId) {
 
     const modal = document.getElementById('mapping-slayer-edit-modal');
     modal.style.display = 'block';
+    
+    // Also show the gallery modal
+    openGalleryModal(dot);
 }
 
 function openGroupEditModal() {
@@ -3811,6 +3814,9 @@ function closeEditModal() {
         modal.style.display = 'none';
         appState.editingDot = null;
     }
+    
+    // Also close the gallery modal
+    closeGalleryModal();
 }
 
 function closeGroupEditModal() {
@@ -5980,3 +5986,102 @@ export {
 function resetKeyboardShortcutsFlag() {
     keyboardShortcutsSetup = false;
 }
+
+// Gallery Modal Functions
+function openGalleryModal(dot) {
+    const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
+    if (!galleryModal) return;
+    
+    // Show the modal
+    galleryModal.classList.add('ms-visible');
+    
+    // Initialize gallery with dot's photos
+    populateGallery(dot);
+    
+    // Setup gallery event listeners if not already done
+    setupGalleryEventListeners();
+}
+
+function closeGalleryModal() {
+    const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
+    if (galleryModal) {
+        galleryModal.classList.remove('ms-visible');
+    }
+}
+
+function populateGallery(dot) {
+    const mainImage = document.getElementById('gallery-main-image');
+    const thumbnails = document.querySelectorAll('.ms-gallery-thumb');
+    
+    // Clear current content
+    if (mainImage) {
+        mainImage.innerHTML = '<span class="ms-gallery-placeholder">CURRENT PIC</span>';
+    }
+    
+    thumbnails.forEach(thumb => {
+        thumb.innerHTML = '';
+        thumb.classList.remove('active');
+    });
+    
+    // If dot has photos, display them
+    if (dot.photos && dot.photos.length > 0) {
+        dot.photos.forEach((photo, index) => {
+            if (index < 4) {
+                const thumb = thumbnails[index];
+                if (thumb) {
+                    const img = document.createElement('img');
+                    img.src = photo.data;
+                    img.alt = `Photo ${index + 1}`;
+                    thumb.appendChild(img);
+                    
+                    // Set first photo as active
+                    if (index === 0) {
+                        thumb.classList.add('active');
+                        displayMainImage(photo.data);
+                    }
+                    
+                    // Add click handler
+                    thumb.onclick = () => {
+                        thumbnails.forEach(t => t.classList.remove('active'));
+                        thumb.classList.add('active');
+                        displayMainImage(photo.data);
+                    };
+                }
+            }
+        });
+    }
+}
+
+function displayMainImage(imageSrc) {
+    const mainImage = document.getElementById('gallery-main-image');
+    if (mainImage) {
+        mainImage.innerHTML = `<img src="${imageSrc}" alt="Selected photo">`;
+    }
+}
+
+function setupGalleryEventListeners() {
+    // Only setup once
+    if (window.galleryListenersSetup) return;
+    window.galleryListenersSetup = true;
+    
+    // Close button
+    const closeBtn = document.getElementById('gallery-close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            closeEditModal(); // This will close both modals
+        });
+    }
+    
+    // Add photo button
+    const addBtn = document.getElementById('gallery-add-btn');
+    if (addBtn) {
+        addBtn.addEventListener('click', () => {
+            // TODO: Implement photo capture/upload
+            console.log('Add photo clicked');
+        });
+    }
+}
+
+// Make gallery functions available globally
+window.openGalleryModal = openGalleryModal;
+window.closeGalleryModal = closeGalleryModal;

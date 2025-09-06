@@ -328,6 +328,32 @@ class MappingSlayerApp extends SlayerAppBase {
                 </div>
             </div>
 
+            <!-- Gallery Modal (shows alongside Edit Location modal) -->
+            <div class="ms-modal ms-gallery-modal" id="mapping-slayer-gallery-modal">
+                <div class="ms-modal-content ms-gallery-content">
+                    <div class="ms-gallery-header">
+                        <span class="ms-gallery-title">Gallery</span>
+                        <div class="ms-gallery-controls">
+                            <button class="ms-gallery-btn ms-gallery-add-btn" id="gallery-add-btn" title="Add Photo">+</button>
+                            <button class="ms-gallery-btn ms-gallery-close-btn" id="gallery-close-btn" title="Close">×</button>
+                        </div>
+                    </div>
+                    <div class="ms-gallery-body">
+                        <div class="ms-gallery-main-view">
+                            <div class="ms-gallery-main-image" id="gallery-main-image">
+                                <span class="ms-gallery-placeholder">CURRENT PIC</span>
+                            </div>
+                        </div>
+                        <div class="ms-gallery-thumbnails">
+                            <div class="ms-gallery-thumb" data-index="0"></div>
+                            <div class="ms-gallery-thumb" data-index="1"></div>
+                            <div class="ms-gallery-thumb" data-index="2"></div>
+                            <div class="ms-gallery-thumb" data-index="3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Group Edit Modal -->
             <div class="ms-modal" id="mapping-slayer-group-edit-modal">
                 <div class="ms-modal-content">
