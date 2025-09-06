@@ -1390,7 +1390,7 @@ body {
     display: none;
     position: fixed;
     z-index: 10000; /* Same level as edit modal */
-    left: calc(50% + 220px); /* Position to the right of edit modal (400px/2 + 20px gap) */
+    left: calc(50% + 210px); /* Position to the right of edit modal (400px/2 + 10px gap) */
     width: 380px; /* Slightly smaller than max to match edit modal */
     max-width: 400px;
 }
