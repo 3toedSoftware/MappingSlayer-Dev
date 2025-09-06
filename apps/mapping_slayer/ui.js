@@ -1657,6 +1657,8 @@ function updateEditModalOptions(selectElementId = 'edit-marker-type', isGroupEdi
 let touchDraggingDot = null;
 let touchDragStartPos = { x: 0, y: 0 };
 let touchDragOriginalDotPos = { x: 0, y: 0 };
+let longPressTimer = null;
+let isLongPress = false;
 
 function handleDotTouchStart(e) {
     const dotElement = e.target.closest('.ms-map-dot');
@@ -1671,6 +1673,27 @@ function handleDotTouchStart(e) {
             touchDraggingDot = { element: dotElement, dot: dot, id: dotId };
             touchDragStartPos = { x: touch.clientX, y: touch.clientY };
             touchDragOriginalDotPos = { x: dot.x, y: dot.y };
+            
+            // Start long press timer (500ms)
+            isLongPress = false;
+            longPressTimer = setTimeout(() => {
+                isLongPress = true;
+                // Trigger haptic feedback if available
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+                
+                // Open edit modal
+                clearSelection();
+                selectDot(dotId);
+                updateSelectionUI();
+                openEditModal(dotId);
+                
+                // Reset drag state since we're opening modal
+                touchDraggingDot = null;
+                dotElement.style.zIndex = '';
+                dotElement.style.opacity = '';
+            }, 500);
             
             // Add visual feedback
             dotElement.style.zIndex = '1000';
@@ -1688,6 +1711,12 @@ function handleDotTouchMove(e) {
     const touch = e.touches[0];
     const deltaX = (touch.clientX - touchDragStartPos.x) / appState.mapTransform.scale;
     const deltaY = (touch.clientY - touchDragStartPos.y) / appState.mapTransform.scale;
+    
+    // Cancel long press if user moves more than 10 pixels
+    if (longPressTimer && (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10)) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
     
     // Update dot position
     const newX = touchDragOriginalDotPos.x + deltaX;
@@ -1708,6 +1737,18 @@ function handleDotTouchMove(e) {
 }
 
 function handleDotTouchEnd(e) {
+    // Clear long press timer
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+    
+    // If long press was triggered, don't do anything else
+    if (isLongPress) {
+        isLongPress = false;
+        return;
+    }
+    
     if (touchDraggingDot) {
         // Restore visual style
         touchDraggingDot.element.style.zIndex = '';
