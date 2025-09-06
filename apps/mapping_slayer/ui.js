@@ -5991,12 +5991,14 @@ function resetKeyboardShortcutsFlag() {
 }
 
 // Gallery Modal Functions
-function openGalleryModal(dot) {
+let currentGalleryDot = null;
+let galleryResizeHandler = null;
+
+function updateGalleryPosition() {
     const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
     const editModal = document.getElementById('mapping-slayer-edit-modal');
     if (!galleryModal || !editModal) return;
     
-    // Match the height and position of the edit modal
     const editModalContent = editModal.querySelector('.ms-modal-content');
     if (editModalContent) {
         const editHeight = editModalContent.offsetHeight;
@@ -6015,6 +6017,17 @@ function openGalleryModal(dot) {
         galleryModal.style.left = (editRight + 10) + 'px'; // 10px gap
         galleryModal.style.transform = 'none'; // Remove any transforms
     }
+}
+
+function openGalleryModal(dot) {
+    const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
+    if (!galleryModal) return;
+    
+    // Store current dot reference
+    currentGalleryDot = dot;
+    
+    // Position the gallery
+    updateGalleryPosition();
     
     // Show the modal
     galleryModal.classList.add('ms-visible');
@@ -6024,6 +6037,23 @@ function openGalleryModal(dot) {
     
     // Setup gallery event listeners if not already done
     setupGalleryEventListeners();
+    
+    // Add resize listener with debouncing
+    if (galleryResizeHandler) {
+        window.removeEventListener('resize', galleryResizeHandler);
+    }
+    
+    let resizeTimeout;
+    galleryResizeHandler = () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (galleryModal.classList.contains('ms-visible')) {
+                updateGalleryPosition();
+            }
+        }, 100); // Debounce by 100ms
+    };
+    
+    window.addEventListener('resize', galleryResizeHandler);
 }
 
 function closeGalleryModal() {
@@ -6031,6 +6061,15 @@ function closeGalleryModal() {
     if (galleryModal) {
         galleryModal.classList.remove('ms-visible');
     }
+    
+    // Clean up resize listener
+    if (galleryResizeHandler) {
+        window.removeEventListener('resize', galleryResizeHandler);
+        galleryResizeHandler = null;
+    }
+    
+    // Clear current dot reference
+    currentGalleryDot = null;
 }
 
 function populateGallery(dot) {
