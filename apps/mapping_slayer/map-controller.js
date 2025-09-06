@@ -552,6 +552,9 @@ function handleMapWheel(e) {
 let touches = [];
 let lastTouchDistance = 0;
 let isPinching = false;
+let touchDragging = false;
+let touchDragStart = { x: 0, y: 0 };
+let touchLastTransform = { x: 0, y: 0 };
 
 function handleTouchStart(e) {
     // Store touch points
@@ -560,14 +563,23 @@ function handleTouchStart(e) {
     if (touches.length === 2) {
         // Two fingers - start pinch zoom
         isPinching = true;
+        touchDragging = false;
         const dx = touches[0].clientX - touches[1].clientX;
         const dy = touches[0].clientY - touches[1].clientY;
         lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
         e.preventDefault();
     } else if (touches.length === 1) {
-        // Single touch - might be pan or tap
+        // Single touch - start pan
         isPinching = false;
-        // Let the existing mouse handlers deal with single touch via mousedown
+        touchDragging = true;
+        touchDragStart.x = touches[0].clientX;
+        touchDragStart.y = touches[0].clientY;
+        touchLastTransform.x = appState.mapTransform.x;
+        touchLastTransform.y = appState.mapTransform.y;
+        
+        // Add dragging class for visual feedback
+        const mapContainer = document.getElementById('map-container');
+        mapContainer.classList.add('ms-dragging');
     }
 }
 
@@ -606,9 +618,22 @@ function handleTouchMove(e) {
         
         lastTouchDistance = distance;
         touches = Array.from(e.touches);
-    } else if (touches.length === 1 && e.touches.length === 1 && !isPinching) {
-        // Single finger pan - let existing mouse move handler deal with it
-        // The browser converts touch to mouse events automatically
+    } else if (touches.length === 1 && e.touches.length === 1 && !isPinching && touchDragging) {
+        // Single finger pan
+        e.preventDefault();
+        
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - touchDragStart.x;
+        const deltaY = touch.clientY - touchDragStart.y;
+        
+        // Only consider it a drag if moved more than 5 pixels (to distinguish from tap)
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+            appState.mapTransform.x = touchLastTransform.x + deltaX;
+            appState.mapTransform.y = touchLastTransform.y + deltaY;
+            
+            applyMapTransform();
+            updateViewportDotsThrottled();
+        }
     }
 }
 
@@ -617,6 +642,12 @@ function handleTouchEnd(e) {
     if (touches.length < 2) {
         isPinching = false;
         lastTouchDistance = 0;
+    }
+    if (touches.length === 0) {
+        touchDragging = false;
+        // Remove dragging class
+        const mapContainer = document.getElementById('map-container');
+        mapContainer.classList.remove('ms-dragging');
     }
 }
 
