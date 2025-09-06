@@ -5996,7 +5996,7 @@ function openGalleryModal(dot) {
     const editModal = document.getElementById('mapping-slayer-edit-modal');
     if (!galleryModal || !editModal) return;
     
-    // Match the height of the edit modal
+    // Match the height and position of the edit modal
     const editModalContent = editModal.querySelector('.ms-modal-content');
     if (editModalContent) {
         const editHeight = editModalContent.offsetHeight;
@@ -6006,11 +6006,14 @@ function openGalleryModal(dot) {
             galleryContent.style.minHeight = editHeight + 'px';
         }
         
-        // Also match vertical position
+        // Position gallery 10px to the right of edit modal
         const editRect = editModalContent.getBoundingClientRect();
         const editTop = editRect.top;
+        const editRight = editRect.right;
+        
         galleryModal.style.top = editTop + 'px';
-        galleryModal.style.transform = 'none'; // Remove the translateY since we're using absolute top
+        galleryModal.style.left = (editRight + 10) + 'px'; // 10px gap
+        galleryModal.style.transform = 'none'; // Remove any transforms
     }
     
     // Show the modal
