@@ -553,13 +553,13 @@ let touches = [];
 let lastTouchDistance = 0;
 let isPinching = false;
 let touchDragging = false;
-const touchDragStart = { x: 0, y: 0 };
-const touchLastTransform = { x: 0, y: 0 };
+let touchDragStart = { x: 0, y: 0 };
+let touchLastTransform = { x: 0, y: 0 };
 
 function handleTouchStart(e) {
     // Store touch points
     touches = Array.from(e.touches);
-
+    
     if (touches.length === 2) {
         // Two fingers - start pinch zoom
         isPinching = true;
@@ -576,7 +576,7 @@ function handleTouchStart(e) {
         touchDragStart.y = touches[0].clientY;
         touchLastTransform.x = appState.mapTransform.x;
         touchLastTransform.y = appState.mapTransform.y;
-
+        
         // Add dragging class for visual feedback
         const mapContainer = document.getElementById('map-container');
         mapContainer.classList.add('ms-dragging');
@@ -587,50 +587,50 @@ function handleTouchMove(e) {
     if (touches.length === 2 && e.touches.length === 2) {
         // Pinch zoom
         e.preventDefault();
-
+        
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
-
+        
         // Calculate distance between touches
         const dx = touch1.clientX - touch2.clientX;
         const dy = touch1.clientY - touch2.clientY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-
+        
         if (lastTouchDistance > 0) {
             // Calculate zoom
             const scale = distance / lastTouchDistance;
             const newScale = Math.max(0.1, Math.min(5, appState.mapTransform.scale * scale));
-
+            
             // Find center point between touches
             const rect = e.currentTarget.getBoundingClientRect();
             const centerX = ((touch1.clientX + touch2.clientX) / 2) - rect.left;
             const centerY = ((touch1.clientY + touch2.clientY) / 2) - rect.top;
-
+            
             // Zoom towards center point
             const scaleChange = newScale / appState.mapTransform.scale;
             appState.mapTransform.x = centerX - (centerX - appState.mapTransform.x) * scaleChange;
             appState.mapTransform.y = centerY - (centerY - appState.mapTransform.y) * scaleChange;
             appState.mapTransform.scale = newScale;
-
+            
             applyMapTransform();
             updateViewportDots();
         }
-
+        
         lastTouchDistance = distance;
         touches = Array.from(e.touches);
     } else if (touches.length === 1 && e.touches.length === 1 && !isPinching && touchDragging) {
         // Single finger pan
         e.preventDefault();
-
+        
         const touch = e.touches[0];
         const deltaX = touch.clientX - touchDragStart.x;
         const deltaY = touch.clientY - touchDragStart.y;
-
+        
         // Only consider it a drag if moved more than 5 pixels (to distinguish from tap)
         if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
             appState.mapTransform.x = touchLastTransform.x + deltaX;
             appState.mapTransform.y = touchLastTransform.y + deltaY;
-
+            
             applyMapTransform();
             updateViewportDotsThrottled();
         }
@@ -658,12 +658,12 @@ function setupMapInteraction() {
     // Mouse events
     mapContainer.addEventListener('mousedown', handleMapMouseDown);
     mapContainer.addEventListener('wheel', handleMapWheel, { passive: false });
-
+    
     // Touch events for mobile/tablet
     mapContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
     mapContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
     mapContainer.addEventListener('touchend', handleTouchEnd, { passive: false });
-
+    
     // Prevent default touch behavior on the map
     mapContainer.style.touchAction = 'none';
 }
