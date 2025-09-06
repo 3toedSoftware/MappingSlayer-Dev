@@ -162,6 +162,7 @@ class MappingSlayerApp extends SlayerAppBase {
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="toggle-messages2-btn">SHOW MSG2</button>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="toggle-inst-display-btn">INST ONLY</button>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="renumber-btn">RENUMBER</button>
+                        <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="dotcam-btn">DOTCAM</button>
                     </div>
                     
                     <div class="ms-legends-container">

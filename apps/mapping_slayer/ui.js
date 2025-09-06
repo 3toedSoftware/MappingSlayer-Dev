@@ -44,6 +44,9 @@ import { initializeMarkerTypeFlags, openFlagModal } from './flag-ui.js';
 
 const previewTimeout = null;
 
+// DOTCAM mode state
+let isDotcamMode = false;
+
 // Performance optimization: Cache dot counts by marker type
 const dotCountCache = new Map(); // markerType -> count
 let dotCountCacheValid = false;
@@ -3469,6 +3472,7 @@ function addButtonEventListeners() {
     const toggleMessages2Btn = document.querySelector('#toggle-messages2-btn');
     const toggleLocationsBtn = document.querySelector('#toggle-locations-btn');
     const renumberBtn = document.querySelector('#renumber-btn');
+    const dotcamBtn = document.querySelector('#dotcam-btn');
     const findInput = document.querySelector('#find-input');
     const replaceInput = document.querySelector('#replace-input');
     const findAllBtn = document.querySelector('#find-all-btn');
@@ -3481,6 +3485,20 @@ function addButtonEventListeners() {
     if (renumberBtn) {
         renumberBtn.addEventListener('click', () => {
             openRenumberModal();
+        });
+    }
+
+    if (dotcamBtn) {
+        dotcamBtn.addEventListener('click', () => {
+            isDotcamMode = !isDotcamMode;
+            dotcamBtn.classList.toggle('active', isDotcamMode);
+            if (isDotcamMode) {
+                dotcamBtn.style.background = '#f07727';
+                dotcamBtn.style.color = 'white';
+            } else {
+                dotcamBtn.style.background = '';
+                dotcamBtn.style.color = '';
+            }
         });
     }
 
@@ -3738,6 +3756,16 @@ function generateFlagSelectors(modalType, dot, multipleDots = null) {
 function openEditModal(internalId) {
     const dot = getCurrentPageDots().get(internalId);
     if (!dot) return;
+
+    // Check if DOTCAM mode is active
+    if (isDotcamMode) {
+        // Store the dot reference for photo capture
+        currentGalleryDot = dot;
+        
+        // Open camera directly
+        openCameraForDotcam();
+        return;
+    }
 
     // Migrate old properties to new flag system if needed
     migrateDotToFlags(dot);
@@ -6244,6 +6272,11 @@ function showPhotoOptions() {
             optionsModal.remove();
         }
     });
+}
+
+function openCameraForDotcam() {
+    // In DOTCAM mode, go directly to camera capture without the options modal
+    openCameraCapture();
 }
 
 async function openCameraCapture() {
