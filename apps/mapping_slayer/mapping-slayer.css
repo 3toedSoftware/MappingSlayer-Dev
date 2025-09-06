@@ -1390,13 +1390,9 @@ body {
     display: none;
     position: fixed;
     z-index: 10000; /* Same level as edit modal */
-    top: 50%;
     left: calc(50% + 220px); /* Position to the right of edit modal (400px/2 + 20px gap) */
-    transform: translateY(-50%);
     width: 380px; /* Slightly smaller than max to match edit modal */
     max-width: 400px;
-    height: auto;
-    max-height: 80vh;
 }
 
 .ms-gallery-modal.ms-visible {
@@ -1412,7 +1408,7 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     padding: 10px;
     height: 100%;
-    min-height: 500px;
+    overflow: hidden;
 }
 
 .ms-gallery-header {

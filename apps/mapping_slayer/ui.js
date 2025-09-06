@@ -3763,7 +3763,10 @@ function openEditModal(internalId) {
     modal.style.display = 'block';
     
     // Also show the gallery modal
-    openGalleryModal(dot);
+    // Use setTimeout to ensure edit modal is fully rendered first
+    setTimeout(() => {
+        openGalleryModal(dot);
+    }, 50);
 }
 
 function openGroupEditModal() {
@@ -5990,7 +5993,25 @@ function resetKeyboardShortcutsFlag() {
 // Gallery Modal Functions
 function openGalleryModal(dot) {
     const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
-    if (!galleryModal) return;
+    const editModal = document.getElementById('mapping-slayer-edit-modal');
+    if (!galleryModal || !editModal) return;
+    
+    // Match the height of the edit modal
+    const editModalContent = editModal.querySelector('.ms-modal-content');
+    if (editModalContent) {
+        const editHeight = editModalContent.offsetHeight;
+        const galleryContent = galleryModal.querySelector('.ms-gallery-content');
+        if (galleryContent) {
+            galleryContent.style.height = editHeight + 'px';
+            galleryContent.style.minHeight = editHeight + 'px';
+        }
+        
+        // Also match vertical position
+        const editRect = editModalContent.getBoundingClientRect();
+        const editTop = editRect.top;
+        galleryModal.style.top = editTop + 'px';
+        galleryModal.style.transform = 'none'; // Remove the translateY since we're using absolute top
+    }
     
     // Show the modal
     galleryModal.classList.add('ms-visible');
