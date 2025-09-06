@@ -548,13 +548,93 @@ function handleMapWheel(e) {
     updateViewportDots();
 }
 
+// Touch handling variables
+let touches = [];
+let lastTouchDistance = 0;
+let isPinching = false;
+
+function handleTouchStart(e) {
+    // Store touch points
+    touches = Array.from(e.touches);
+    
+    if (touches.length === 2) {
+        // Two fingers - start pinch zoom
+        isPinching = true;
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+        e.preventDefault();
+    } else if (touches.length === 1) {
+        // Single touch - might be pan or tap
+        isPinching = false;
+        // Let the existing mouse handlers deal with single touch via mousedown
+    }
+}
+
+function handleTouchMove(e) {
+    if (touches.length === 2 && e.touches.length === 2) {
+        // Pinch zoom
+        e.preventDefault();
+        
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        
+        // Calculate distance between touches
+        const dx = touch1.clientX - touch2.clientX;
+        const dy = touch1.clientY - touch2.clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (lastTouchDistance > 0) {
+            // Calculate zoom
+            const scale = distance / lastTouchDistance;
+            const newScale = Math.max(0.1, Math.min(5, appState.mapTransform.scale * scale));
+            
+            // Find center point between touches
+            const rect = e.currentTarget.getBoundingClientRect();
+            const centerX = ((touch1.clientX + touch2.clientX) / 2) - rect.left;
+            const centerY = ((touch1.clientY + touch2.clientY) / 2) - rect.top;
+            
+            // Zoom towards center point
+            const scaleChange = newScale / appState.mapTransform.scale;
+            appState.mapTransform.x = centerX - (centerX - appState.mapTransform.x) * scaleChange;
+            appState.mapTransform.y = centerY - (centerY - appState.mapTransform.y) * scaleChange;
+            appState.mapTransform.scale = newScale;
+            
+            applyMapTransform();
+            updateViewportDots();
+        }
+        
+        lastTouchDistance = distance;
+        touches = Array.from(e.touches);
+    } else if (touches.length === 1 && e.touches.length === 1 && !isPinching) {
+        // Single finger pan - let existing mouse move handler deal with it
+        // The browser converts touch to mouse events automatically
+    }
+}
+
+function handleTouchEnd(e) {
+    touches = Array.from(e.touches);
+    if (touches.length < 2) {
+        isPinching = false;
+        lastTouchDistance = 0;
+    }
+}
+
 function setupMapInteraction() {
     const mapContainer = document.getElementById('map-container');
     if (!mapContainer) return;
 
+    // Mouse events
     mapContainer.addEventListener('mousedown', handleMapMouseDown);
     mapContainer.addEventListener('wheel', handleMapWheel, { passive: false });
-    // Remove the cursor style setting and event listeners since we're using CSS defaults
+    
+    // Touch events for mobile/tablet
+    mapContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+    mapContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+    mapContainer.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // Prevent default touch behavior on the map
+    mapContainer.style.touchAction = 'none';
 }
 
 export {
