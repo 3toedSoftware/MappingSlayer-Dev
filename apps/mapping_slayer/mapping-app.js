@@ -19,7 +19,7 @@ import {
     updateAllSectionsForCurrentPage,
     zoomToFitDots
 } from './ui.js';
-import { withoutAutoSync, triggerManualSync, getCurrentPageDots } from './state.js';
+import { withoutAutoSync, triggerManualSync, getCurrentPageDots, appState } from './state.js';
 
 class MappingSlayerApp extends SlayerAppBase {
     constructor() {
@@ -162,6 +162,7 @@ class MappingSlayerApp extends SlayerAppBase {
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="toggle-messages2-btn">SHOW MSG2</button>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="toggle-inst-display-btn">INST ONLY</button>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="renumber-btn">RENUMBER</button>
+                        <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width ms-camera-toggle" id="camera-toggle-btn" title="Toggle Camera">📷</button>
                     </div>
                     
                     <div class="ms-legends-container">
@@ -318,6 +319,17 @@ class MappingSlayerApp extends SlayerAppBase {
                         <div class="ms-form-group">
                             <label class="ms-form-label">Notes</label>
                             <textarea class="ms-form-input ms-form-textarea" id="edit-notes" placeholder="Enter notes..."></textarea>
+                        </div>
+                        <div class="ms-form-group">
+                            <label class="ms-form-label">Photos</label>
+                            <div class="ms-photo-gallery" id="edit-photo-gallery">
+                                <div class="ms-photo-grid">
+                                    <!-- Photos will be dynamically inserted here -->
+                                </div>
+                                <button class="ms-btn ms-btn-secondary ms-add-photo-btn" id="add-photo-btn" title="Add Photo">
+                                    <span style="font-size: 20px;">+</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="ms-modal-buttons">
@@ -675,6 +687,16 @@ class MappingSlayerApp extends SlayerAppBase {
                 if (controlsModal) {
                     controlsModal.style.display = 'block';
                 }
+            });
+        }
+
+        // Camera toggle button
+        const cameraToggleBtn = this.container.querySelector('#camera-toggle-btn');
+        if (cameraToggleBtn) {
+            cameraToggleBtn.addEventListener('click', () => {
+                appState.cameraEnabled = !appState.cameraEnabled;
+                cameraToggleBtn.classList.toggle('active', appState.cameraEnabled);
+                console.log('Camera mode:', appState.cameraEnabled ? 'ON' : 'OFF');
             });
         }
 

@@ -31,6 +31,7 @@ export const appState = {
     messages2Visible: false,
     locationsVisible: true,
     instFilterMode: 'showInst', // 'instOnly', 'hideInst', 'showInst'
+    cameraEnabled: false, // Camera toggle state for auto-capture
     searchResults: [],
     currentSearchIndex: -1,
     replaceText: '',

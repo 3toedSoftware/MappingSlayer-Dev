@@ -1663,17 +1663,17 @@ let isLongPress = false;
 function handleDotTouchStart(e) {
     const dotElement = e.target.closest('.ms-map-dot');
     if (!dotElement) return;
-    
+
     if (e.touches.length === 1) {
         const touch = e.touches[0];
         const dotId = dotElement.dataset.dotId;
         const dot = getCurrentPageDots().get(dotId);
-        
+
         if (dot) {
             touchDraggingDot = { element: dotElement, dot: dot, id: dotId };
             touchDragStartPos = { x: touch.clientX, y: touch.clientY };
             touchDragOriginalDotPos = { x: dot.x, y: dot.y };
-            
+
             // Start long press timer (500ms)
             isLongPress = false;
             longPressTimer = setTimeout(() => {
@@ -1682,23 +1682,23 @@ function handleDotTouchStart(e) {
                 if (navigator.vibrate) {
                     navigator.vibrate(50);
                 }
-                
+
                 // Open edit modal
                 clearSelection();
                 selectDot(dotId);
                 updateSelectionUI();
                 openEditModal(dotId);
-                
+
                 // Reset drag state since we're opening modal
                 touchDraggingDot = null;
                 dotElement.style.zIndex = '';
                 dotElement.style.opacity = '';
             }, 500);
-            
+
             // Add visual feedback
             dotElement.style.zIndex = '1000';
             dotElement.style.opacity = '0.8';
-            
+
             e.preventDefault();
             e.stopPropagation();
         }
@@ -1707,31 +1707,31 @@ function handleDotTouchStart(e) {
 
 function handleDotTouchMove(e) {
     if (!touchDraggingDot || e.touches.length !== 1) return;
-    
+
     const touch = e.touches[0];
     const deltaX = (touch.clientX - touchDragStartPos.x) / appState.mapTransform.scale;
     const deltaY = (touch.clientY - touchDragStartPos.y) / appState.mapTransform.scale;
-    
+
     // Cancel long press if user moves more than 10 pixels
     if (longPressTimer && (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10)) {
         clearTimeout(longPressTimer);
         longPressTimer = null;
     }
-    
+
     // Update dot position
     const newX = touchDragOriginalDotPos.x + deltaX;
     const newY = touchDragOriginalDotPos.y + deltaY;
-    
+
     // Update the dot's data
     touchDraggingDot.dot.x = newX;
     touchDraggingDot.dot.y = newY;
-    
+
     // Update the visual position
     const size = 20 * appState.dotSize * 2;
     const halfSize = size / 2;
     touchDraggingDot.element.style.left = `${newX - halfSize}px`;
     touchDraggingDot.element.style.top = `${newY - halfSize}px`;
-    
+
     e.preventDefault();
     e.stopPropagation();
 }
@@ -1742,28 +1742,28 @@ function handleDotTouchEnd(e) {
         clearTimeout(longPressTimer);
         longPressTimer = null;
     }
-    
+
     // If long press was triggered, don't do anything else
     if (isLongPress) {
         isLongPress = false;
         return;
     }
-    
+
     if (touchDraggingDot) {
         // Restore visual style
         touchDraggingDot.element.style.zIndex = '';
         touchDraggingDot.element.style.opacity = '';
-        
+
         // Check if dot was actually moved (more than 5px threshold)
         const movedX = Math.abs(touchDraggingDot.dot.x - touchDragOriginalDotPos.x);
         const movedY = Math.abs(touchDraggingDot.dot.y - touchDragOriginalDotPos.y);
-        
+
         if (movedX > 5 || movedY > 5) {
             // Dot was dragged - update and save
             import('./state.js').then(({ setDirtyState }) => {
                 setDirtyState();
             });
-            
+
             // Update any annotation lines
             import('./ui.js').then(({ renderAnnotationLines }) => {
                 renderAnnotationLines();
@@ -1779,7 +1779,7 @@ function handleDotTouchEnd(e) {
             }
             updateSelectionUI();
         }
-        
+
         touchDraggingDot = null;
     }
 }
@@ -1801,7 +1801,7 @@ function setupCanvasEventListeners() {
     // Handle right-click to open edit modal
     mapContent.addEventListener('contextmenu', handleContextMenu);
     mapContainer.addEventListener('contextmenu', handleContextMenu);
-    
+
     // Touch events for dot dragging
     mapContent.addEventListener('touchstart', handleDotTouchStart, { passive: false });
     mapContent.addEventListener('touchmove', handleDotTouchMove, { passive: false });
@@ -2635,6 +2635,11 @@ function addDot(x, y, markerTypeCode, message) {
         updateMapLegend(); // Update the page legend
         updateProjectLegend(); // Update the project legend
         setDirtyState();
+
+        // Trigger camera capture if enabled
+        if (appState.cameraEnabled) {
+            capturePhotoForDot(dot.internalId);
+        }
     });
 
     return dot;
@@ -2645,6 +2650,206 @@ function addDotToData(x, y, markerTypeCode, message, message2) {
     // Don't capture here - capture should happen after the dot is fully rendered
     return dot;
 }
+
+// Camera capture functionality
+async function capturePhotoForDot(dotId) {
+    try {
+        // Create camera modal if it doesn't exist
+        let cameraModal = document.getElementById('camera-capture-modal');
+        if (!cameraModal) {
+            cameraModal = createCameraModal();
+            document.body.appendChild(cameraModal);
+        }
+
+        // Show the modal
+        cameraModal.style.display = 'block';
+        cameraModal.dataset.dotId = dotId;
+
+        // Get video element
+        const video = cameraModal.querySelector('#camera-video');
+        const captureBtn = cameraModal.querySelector('#capture-photo-btn');
+        const closeBtn = cameraModal.querySelector('#close-camera-btn');
+
+        // Request camera access
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: 'environment', // Use back camera on mobile
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            }
+        });
+
+        video.srcObject = stream;
+        await video.play();
+
+        // Handle capture button
+        captureBtn.onclick = async () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+
+            // Compress the image
+            const compressedBlob = await compressImage(canvas);
+
+            // Store the photo with the dot
+            storeDotPhoto(dotId, compressedBlob);
+
+            // Stop the camera and close modal
+            stream.getTracks().forEach(track => track.stop());
+            cameraModal.style.display = 'none';
+        };
+
+        // Handle close button
+        closeBtn.onclick = () => {
+            stream.getTracks().forEach(track => track.stop());
+            cameraModal.style.display = 'none';
+        };
+
+    } catch (error) {
+        console.error('Camera access denied or error:', error);
+        alert('Camera access denied or not available. Photo capture skipped.');
+    }
+}
+
+function createCameraModal() {
+    const modal = document.createElement('div');
+    modal.id = 'camera-capture-modal';
+    modal.className = 'ms-modal';
+    modal.innerHTML = `
+        <div class="ms-modal-content" style="max-width: 90%; max-height: 90%;">
+            <div class="ms-modal-header">
+                <span>Capture Photo for Location</span>
+                <button class="ms-modal-close" id="close-camera-btn">&times;</button>
+            </div>
+            <div class="ms-modal-body" style="text-align: center;">
+                <video id="camera-video" style="width: 100%; max-height: 60vh; background: #000;"></video>
+            </div>
+            <div class="ms-modal-buttons">
+                <button class="ms-btn ms-btn-primary" id="capture-photo-btn">CAPTURE</button>
+            </div>
+        </div>
+    `;
+    return modal;
+}
+
+async function compressImage(canvas, maxSizeKB = 500) {
+    let quality = 0.9;
+    let blob;
+
+    do {
+        blob = await new Promise(resolve => {
+            canvas.toBlob(resolve, 'image/jpeg', quality);
+        });
+        quality -= 0.1;
+    } while (blob.size > maxSizeKB * 1024 && quality > 0.1);
+
+    return blob;
+}
+
+function storeDotPhoto(dotId, photoBlob) {
+    // Get the dot data
+    const dots = appState.dotsByPage.get(appState.currentPdfPage);
+    if (!dots) return;
+
+    const dot = dots.get(dotId);
+    if (!dot) return;
+
+    // Initialize photos array if it doesn't exist
+    if (!dot.photos) {
+        dot.photos = [];
+    }
+
+    // Add photo (max 4 photos)
+    if (dot.photos.length < 4) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            dot.photos.push({
+                id: Date.now(),
+                data: reader.result,
+                timestamp: new Date().toISOString()
+            });
+            setDirtyState();
+            console.log(`Photo captured for dot ${dotId}. Total photos: ${dot.photos.length}`);
+
+            // If edit modal is open, refresh the gallery
+            if (appState.editingDot === dotId) {
+                populatePhotoGallery(dot);
+            }
+        };
+        reader.readAsDataURL(photoBlob);
+    } else {
+        alert('Maximum 4 photos per location reached.');
+    }
+}
+
+function populatePhotoGallery(dot) {
+    const photoGrid = document.querySelector('#edit-photo-gallery .ms-photo-grid');
+    const addPhotoBtn = document.getElementById('add-photo-btn');
+
+    if (!photoGrid) return;
+
+    // Clear existing photos
+    photoGrid.innerHTML = '';
+
+    // Add existing photos
+    if (dot.photos && dot.photos.length > 0) {
+        dot.photos.forEach(photo => {
+            const photoItem = document.createElement('div');
+            photoItem.className = 'ms-photo-item';
+            photoItem.innerHTML = `
+                <img src="${photo.data}" alt="Location photo" onclick="viewFullPhoto('${photo.id}')">
+                <button class="ms-photo-delete" onclick="deletePhoto(${dot.internalId}, ${photo.id})" title="Delete photo">×</button>
+            `;
+            photoGrid.appendChild(photoItem);
+        });
+    }
+
+    // Show/hide add button based on photo count
+    if (addPhotoBtn) {
+        addPhotoBtn.style.display = (!dot.photos || dot.photos.length < 4) ? 'block' : 'none';
+    }
+}
+
+function deletePhoto(dotId, photoId) {
+    const dots = appState.dotsByPage.get(appState.currentPdfPage);
+    if (!dots) return;
+
+    const dot = dots.get(dotId);
+    if (!dot || !dot.photos) return;
+
+    // Find and remove the photo
+    const photoIndex = dot.photos.findIndex(p => p.id === photoId);
+    if (photoIndex !== -1) {
+        dot.photos.splice(photoIndex, 1);
+        setDirtyState();
+
+        // Refresh the gallery
+        populatePhotoGallery(dot);
+    }
+}
+
+function viewFullPhoto(photoId) {
+    // TODO: Implement full photo viewer modal
+    console.log('View full photo:', photoId);
+}
+
+// Setup photo gallery event listeners
+function setupPhotoGalleryListeners() {
+    const addPhotoBtn = document.getElementById('add-photo-btn');
+    if (addPhotoBtn) {
+        addPhotoBtn.addEventListener('click', () => {
+            if (appState.editingDot) {
+                capturePhotoForDot(appState.editingDot);
+            }
+        });
+    }
+}
+
+// Make functions globally available for onclick handlers
+window.deletePhoto = deletePhoto;
+window.viewFullPhoto = viewFullPhoto;
 
 function isCollision(newX, newY) {
     const dots = getCurrentPageDots();
@@ -3220,6 +3425,9 @@ function setupModalEventListeners() {
         });
     }
 
+    // Setup photo gallery listeners
+    setupPhotoGalleryListeners();
+
     // Edit Modal Event Listeners
     const editModal = document.getElementById('mapping-slayer-edit-modal');
     const updateDotBtn = document.getElementById('update-dot-btn');
@@ -3758,6 +3966,9 @@ function openEditModal(internalId) {
     generateFlagSelectors('edit', dot);
 
     document.getElementById('edit-notes').value = dot.notes || '';
+
+    // Populate photo gallery
+    populatePhotoGallery(dot);
 
     const modal = document.getElementById('mapping-slayer-edit-modal');
     modal.style.display = 'block';
