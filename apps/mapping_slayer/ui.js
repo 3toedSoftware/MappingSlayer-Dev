@@ -6100,14 +6100,14 @@ function populateGallery(dot) {
                     // Set first photo as active
                     if (index === 0) {
                         thumb.classList.add('active');
-                        displayMainImage(photo.data);
+                        displayMainImage(photo.data, photo.id);
                     }
                     
                     // Add click handler
                     thumb.onclick = () => {
                         thumbnails.forEach(t => t.classList.remove('active'));
                         thumb.classList.add('active');
-                        displayMainImage(photo.data);
+                        displayMainImage(photo.data, photo.id);
                     };
                 }
             }
@@ -6115,12 +6115,45 @@ function populateGallery(dot) {
     }
 }
 
-function displayMainImage(imageSrc) {
+function displayMainImage(imageSrc, photoId = null) {
     const mainImage = document.getElementById('gallery-main-image');
     if (mainImage) {
-        mainImage.innerHTML = `<img src="${imageSrc}" alt="Selected photo">`;
+        mainImage.innerHTML = `
+            <img src="${imageSrc}" alt="Selected photo">
+            ${photoId ? `<button class="ms-gallery-delete-btn" onclick="deletePhotoFromGallery('${photoId}')" title="Delete this photo">🗑️</button>` : ''}
+        `;
     }
 }
+
+function deletePhotoFromGallery(photoId) {
+    if (!currentGalleryDot) return;
+    
+    if (!confirm('Delete this photo?')) return;
+    
+    // Get the current dot
+    const dots = appState.dotsByPage.get(appState.currentPdfPage);
+    if (!dots) return;
+    
+    const dot = dots.get(currentGalleryDot.internalId);
+    if (!dot || !dot.photos) return;
+    
+    // Find and remove the photo
+    const photoIndex = dot.photos.findIndex(p => p.id == photoId);
+    if (photoIndex !== -1) {
+        dot.photos.splice(photoIndex, 1);
+        
+        // Mark as dirty
+        setDirtyState();
+        
+        // Update gallery display
+        populateGallery(dot);
+        
+        console.log(`Photo deleted. Remaining photos: ${dot.photos.length}`);
+    }
+}
+
+// Make delete function globally available
+window.deletePhotoFromGallery = deletePhotoFromGallery;
 
 function setupGalleryEventListeners() {
     // Only setup once
@@ -6139,9 +6172,246 @@ function setupGalleryEventListeners() {
     const addBtn = document.getElementById('gallery-add-btn');
     if (addBtn) {
         addBtn.addEventListener('click', () => {
-            // TODO: Implement photo capture/upload
-            console.log('Add photo clicked');
+            showPhotoOptions();
         });
+    }
+}
+
+// Photo capture/upload functions
+function showPhotoOptions() {
+    if (!currentGalleryDot) return;
+    
+    // Check if dot already has 4 photos
+    const dot = getCurrentPageDots().get(currentGalleryDot.internalId);
+    if (dot && dot.photos && dot.photos.length >= 4) {
+        alert('Maximum 4 photos per location reached.');
+        return;
+    }
+    
+    // Create options modal
+    const optionsModal = document.createElement('div');
+    optionsModal.className = 'ms-photo-options-modal';
+    optionsModal.innerHTML = `
+        <div class="ms-photo-options-content">
+            <div class="ms-photo-options-header">
+                <span>Add Photo</span>
+                <button class="ms-modal-close" id="close-photo-options">×</button>
+            </div>
+            <div class="ms-photo-options-body">
+                <button class="ms-btn ms-btn-primary ms-photo-option-btn" id="take-photo-btn">
+                    📷 Take Photo
+                </button>
+                <button class="ms-btn ms-btn-primary ms-photo-option-btn" id="choose-file-btn">
+                    📁 Choose File
+                </button>
+                <input type="file" id="photo-file-input" accept="image/*" style="display: none;">
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(optionsModal);
+    
+    // Handle close button
+    document.getElementById('close-photo-options').addEventListener('click', () => {
+        optionsModal.remove();
+    });
+    
+    // Handle take photo button
+    document.getElementById('take-photo-btn').addEventListener('click', () => {
+        optionsModal.remove();
+        openCameraCapture();
+    });
+    
+    // Handle choose file button
+    const fileInput = document.getElementById('photo-file-input');
+    document.getElementById('choose-file-btn').addEventListener('click', () => {
+        fileInput.click();
+    });
+    
+    // Handle file selection
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            optionsModal.remove();
+            await processImageFile(file);
+        }
+    });
+    
+    // Close on background click
+    optionsModal.addEventListener('click', (e) => {
+        if (e.target === optionsModal) {
+            optionsModal.remove();
+        }
+    });
+}
+
+async function openCameraCapture() {
+    // Create camera modal
+    const cameraModal = document.createElement('div');
+    cameraModal.className = 'ms-camera-modal';
+    cameraModal.innerHTML = `
+        <div class="ms-camera-content">
+            <div class="ms-camera-header">
+                <span>Capture Photo</span>
+                <button class="ms-modal-close" id="close-camera">×</button>
+            </div>
+            <div class="ms-camera-body">
+                <video id="camera-video" autoplay playsinline></video>
+                <canvas id="camera-canvas" style="display: none;"></canvas>
+            </div>
+            <div class="ms-camera-controls">
+                <button class="ms-btn ms-btn-primary" id="capture-btn">📷 CAPTURE</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(cameraModal);
+    
+    const video = document.getElementById('camera-video');
+    const canvas = document.getElementById('camera-canvas');
+    const ctx = canvas.getContext('2d');
+    let stream = null;
+    
+    try {
+        // Request camera access (prefer back camera on mobile)
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: 'environment',
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            }
+        });
+        
+        video.srcObject = stream;
+        
+        // Handle capture button
+        document.getElementById('capture-btn').addEventListener('click', async () => {
+            // Set canvas size to video size
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw video frame to canvas
+            ctx.drawImage(video, 0, 0);
+            
+            // Convert to blob
+            canvas.toBlob(async (blob) => {
+                // Stop camera
+                stream.getTracks().forEach(track => track.stop());
+                cameraModal.remove();
+                
+                // Process the captured image
+                await processImageBlob(blob);
+            }, 'image/jpeg', 0.9);
+        });
+        
+        // Handle close button
+        document.getElementById('close-camera').addEventListener('click', () => {
+            stream.getTracks().forEach(track => track.stop());
+            cameraModal.remove();
+        });
+        
+    } catch (error) {
+        console.error('Camera access denied:', error);
+        alert('Camera access denied or not available.');
+        cameraModal.remove();
+    }
+}
+
+async function processImageFile(file) {
+    // Convert file to blob for processing
+    const blob = new Blob([file], { type: file.type });
+    await processImageBlob(blob);
+}
+
+async function processImageBlob(blob) {
+    // Compress image to max 500KB
+    const compressedBlob = await compressImage(blob, 500);
+    
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onloadend = () => {
+        const base64Data = reader.result;
+        addPhotoToDot(base64Data);
+    };
+    reader.readAsDataURL(compressedBlob);
+}
+
+async function compressImage(blob, maxSizeKB) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        img.onload = async () => {
+            // Calculate new dimensions (max 1920px on longest side)
+            let width = img.width;
+            let height = img.height;
+            const maxDimension = 1920;
+            
+            if (width > height && width > maxDimension) {
+                height = (height / width) * maxDimension;
+                width = maxDimension;
+            } else if (height > maxDimension) {
+                width = (width / height) * maxDimension;
+                height = maxDimension;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw resized image
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Compress with reducing quality until under maxSizeKB
+            let quality = 0.9;
+            let compressedBlob;
+            
+            do {
+                compressedBlob = await new Promise(resolve => {
+                    canvas.toBlob(resolve, 'image/jpeg', quality);
+                });
+                quality -= 0.1;
+            } while (compressedBlob.size > maxSizeKB * 1024 && quality > 0.1);
+            
+            resolve(compressedBlob);
+        };
+        
+        // Create object URL and load image
+        const url = URL.createObjectURL(blob);
+        img.src = url;
+    });
+}
+
+function addPhotoToDot(base64Data) {
+    if (!currentGalleryDot) return;
+    
+    // Get the current dot
+    const dots = appState.dotsByPage.get(appState.currentPdfPage);
+    if (!dots) return;
+    
+    const dot = dots.get(currentGalleryDot.internalId);
+    if (!dot) return;
+    
+    // Initialize photos array if needed
+    if (!dot.photos) {
+        dot.photos = [];
+    }
+    
+    // Add photo (check max 4)
+    if (dot.photos.length < 4) {
+        dot.photos.push({
+            id: Date.now() + Math.random(), // Unique ID
+            data: base64Data,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Mark as dirty for saving
+        setDirtyState();
+        
+        // Update gallery display
+        populateGallery(dot);
+        
+        console.log(`Photo added. Total photos: ${dot.photos.length}`);
     }
 }
 
