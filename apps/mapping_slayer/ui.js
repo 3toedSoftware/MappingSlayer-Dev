@@ -1898,6 +1898,15 @@ function handleMapClick(e) {
                     updateMapLegend(); // Update the page legend
                     updateProjectLegend(); // Update the project legend
                     setDirtyState();
+                    
+                    // Check if DOTCAM mode is active for new dots
+                    if (isDotcamMode) {
+                        // Store the dot reference for photo capture
+                        currentGalleryDot = dot;
+                        
+                        // Open camera directly for the newly created dot
+                        openCameraForDotcam();
+                    }
                 });
             }
         }
@@ -3756,16 +3765,6 @@ function generateFlagSelectors(modalType, dot, multipleDots = null) {
 function openEditModal(internalId) {
     const dot = getCurrentPageDots().get(internalId);
     if (!dot) return;
-
-    // Check if DOTCAM mode is active
-    if (isDotcamMode) {
-        // Store the dot reference for photo capture
-        currentGalleryDot = dot;
-        
-        // Open camera directly
-        openCameraForDotcam();
-        return;
-    }
 
     // Migrate old properties to new flag system if needed
     migrateDotToFlags(dot);
