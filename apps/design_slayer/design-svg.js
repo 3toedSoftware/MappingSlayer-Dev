@@ -53,7 +53,11 @@ export class DesignSVG {
     async loadSVGLibrary() {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = './apps/design_slayer/lib/svg.min.js';
+            // Use path that works both locally and on GitHub Pages
+            const basePath = window.location.pathname.includes('/3toedSoftware/') 
+                ? '/3toedSoftware/apps/design_slayer/lib/svg.min.js'
+                : '/apps/design_slayer/lib/svg.min.js';
+            script.src = basePath;
             script.onload = resolve;
             script.onerror = reject;
             document.head.appendChild(script);
