@@ -20,11 +20,17 @@ body {
 /* Adjusted for suite integration - removed header row */
 .ms-app-container {
     display: grid;
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: 280px 1fr;
     grid-template-rows: 1fr 60px; /* No header row */
     height: calc(100vh - 60px); /* Account for unified header */
     gap: 2px;
     background: #333537;
+    transition: grid-template-columns 0.3s ease;
+}
+
+/* When left panel is collapsed, adjust grid */
+.ms-app-container:has(.ms-left-panel.collapsed) {
+    grid-template-columns: 0 1fr;
 }
 
 .ms-header {
@@ -286,9 +292,48 @@ body {
     border-right: 1px solid #555;
     height: 100%;
     overflow: hidden;
-    transition: width 0.3s ease;
+    transition: transform 0.3s ease;
     position: relative;
     z-index: 10;
+    width: 100%;
+}
+
+.ms-left-panel.collapsed {
+    transform: translateX(-100%);
+}
+
+/* Collapse Button - attached to right edge of left panel */
+.ms-panel-collapse-btn {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 60px;
+    background: #f07727;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    z-index: 11;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    padding: 0;
+}
+
+.ms-panel-collapse-btn:hover {
+    background: #e55a00;
+}
+
+.ms-panel-collapse-btn .collapse-arrow {
+    color: white;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.ms-left-panel.collapsed .ms-panel-collapse-btn .collapse-arrow {
+    transform: rotate(180deg);
 }
 
 .ms-left-panel.ms-expanded {

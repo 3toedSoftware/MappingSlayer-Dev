@@ -136,6 +136,11 @@ class MappingSlayerApp extends SlayerAppBase {
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Collapse Button attached to right edge of left panel -->
+                    <button class="ms-panel-collapse-btn" id="left-panel-collapse-btn" title="Toggle left panel">
+                        <span class="collapse-arrow">◀</span>
+                    </button>
                 </div>
 
                 <!-- Map Section -->
@@ -654,6 +659,15 @@ class MappingSlayerApp extends SlayerAppBase {
     }
 
     setupBasicEventListeners() {
+        // Collapse button for left panel
+        const collapseBtn = this.container.querySelector('#left-panel-collapse-btn');
+        const leftPanel = this.container.querySelector('.ms-left-panel');
+        if (collapseBtn && leftPanel) {
+            collapseBtn.addEventListener('click', () => {
+                leftPanel.classList.toggle('collapsed');
+            });
+        }
+
         const helpBtn = this.container.querySelector('#help-btn');
         if (helpBtn) {
             helpBtn.addEventListener('click', () => {
