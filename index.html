@@ -110,15 +110,19 @@
              */
             async function initializeSlayerSuite() {
                 try {
-                    // Load PDF.js for Mapping Slayer
+                    // Load PDF.js for Mapping Slayer  
                     console.log('Loading PDF.js library...');
-                    await loadScript(
-                        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
-                    );
-                    if (window.pdfjsLib) {
-                        pdfjsLib.GlobalWorkerOptions.workerSrc =
-                            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                        console.log('PDF.js configured successfully.');
+                    try {
+                        await loadScript(
+                            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
+                        );
+                        if (window.pdfjsLib) {
+                            pdfjsLib.GlobalWorkerOptions.workerSrc =
+                                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                            console.log('PDF.js configured successfully.');
+                        }
+                    } catch (pdfError) {
+                        console.warn('PDF.js failed to load, continuing without PDF support:', pdfError);
                     }
 
                     // Import core framework
