@@ -103,7 +103,7 @@ class MappingSlayerApp extends SlayerAppBase {
                 <div class="ms-left-panel">
                     <div class="ms-panel-section ms-filter-section">
                         <div class="ms-panel-header">
-                            <span>MARKER TYPES</span>
+                            <span>MARKER TYPE 1</span>
                             <div class="ms-header-buttons">
                                 <button class="ms-btn ms-btn-small ms-btn-primary" id="add-marker-type-btn">+</button>
                                 <button class="ms-btn ms-btn-small ms-btn-secondary" id="import-marker-types-btn" title="Import Marker Types">IMP</button>
