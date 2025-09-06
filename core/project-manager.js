@@ -38,7 +38,11 @@ export class ProjectManager {
      */
     initializeWorker() {
         try {
-            this.saveWorker = new Worker('/core/save-worker.js');
+            // Use relative path that works both locally and on GitHub Pages
+            const basePath = window.location.pathname.includes('/3toedSoftware/') 
+                ? '/3toedSoftware/shared/workers/saveWorker.js'
+                : '/shared/workers/saveWorker.js';
+            this.saveWorker = new Worker(basePath);
 
             this.saveWorker.onmessage = e => {
                 this.handleWorkerMessage(e.data);
