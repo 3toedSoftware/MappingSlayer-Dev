@@ -329,8 +329,8 @@ class MappingSlayerApp extends SlayerAppBase {
             </div>
 
             <!-- Gallery Modal (shows alongside Edit Location modal) -->
-            <div class="ms-modal ms-gallery-modal" id="mapping-slayer-gallery-modal">
-                <div class="ms-modal-content ms-gallery-content">
+            <div class="ms-gallery-modal" id="mapping-slayer-gallery-modal">
+                <div class="ms-gallery-content">
                     <div class="ms-gallery-header">
                         <span class="ms-gallery-title">Gallery</span>
                         <div class="ms-gallery-controls">
