@@ -1653,6 +1653,96 @@ function updateEditModalOptions(selectElementId = 'edit-marker-type', isGroupEdi
 }
 
 // Canvas event setup functions
+// Touch drag support for dots
+let touchDraggingDot = null;
+let touchDragStartPos = { x: 0, y: 0 };
+let touchDragOriginalDotPos = { x: 0, y: 0 };
+
+function handleDotTouchStart(e) {
+    const dotElement = e.target.closest('.ms-map-dot');
+    if (!dotElement) return;
+    
+    if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const dotId = dotElement.dataset.dotId;
+        const dot = getCurrentPageDots().get(dotId);
+        
+        if (dot) {
+            touchDraggingDot = { element: dotElement, dot: dot, id: dotId };
+            touchDragStartPos = { x: touch.clientX, y: touch.clientY };
+            touchDragOriginalDotPos = { x: dot.x, y: dot.y };
+            
+            // Add visual feedback
+            dotElement.style.zIndex = '1000';
+            dotElement.style.opacity = '0.8';
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+}
+
+function handleDotTouchMove(e) {
+    if (!touchDraggingDot || e.touches.length !== 1) return;
+    
+    const touch = e.touches[0];
+    const deltaX = (touch.clientX - touchDragStartPos.x) / appState.mapTransform.scale;
+    const deltaY = (touch.clientY - touchDragStartPos.y) / appState.mapTransform.scale;
+    
+    // Update dot position
+    const newX = touchDragOriginalDotPos.x + deltaX;
+    const newY = touchDragOriginalDotPos.y + deltaY;
+    
+    // Update the dot's data
+    touchDraggingDot.dot.x = newX;
+    touchDraggingDot.dot.y = newY;
+    
+    // Update the visual position
+    const size = 20 * appState.dotSize * 2;
+    const halfSize = size / 2;
+    touchDraggingDot.element.style.left = `${newX - halfSize}px`;
+    touchDraggingDot.element.style.top = `${newY - halfSize}px`;
+    
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function handleDotTouchEnd(e) {
+    if (touchDraggingDot) {
+        // Restore visual style
+        touchDraggingDot.element.style.zIndex = '';
+        touchDraggingDot.element.style.opacity = '';
+        
+        // Check if dot was actually moved (more than 5px threshold)
+        const movedX = Math.abs(touchDraggingDot.dot.x - touchDragOriginalDotPos.x);
+        const movedY = Math.abs(touchDraggingDot.dot.y - touchDragOriginalDotPos.y);
+        
+        if (movedX > 5 || movedY > 5) {
+            // Dot was dragged - update and save
+            import('./state.js').then(({ setDirtyState }) => {
+                setDirtyState();
+            });
+            
+            // Update any annotation lines
+            import('./ui.js').then(({ renderAnnotationLines }) => {
+                renderAnnotationLines();
+            });
+        } else {
+            // Dot was tapped, not dragged - handle as click
+            const dotId = touchDraggingDot.id;
+            if (appState.selectedDots.has(dotId) && appState.selectedDots.size === 1) {
+                clearSelection();
+            } else {
+                clearSelection();
+                selectDot(dotId);
+            }
+            updateSelectionUI();
+        }
+        
+        touchDraggingDot = null;
+    }
+}
+
 function setupCanvasEventListeners() {
     const mapContent = document.getElementById('map-content');
     const mapContainer = document.getElementById('map-container');
@@ -1670,6 +1760,11 @@ function setupCanvasEventListeners() {
     // Handle right-click to open edit modal
     mapContent.addEventListener('contextmenu', handleContextMenu);
     mapContainer.addEventListener('contextmenu', handleContextMenu);
+    
+    // Touch events for dot dragging
+    mapContent.addEventListener('touchstart', handleDotTouchStart, { passive: false });
+    mapContent.addEventListener('touchmove', handleDotTouchMove, { passive: false });
+    mapContent.addEventListener('touchend', handleDotTouchEnd, { passive: false });
 
     // Set initial cursor state
     mapContainer.style.cursor = 'default';
