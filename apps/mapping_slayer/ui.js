@@ -6097,13 +6097,8 @@ function openGalleryModal(dot) {
     if (!galleryModal) return;
 
     console.log('=== OPENING GALLERY ===');
-    console.log('Dot ID:', dot.internalId);
-    console.log('Location:', dot.locationNumber);
-    console.log('Has photo:', !!dot.photo);
-    
     // Store current dot reference
     currentGalleryDot = dot;
-    console.log('currentGalleryDot set to:', currentGalleryDot.internalId);
 
     // Position the gallery
     updateGalleryPosition();
@@ -6154,10 +6149,6 @@ function closeGalleryModal() {
 function populateGallery(dot) {
     const mainImage = document.getElementById('gallery-main-image');
 
-    console.log('=== POPULATING GALLERY ===');
-    console.log('Dot ID:', dot.internalId);
-    console.log('Location:', dot.locationNumber);
-    console.log('Has photo:', !!dot.photo);
 
     // Display the photo if it exists, otherwise show placeholder
     if (mainImage) {
@@ -6199,8 +6190,6 @@ function deletePhotoFromGallery() {
 
     // Update gallery display
     populateGallery(dot);
-
-    console.log('Photo deleted from dot:', dot.locationNumber);
 }
 
 // Make delete function globally available
@@ -6444,15 +6433,10 @@ async function compressImage(blob, maxSizeKB) {
 }
 
 function addPhotoToDot(base64Data) {
-    console.log('=== REPLACING PHOTO FOR DOT ===');
-    
     if (!currentGalleryDot) {
         console.error('NO currentGalleryDot!');
         return;
     }
-    
-    console.log('Current gallery dot ID:', currentGalleryDot.internalId);
-    console.log('Current gallery dot location:', currentGalleryDot.locationNumber);
 
     // Get the current dot
     const dots = getCurrentPageDots();
@@ -6466,9 +6450,6 @@ function addPhotoToDot(base64Data) {
         console.error('Could not find dot in current page dots!');
         return;
     }
-    
-    console.log('Found dot, location:', dot.locationNumber);
-    console.log('Previous photo:', !!dot.photo ? 'exists' : 'none');
 
     // Replace the photo (single photo, not array)
     dot.photo = base64Data;
@@ -6478,8 +6459,6 @@ function addPhotoToDot(base64Data) {
 
     // Update gallery display
     populateGallery(dot);
-
-    console.log('Photo replaced for dot:', dot.locationNumber);
 }
 
 // Make gallery functions available globally
