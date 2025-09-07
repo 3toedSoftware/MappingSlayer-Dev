@@ -53,25 +53,25 @@ export function getDefaultFlagConfig() {
     return {
         [FLAG_POSITIONS.TOP_LEFT]: {
             name: 'Flag 1',
-            symbol: null,
+            symbol: 'star', // Start with star instead of null
             customIcon: null, // Base64 or URL for custom icon
             enabled: true
         },
         [FLAG_POSITIONS.TOP_RIGHT]: {
             name: 'Flag 2',
-            symbol: null,
+            symbol: 'star', // Start with star instead of null
             customIcon: null,
             enabled: true
         },
         [FLAG_POSITIONS.BOTTOM_LEFT]: {
             name: 'Flag 3',
-            symbol: null,
+            symbol: 'star', // Start with star instead of null
             customIcon: null,
             enabled: true
         },
         [FLAG_POSITIONS.BOTTOM_RIGHT]: {
             name: 'Flag 4',
-            symbol: null,
+            symbol: 'star', // Start with star instead of null
             customIcon: null,
             enabled: true
         }
