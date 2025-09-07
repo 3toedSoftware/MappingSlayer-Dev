@@ -421,9 +421,8 @@ body {
 }
 
 .ms-filter-checkbox input[type='checkbox'] {
-    margin: 0 8px;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     accent-color: #f07727;
     flex-shrink: 0;
 }
@@ -2601,14 +2600,14 @@ body {
 .ms-design-reference-container {
     display: flex;
     align-items: center;
-    margin-left: 8px;
+    margin-left: 4px;
     margin-right: 4px;
     flex-shrink: 0;
 }
 
 .ms-design-reference-square {
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 20px;
     border-radius: 4px;
     border: 2px dashed #666;
     background: #3a3a3a;
