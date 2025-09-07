@@ -25,28 +25,35 @@ class SaveManager {
         // Initialize file handle store but DON'T restore file handle
         // This ensures save button stays disabled until explicit Save As
         try {
-            console.log('🐛 Initializing fileHandleStore...');
+            if (window.debugLog)
+                window.debugLog('SAVE_MANAGER', '🐛 Initializing fileHandleStore...');
             await fileHandleStore.init();
-            console.log('🐛 FileHandleStore initialized');
+            if (window.debugLog) window.debugLog('SAVE_MANAGER', '🐛 FileHandleStore initialized');
 
             // Clear any stored file handle to ensure fresh start
             await fileHandleStore.delete(this.fileHandleKey);
-            console.log('🐛 Cleared any stored file handle - starting fresh');
+            if (window.debugLog)
+                window.debugLog(
+                    'SAVE_MANAGER',
+                    '🐛 Cleared any stored file handle - starting fresh'
+                );
 
             // Explicitly set fileHandle to null
             this.fileHandle = null;
         } catch (err) {
-            console.log('🐛 Could not initialize file handle store:', err);
+            if (window.debugLog)
+                window.debugLog('SAVE_MANAGER', '🐛 Could not initialize file handle store:', err);
         }
 
-        console.log('💾 Save Manager initialized');
+        if (window.debugLog) window.debugLog('SAVE_MANAGER', '💾 Save Manager initialized');
     }
 
     /**
      * Setup event handlers for save/load buttons
      */
     setupEventHandlers() {
-        console.log('📊 [SaveManager] Setting up event handlers...');
+        if (window.debugLog)
+            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Setting up event handlers...');
 
         const saveBtn = document.getElementById('save-project-btn');
         const saveAsBtn = document.getElementById('save-as-project-btn');
@@ -55,17 +62,23 @@ class SaveManager {
 
         if (saveBtn) {
             saveBtn.addEventListener('click', () => this.save());
-            console.log('📊 [SaveManager] SAVE button listener attached');
+            if (window.debugLog)
+                window.debugLog('SAVE_MANAGER', '📊 [SaveManager] SAVE button listener attached');
         }
 
         if (saveAsBtn) {
             saveAsBtn.addEventListener('click', () => this.saveAs());
-            console.log('📊 [SaveManager] SAVE AS button listener attached');
+            if (window.debugLog)
+                window.debugLog(
+                    'SAVE_MANAGER',
+                    '📊 [SaveManager] SAVE AS button listener attached'
+                );
         }
 
         if (loadBtn) {
             loadBtn.addEventListener('click', () => this.load());
-            console.log('📊 [SaveManager] LOAD button listener attached');
+            if (window.debugLog)
+                window.debugLog('SAVE_MANAGER', '📊 [SaveManager] LOAD button listener attached');
         }
 
         if (autosaveCheckbox) {
@@ -73,23 +86,36 @@ class SaveManager {
         }
 
         // Listen for project dirty state
-        console.log('📊 [SaveManager] Subscribing to appBridge events...');
+        if (window.debugLog)
+            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Subscribing to appBridge events...');
         appBridge.subscribe('project:dirty', data => {
-            console.log('📊 [SaveManager] Received project:dirty event', data);
+            if (window.debugLog)
+                window.debugLog(
+                    'SAVE_MANAGER',
+                    '📊 [SaveManager] Received project:dirty event',
+                    data
+                );
             this.hasUnsavedChanges = true;
             this.updateSaveButton();
         });
 
         appBridge.subscribe('project:saved', data => {
-            console.log('📊 [SaveManager] Received project:saved event', data);
+            if (window.debugLog)
+                window.debugLog(
+                    'SAVE_MANAGER',
+                    '📊 [SaveManager] Received project:saved event',
+                    data
+                );
             this.hasUnsavedChanges = false;
             this.updateSaveButton();
         });
 
-        console.log('📊 [SaveManager] Event subscriptions complete');
+        if (window.debugLog)
+            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Event subscriptions complete');
 
         // Initial button state
-        console.log('📊 [SaveManager] Setting initial button state...');
+        if (window.debugLog)
+            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Setting initial button state...');
         this.updateSaveButton();
     }
 
@@ -97,38 +123,44 @@ class SaveManager {
      * Verify we have permission to write to the file
      */
     async verifyPermission(fileHandle, withWrite = true) {
-        console.log('🐛 verifyPermission called for:', fileHandle.name);
-        console.log('🐛 withWrite:', withWrite);
+        if (window.debugLog) {
+            window.debugLog('SAVE_MANAGER', '🐛 verifyPermission called for:', fileHandle.name);
+            window.debugLog('SAVE_MANAGER', '🐛 withWrite:', withWrite);
+        }
 
         const options = {};
         if (withWrite) {
             options.mode = 'readwrite';
         }
 
-        console.log('🐛 Permission options:', options);
+        if (window.debugLog) window.debugLog('SAVE_MANAGER', '🐛 Permission options:', options);
 
         // Check if we already have permission
         const queryResult = await fileHandle.queryPermission(options);
-        console.log('🐛 queryPermission result:', queryResult);
+        if (window.debugLog)
+            window.debugLog('SAVE_MANAGER', '🐛 queryPermission result:', queryResult);
 
         if (queryResult === 'granted') {
-            console.log('🐛 Permission already granted');
+            if (window.debugLog) window.debugLog('SAVE_MANAGER', '🐛 Permission already granted');
             return true;
         }
 
-        console.log('🐛 Permission not granted, requesting...');
+        if (window.debugLog)
+            window.debugLog('SAVE_MANAGER', '🐛 Permission not granted, requesting...');
 
         // Request permission (this may show a dialog)
         // In Chrome 122+, users can choose "Allow on every visit" for persistent permission
         const requestResult = await fileHandle.requestPermission(options);
-        console.log('🐛 requestPermission result:', requestResult);
+        if (window.debugLog)
+            window.debugLog('SAVE_MANAGER', '🐛 requestPermission result:', requestResult);
 
         if (requestResult === 'granted') {
-            console.log('🐛 Permission granted after request');
+            if (window.debugLog)
+                window.debugLog('SAVE_MANAGER', '🐛 Permission granted after request');
             return true;
         }
 
-        console.log('🐛 Permission denied');
+        if (window.debugLog) window.debugLog('SAVE_MANAGER', '🐛 Permission denied');
         return false;
     }
 
@@ -136,20 +168,25 @@ class SaveManager {
      * Save project to .slayer file
      */
     async save() {
-        console.log('🐛 DEBUG BEAST: save() method called');
-        console.log('🐛 Current fileHandle:', this.fileHandle);
-        console.log(
-            '🐛 fileHandle type:',
-            this.fileHandle ? this.fileHandle.constructor.name : 'null'
-        );
+        if (window.debugLog) {
+            window.debugLog('SAVE_MANAGER', '🐛 DEBUG BEAST: save() method called');
+            window.debugLog('SAVE_MANAGER', '🐛 Current fileHandle:', this.fileHandle);
+            window.debugLog(
+                'SAVE_MANAGER',
+                '🐛 fileHandle type:',
+                this.fileHandle ? this.fileHandle.constructor.name : 'null'
+            );
+        }
 
         // If no file has been saved yet, do Save As
         if (!this.fileHandle) {
-            console.log('🐛 No fileHandle found, redirecting to saveAs()');
+            if (window.debugLog)
+                window.debugLog('SAVE_MANAGER', '🐛 No fileHandle found, redirecting to saveAs()');
             return this.saveAs();
         }
 
-        console.log('🐛 fileHandle exists, proceeding with silent save...');
+        if (window.debugLog)
+            window.debugLog('SAVE_MANAGER', '🐛 fileHandle exists, proceeding with silent save...');
 
         const saveBtn = document.getElementById('save-project-btn');
         const originalText = saveBtn ? saveBtn.textContent : 'SAVE';
@@ -174,7 +211,12 @@ class SaveManager {
 
             // Use File System Access API for silent save
             try {
-                console.log('🐛 About to verify permissions for fileHandle:', this.fileHandle.name);
+                if (window.debugLog)
+                    window.debugLog(
+                        'SAVE_MANAGER',
+                        '🐛 About to verify permissions for fileHandle:',
+                        this.fileHandle.name
+                    );
 
                 // Verify permission first
                 if (!(await this.verifyPermission(this.fileHandle))) {
@@ -182,24 +224,34 @@ class SaveManager {
                     // Permission denied - need to use Save As
                     this.fileHandle = null;
                     await fileHandleStore.delete(this.fileHandleKey);
-                    console.log('🐛 Permissions failed, redirecting to saveAs()');
+                    if (window.debugLog)
+                        window.debugLog(
+                            'SAVE_MANAGER',
+                            '🐛 Permissions failed, redirecting to saveAs()'
+                        );
                     return this.saveAs();
                 }
 
-                console.log('🐛 Permissions verified, proceeding with write...');
+                if (window.debugLog) {
+                    window.debugLog(
+                        'SAVE_MANAGER',
+                        '🐛 Permissions verified, proceeding with write...'
+                    );
+                }
 
                 const writable = await this.fileHandle.createWritable();
-                console.log('🐛 Writable stream created');
+                if (window.debugLog) window.debugLog('SAVE_MANAGER', '🐛 Writable stream created');
                 await writable.write(blob);
-                console.log('🐛 Data written to stream');
+                if (window.debugLog) window.debugLog('SAVE_MANAGER', '🐛 Data written to stream');
                 await writable.close();
-                console.log('🐛 Stream closed');
+                if (window.debugLog) window.debugLog('SAVE_MANAGER', '🐛 Stream closed');
 
                 // Store the file handle for future use
                 await fileHandleStore.set(this.fileHandleKey, this.fileHandle);
-                console.log('🐛 FileHandle stored in IndexedDB');
+                if (window.debugLog)
+                    window.debugLog('SAVE_MANAGER', '🐛 FileHandle stored in IndexedDB');
 
-                console.log('✅ Silent save successful');
+                if (window.logAlways) window.logAlways('✅ Silent save successful');
             } catch (err) {
                 console.error('Silent save failed:', err);
                 // Only show error, don't fall back to download
@@ -207,7 +259,7 @@ class SaveManager {
                 throw err;
             }
 
-            console.log('✅ Project saved successfully');
+            if (window.logAlways) window.logAlways('✅ Project saved successfully');
 
             // Mark as saved
             this.hasUnsavedChanges = false;
@@ -224,12 +276,19 @@ class SaveManager {
      * Load project from .slayer file
      */
     async load() {
-        console.log('🐛 DEBUG: load() called');
-        console.log('🐛 showOpenFilePicker available?', 'showOpenFilePicker' in window);
+        if (window.debugLog) {
+            window.debugLog('SAVE_MANAGER', '🐛 DEBUG: load() called');
+            window.debugLog(
+                'SAVE_MANAGER',
+                '🐛 showOpenFilePicker available?',
+                'showOpenFilePicker' in window
+            );
+        }
 
         // Try to use File System Access API for loading
         if ('showOpenFilePicker' in window) {
-            console.log('🐛 Using File System Access API for loading');
+            if (window.debugLog)
+                window.debugLog('SAVE_MANAGER', '🐛 Using File System Access API for loading');
             try {
                 const [fileHandle] = await window.showOpenFilePicker({
                     types: [
@@ -242,18 +301,30 @@ class SaveManager {
                 });
 
                 const file = await fileHandle.getFile();
-                console.log('🐛 File selected via File System Access API:', file.name);
+                if (window.debugLog)
+                    window.debugLog(
+                        'SAVE_MANAGER',
+                        '🐛 File selected via File System Access API:',
+                        file.name
+                    );
 
                 this.fileHandle = fileHandle; // Save handle for later silent saves
-                console.log('📊 [FileHandle SAVED]:', {
-                    exists: !!this.fileHandle,
-                    type: this.fileHandle.constructor.name,
-                    name: file.name
-                });
+                if (window.debugLog) {
+                    window.debugLog('SAVE_MANAGER', '📊 [FileHandle SAVED]:', {
+                        exists: !!this.fileHandle,
+                        type: this.fileHandle.constructor.name,
+                        name: file.name
+                    });
+                }
 
                 // Store the file handle for persistent access
                 await fileHandleStore.set(this.fileHandleKey, fileHandle);
-                console.log('🐛 FileHandle stored in IndexedDB with key:', this.fileHandleKey);
+                if (window.debugLog)
+                    window.debugLog(
+                        'SAVE_MANAGER',
+                        '🐛 FileHandle stored in IndexedDB with key:',
+                        this.fileHandleKey
+                    );
 
                 await this.loadFile(file);
                 return;
@@ -262,13 +333,23 @@ class SaveManager {
                     return; // User cancelled
                 }
                 // Fall back to regular input if API fails
-                console.log('🐛 File System Access API failed, error:', err);
-                console.log('🐛 Using fallback file input method');
+                if (window.debugLog) {
+                    window.debugLog(
+                        'SAVE_MANAGER',
+                        '🐛 File System Access API failed, error:',
+                        err
+                    );
+                    window.debugLog('SAVE_MANAGER', '🐛 Using fallback file input method');
+                }
             }
         }
 
         // Fallback for browsers without File System Access API
-        console.log('🐛 Creating fallback file input (no silent save possible)');
+        if (window.debugLog)
+            window.debugLog(
+                'SAVE_MANAGER',
+                '🐛 Creating fallback file input (no silent save possible)'
+            );
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.slayer';
@@ -277,9 +358,15 @@ class SaveManager {
             const file = e.target.files[0];
             if (!file) return;
 
-            console.log('🐛 File selected via fallback method:', file.name);
+            if (window.debugLog) {
+                window.debugLog('SAVE_MANAGER', '🐛 File selected via fallback method:', file.name);
+            }
             this.fileHandle = null; // No handle available with regular input
-            console.log('🐛 fileHandle set to null (fallback method cannot do silent saves)');
+            if (window.debugLog)
+                window.debugLog(
+                    'SAVE_MANAGER',
+                    '🐛 fileHandle set to null (fallback method cannot do silent saves)'
+                );
             await this.loadFile(file);
         };
 
@@ -291,11 +378,16 @@ class SaveManager {
      * This method won't have a file handle for silent saves
      */
     async loadFileDirectly(file) {
-        console.log('🐛 loadFileDirectly called with:', file.name);
+        if (window.debugLog)
+            window.debugLog('SAVE_MANAGER', '🐛 loadFileDirectly called with:', file.name);
 
         // Clear file handle since this is a direct load without File System Access API
         this.fileHandle = null;
-        console.log('🐛 fileHandle cleared (direct load cannot do silent saves)');
+        if (window.debugLog)
+            window.debugLog(
+                'SAVE_MANAGER',
+                '🐛 fileHandle cleared (direct load cannot do silent saves)'
+            );
 
         // Load the file
         await this.loadFile(file);
@@ -309,28 +401,46 @@ class SaveManager {
      * This enables the SAVE button for silent saves
      */
     async loadFileWithHandle(file, fileHandle) {
-        console.log('📊 [SaveManager] loadFileWithHandle called');
-        console.log('📊 [SaveManager] File:', file.name);
-        console.log('📊 [SaveManager] FileHandle:', fileHandle ? 'YES' : 'NO');
+        if (window.debugLog) {
+            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] loadFileWithHandle called');
+            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] File:', file.name);
+            window.debugLog(
+                'SAVE_MANAGER',
+                '📊 [SaveManager] FileHandle:',
+                fileHandle ? 'YES' : 'NO'
+            );
+        }
 
         if (fileHandle) {
             this.fileHandle = fileHandle;
-            console.log('📊 [FileHandle SAVED from drag-drop]:', {
-                exists: !!this.fileHandle,
-                type: this.fileHandle.constructor.name,
-                name: file.name
-            });
+            if (window.debugLog) {
+                window.debugLog('SAVE_MANAGER', '📊 [FileHandle SAVED from drag-drop]:', {
+                    exists: !!this.fileHandle,
+                    type: this.fileHandle.constructor.name,
+                    name: file.name
+                });
+            }
 
             // Store the file handle for persistent access
             try {
                 await fileHandleStore.set(this.fileHandleKey, fileHandle);
-                console.log('📊 [SaveManager] FileHandle stored in IndexedDB');
+                if (window.debugLog)
+                    window.debugLog(
+                        'SAVE_MANAGER',
+                        '📊 [SaveManager] FileHandle stored in IndexedDB'
+                    );
             } catch (err) {
-                console.log('📊 [SaveManager] Could not store file handle:', err.message);
+                if (window.debugLog)
+                    window.debugLog(
+                        'SAVE_MANAGER',
+                        '📊 [SaveManager] Could not store file handle:',
+                        err.message
+                    );
             }
         } else {
             this.fileHandle = null;
-            console.log('📊 [SaveManager] No file handle provided');
+            if (window.debugLog)
+                window.debugLog('SAVE_MANAGER', '📊 [SaveManager] No file handle provided');
         }
 
         // Load the file
@@ -382,18 +492,21 @@ class SaveManager {
             // Enable save button if we have a file handle
             this.hasUnsavedChanges = false; // Just loaded, no changes yet
             this.updateSaveButton();
-            console.log(
-                '🐛 After load - fileHandle exists:',
-                !!this.fileHandle,
-                'Save button updated'
-            );
+            if (window.debugLog) {
+                window.debugLog(
+                    'SAVE_MANAGER',
+                    '🐛 After load - fileHandle exists:',
+                    !!this.fileHandle,
+                    'Save button updated'
+                );
+            }
 
             // Switch to first successfully loaded app
             if (results.success.length > 0) {
                 await window.slayerSuite.switchToApp(results.success[0]);
             }
 
-            console.log('✅ Project loaded successfully');
+            if (window.logAlways) window.logAlways('✅ Project loaded successfully');
         } catch (error) {
             console.error('❌ Load failed:', error);
             alert(`Failed to load project: ${error.message}`);
@@ -464,7 +577,7 @@ class SaveManager {
                 this.downloadFile(blob);
             }
 
-            console.log('✅ Project saved successfully');
+            if (window.logAlways) window.logAlways('✅ Project saved successfully');
 
             // Mark as saved
             this.hasUnsavedChanges = false;
@@ -498,7 +611,7 @@ class SaveManager {
             this.autosaveInterval = setInterval(
                 () => {
                     if (this.hasUnsavedChanges) {
-                        console.log('🔄 Autosaving...');
+                        if (window.debugLog) window.debugLog('SAVE_MANAGER', '🔄 Autosaving...');
                         this.save();
                     }
                 },
@@ -534,21 +647,29 @@ class SaveManager {
             // Disable save button if no file handle (never saved) or no unsaved changes
             const shouldDisable = !this.fileHandle || !this.hasUnsavedChanges;
 
-            console.log('📊 [SAVE Button Update]', {
-                fileHandle: !!this.fileHandle,
-                fileHandleType: this.fileHandle ? this.fileHandle.constructor.name : 'null',
-                hasUnsavedChanges: this.hasUnsavedChanges,
-                shouldDisable: shouldDisable,
-                projectName: this.projectName
-            });
+            if (window.debugLog) {
+                window.debugLog('SAVE_MANAGER', '📊 [SAVE Button Update]', {
+                    fileHandle: !!this.fileHandle,
+                    fileHandleType: this.fileHandle ? this.fileHandle.constructor.name : 'null',
+                    hasUnsavedChanges: this.hasUnsavedChanges,
+                    shouldDisable: shouldDisable,
+                    projectName: this.projectName
+                });
+            }
 
             saveBtn.disabled = shouldDisable;
             saveBtn.style.opacity = shouldDisable ? '0.5' : '1';
             saveBtn.style.cursor = shouldDisable ? 'not-allowed' : 'pointer';
 
-            console.log('📊 [SAVE Button State]', saveBtn.disabled ? 'DISABLED' : 'ENABLED');
+            if (window.debugLog)
+                window.debugLog(
+                    'SAVE_MANAGER',
+                    '📊 [SAVE Button State]',
+                    saveBtn.disabled ? 'DISABLED' : 'ENABLED'
+                );
         } else {
-            console.log('📊 [SAVE Button Update] Button not found in DOM');
+            if (window.debugLog)
+                window.debugLog('SAVE_MANAGER', '📊 [SAVE Button Update] Button not found in DOM');
         }
     }
 
@@ -579,12 +700,12 @@ class SaveManager {
      * Clear the file handle (for starting fresh)
      */
     async clearFileHandle() {
-        console.log('[SAVE MANAGER] Clearing file handle');
+        if (window.debugLog) window.debugLog('SAVE_MANAGER', '[SAVE MANAGER] Clearing file handle');
         this.fileHandle = null;
         try {
             await fileHandleStore.delete(this.fileHandleKey);
         } catch (err) {
-            console.warn('Failed to clear file handle from storage:', err);
+            if (window.logWarn) window.logWarn('Failed to clear file handle from storage:', err);
         }
         this.updateSaveButton();
     }

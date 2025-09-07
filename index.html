@@ -2,7 +2,10 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
         <title>Slayer Suite - Professional Signage Workflow Platform</title>
         <link rel="stylesheet" href="./shared/styles/suite-header.css" />
 
@@ -110,8 +113,13 @@
              */
             async function initializeSlayerSuite() {
                 try {
-                    // Load PDF.js for Mapping Slayer  
-                    console.log('Loading PDF.js library...');
+                    // Load debug configuration first
+                    await loadScript('./core/debug-config.js');
+
+                    // Load PDF.js for Mapping Slayer
+                    if (window.debugLog) {
+                        window.debugLog('VERBOSE', 'Loading PDF.js library...');
+                    }
                     try {
                         await loadScript(
                             'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
@@ -119,10 +127,15 @@
                         if (window.pdfjsLib) {
                             pdfjsLib.GlobalWorkerOptions.workerSrc =
                                 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                            console.log('PDF.js configured successfully.');
+                            if (window.debugLog) {
+                                window.debugLog('VERBOSE', 'PDF.js configured successfully.');
+                            }
                         }
                     } catch (pdfError) {
-                        console.warn('PDF.js failed to load, continuing without PDF support:', pdfError);
+                        console.warn(
+                            'PDF.js failed to load, continuing without PDF support:',
+                            pdfError
+                        );
                     }
 
                     // Import core framework
@@ -177,7 +190,9 @@
 
                     // Make saveManager globally available for apps
                     window.saveManager = saveManager;
-                    console.log('📊 [Main] SaveManager made globally available');
+                    if (window.debugLog) {
+                        window.debugLog('VERBOSE', '📊 [Main] SaveManager made globally available');
+                    }
 
                     // Create a global suite object for navigation
                     window.slayerSuite = {
@@ -225,8 +240,10 @@
                     // Start with Mapping Slayer
                     await window.slayerSuite.switchToApp('mapping_slayer');
 
-                    console.log('Slayer Suite initialized successfully!');
-                    console.log('Ready to rock and roll!');
+                    if (window.logAlways) {
+                        window.logAlways('Slayer Suite initialized successfully!');
+                        window.logAlways('Ready to rock and roll!');
+                    }
                 } catch (error) {
                     console.error('Failed to initialize Slayer Suite:', error);
                     const container = document.getElementById('app-container');

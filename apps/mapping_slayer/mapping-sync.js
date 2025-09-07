@@ -53,7 +53,7 @@ class MappingSyncAdapter {
         // Enable auto-sync after everything is set up
         setTimeout(() => {
             enableAutoSync();
-            console.log('✅ Auto-sync enabled for marker types');
+            if (window.debugLog) window.debugLog('SYNC', '✅ Auto-sync enabled for marker types');
         }, 100);
     }
 
@@ -197,7 +197,7 @@ class MappingSyncAdapter {
 
     // Handler implementations
     handleSignTypeCreated(data) {
-        console.log('Mapping Slayer: Sign type created', data);
+        if (window.debugLog) window.debugLog('SYNC', 'Mapping Slayer: Sign type created', data);
 
         // Add to local markerTypes if it doesn't exist
         if (!appState.markerTypes[data.code]) {
@@ -213,7 +213,7 @@ class MappingSyncAdapter {
     }
 
     handleSignTypeUpdated(data) {
-        console.log('Mapping Slayer: Sign type updated', data);
+        if (window.debugLog) window.debugLog('SYNC', 'Mapping Slayer: Sign type updated', data);
 
         // Update local markerType
         if (appState.markerTypes[data.code]) {
@@ -229,7 +229,7 @@ class MappingSyncAdapter {
     }
 
     handleSignTypeDeleted(data) {
-        console.log('Mapping Slayer: Sign type deleted', data);
+        if (window.debugLog) window.debugLog('SYNC', 'Mapping Slayer: Sign type deleted', data);
 
         // Remove from local state
         if (appState.markerTypes[data.code]) {
@@ -256,7 +256,7 @@ class MappingSyncAdapter {
     }
 
     handleFieldAdded(data) {
-        console.log('Mapping Slayer: Field added', data);
+        if (window.debugLog) window.debugLog('SYNC', 'Mapping Slayer: Field added', data);
 
         const { signTypeCode, field } = data;
 
@@ -288,7 +288,7 @@ class MappingSyncAdapter {
     }
 
     handleFieldRemoved(data) {
-        console.log('Mapping Slayer: Field removed', data);
+        if (window.debugLog) window.debugLog('SYNC', 'Mapping Slayer: Field removed', data);
 
         const { signTypeCode, fieldName } = data;
 
@@ -313,7 +313,7 @@ class MappingSyncAdapter {
     }
 
     handleNotesChanged(data) {
-        console.log('Mapping Slayer: Notes changed', data);
+        if (window.debugLog) window.debugLog('SYNC', 'Mapping Slayer: Notes changed', data);
 
         // Find the dot and update its notes
         for (const pageData of appState.dotsByPage.values()) {
@@ -331,7 +331,7 @@ class MappingSyncAdapter {
     }
 
     handleMessageChanged(data) {
-        console.log('Mapping Slayer: Message changed', data);
+        if (window.debugLog) window.debugLog('SYNC', 'Mapping Slayer: Message changed', data);
 
         // Find the dot and update its message
         for (const pageData of appState.dotsByPage.values()) {

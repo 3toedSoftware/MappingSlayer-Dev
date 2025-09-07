@@ -332,7 +332,12 @@ export class AppBridge {
      * @param {any} data - Optional data to log
      */
     log(message, data = null) {
-        if (this.isDebugMode) {
+        // Use debug config if available, otherwise fall back to isDebugMode
+        const shouldLog = window.DebugConfig
+            ? window.DebugConfig.VERBOSE || window.DebugConfig.APP_BRIDGE
+            : this.isDebugMode;
+
+        if (shouldLog) {
             const timestamp = new Date().toLocaleTimeString();
             console.log(`[AppBridge ${timestamp}] ${message}`, data || '');
         }

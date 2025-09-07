@@ -81,13 +81,22 @@ export const appState = {
 
 export function setDirtyState() {
     appState.isDirty = true;
-    console.log('📊 [Mapping] setDirtyState called - broadcasting project:dirty');
+    if (window.debugLog)
+        window.debugLog(
+            'MAPPING_SLAYER',
+            '📊 [Mapping] setDirtyState called - broadcasting project:dirty'
+        );
     // Broadcast to save manager
     if (appBridge) {
         appBridge.broadcast('project:dirty');
-        console.log('📊 [Mapping] project:dirty broadcast sent');
+        if (window.debugLog)
+            window.debugLog('MAPPING_SLAYER', '📊 [Mapping] project:dirty broadcast sent');
     } else {
-        console.log('📊 [Mapping] WARNING: appBridge not available to broadcast dirty state');
+        if (window.debugLog)
+            window.debugLog(
+                'MAPPING_SLAYER',
+                '📊 [Mapping] WARNING: appBridge not available to broadcast dirty state'
+            );
     }
 }
 
@@ -196,10 +205,10 @@ function debouncedSync() {
 
         isSyncInProgress = true;
         try {
-            console.log('🔄 Auto-syncing marker types...');
+            if (window.debugLog) window.debugLog('SYNC', '🔄 Auto-syncing marker types...');
             await mappingSyncAdapter.syncMarkerTypes(appBridge);
         } catch (error) {
-            console.error('❌ Auto-sync failed:', error);
+            if (window.logError) window.logError('❌ Auto-sync failed:', error);
         } finally {
             isSyncInProgress = false;
         }
@@ -245,11 +254,12 @@ function createAutoSyncMarkerTypes(markerTypes) {
  */
 export function enableAutoSync() {
     if (!mappingSyncAdapter) {
-        console.warn('⚠️ Cannot enable auto-sync: sync adapter not initialized');
+        if (window.logWarn)
+            window.logWarn('⚠️ Cannot enable auto-sync: sync adapter not initialized');
         return;
     }
 
-    console.log('✅ Enabling automatic marker type sync');
+    if (window.debugLog) window.debugLog('SYNC', '✅ Enabling automatic marker type sync');
     appState.markerTypes = createAutoSyncMarkerTypes(appState.markerTypes);
 }
 
