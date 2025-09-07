@@ -6051,8 +6051,17 @@ function openGalleryModal(dot) {
     const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
     if (!galleryModal) return;
 
+    console.log('=== OPENING GALLERY ===');
+    console.log('Dot ID:', dot.internalId);
+    console.log('Location:', dot.locationNumber);
+    console.log('Photos:', dot.photos ? dot.photos.length : 0);
+    if (dot.photos) {
+        console.log('Photo data exists:', dot.photos.map(p => ({ id: p.id, hasData: !!p.data })));
+    }
+    
     // Store current dot reference
     currentGalleryDot = dot;
+    console.log('currentGalleryDot set to:', currentGalleryDot.internalId);
 
     // Position the gallery
     updateGalleryPosition();
@@ -6102,16 +6111,39 @@ function closeGalleryModal() {
 
 function populateGallery(dot) {
     const mainImage = document.getElementById('gallery-main-image');
-    const thumbnails = document.querySelectorAll('.ms-gallery-thumb');
+    let thumbnails = document.querySelectorAll('.ms-gallery-thumb');
+
+    console.log('=== POPULATING GALLERY ===');
+    console.log('Dot ID:', dot.internalId);
+    console.log('Location:', dot.locationNumber);
+    console.log('Number of photos:', dot.photos ? dot.photos.length : 0);
+    console.log('Thumbnails found:', thumbnails.length);
 
     // Clear current content
     if (mainImage) {
         mainImage.innerHTML = '<span class="ms-gallery-placeholder">CURRENT PIC</span>';
     }
 
-    thumbnails.forEach(thumb => {
-        thumb.innerHTML = '';
-        thumb.classList.remove('active');
+    // Clear thumbnails and remove old event handlers
+    thumbnails.forEach((thumb, idx) => {
+        // Remove all event listeners by replacing the element with a clean clone
+        const newThumb = thumb.cloneNode(false);
+        newThumb.className = 'ms-gallery-thumb';
+        newThumb.dataset.index = idx;
+        thumb.parentNode.replaceChild(newThumb, thumb);
+    });
+    
+    // Re-query thumbnails after replacement
+    thumbnails = document.querySelectorAll('.ms-gallery-thumb');
+    
+    // Add click handler to empty thumbnails for debugging
+    thumbnails.forEach((thumb, idx) => {
+        thumb.onclick = () => {
+            console.log('=== EMPTY THUMBNAIL CLICKED ===');
+            console.log('Index:', idx);
+            console.log('This thumbnail should be empty!');
+            console.log('Current dot:', currentGalleryDot ? currentGalleryDot.internalId : 'NO DOT');
+        };
     });
 
     // If dot has photos, display them
@@ -6133,6 +6165,18 @@ function populateGallery(dot) {
 
                     // Add click handler
                     thumb.onclick = () => {
+                        console.log('=== THUMBNAIL CLICKED ===');
+                        console.log('Thumbnail index:', index);
+                        console.log('Photo ID:', photo.id);
+                        console.log('Current dot ID:', currentGalleryDot ? currentGalleryDot.internalId : 'NO CURRENT DOT');
+                        console.log('Current dot location:', currentGalleryDot ? currentGalleryDot.locationNumber : 'NO CURRENT DOT');
+                        console.log('Photo belongs to dot:', dot.internalId, 'location:', dot.locationNumber);
+                        console.log('Closure dot data:', { 
+                            id: dot.internalId, 
+                            location: dot.locationNumber,
+                            totalPhotos: dot.photos ? dot.photos.length : 0
+                        });
+                        
                         thumbnails.forEach(t => t.classList.remove('active'));
                         thumb.classList.add('active');
                         displayMainImage(photo.data, photo.id);
@@ -6144,6 +6188,11 @@ function populateGallery(dot) {
 }
 
 function displayMainImage(imageSrc, photoId = null) {
+    console.log('=== DISPLAYING MAIN IMAGE ===');
+    console.log('Photo ID:', photoId);
+    console.log('Has image data:', !!imageSrc);
+    console.log('Current gallery dot:', currentGalleryDot ? currentGalleryDot.internalId : 'NO CURRENT DOT');
+    
     const mainImage = document.getElementById('gallery-main-image');
     if (mainImage) {
         mainImage.innerHTML = `
@@ -6419,14 +6468,33 @@ async function compressImage(blob, maxSizeKB) {
 }
 
 function addPhotoToDot(base64Data) {
-    if (!currentGalleryDot) return;
+    console.log('=== ADDING PHOTO TO DOT ===');
+    
+    if (!currentGalleryDot) {
+        console.error('NO currentGalleryDot!');
+        return;
+    }
+    
+    console.log('Current gallery dot ID:', currentGalleryDot.internalId);
+    console.log('Current gallery dot location:', currentGalleryDot.locationNumber);
 
     // Get the current dot
     const dots = getCurrentPageDots();
-    if (!dots) return;
+    if (!dots) {
+        console.error('No dots map for current page!');
+        return;
+    }
+    
+    console.log('Looking for dot with ID:', currentGalleryDot.internalId);
+    console.log('Available dot IDs:', Array.from(dots.keys()));
 
     const dot = dots.get(currentGalleryDot.internalId);
-    if (!dot) return;
+    if (!dot) {
+        console.error('Could not find dot in current page dots!');
+        return;
+    }
+    
+    console.log('Found dot, location:', dot.locationNumber);
 
     // Initialize photos array if needed
     if (!dot.photos) {
