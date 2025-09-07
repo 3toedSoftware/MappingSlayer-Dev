@@ -291,7 +291,7 @@ body {
     flex-direction: column;
     border-right: 1px solid #555;
     height: 100%;
-    overflow: visible; /* Changed from hidden to visible to show the button */
+    overflow: hidden; /* Prevent content from overflowing */
     transition: transform 0.3s ease;
     position: relative;
     z-index: 10;
@@ -380,9 +380,9 @@ body {
 }
 
 .ms-filter-section {
-    flex: 1;
-    min-height: 0;
-    max-height: 60vh;
+    flex: 0 0 auto;  /* Don't grow or shrink, size based on content */
+    min-height: 100px;
+    max-height: 40%;  /* Max 40% of parent height */
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -589,9 +589,8 @@ body {
 }
 
 .ms-list-section {
-    flex: 2;
-    min-height: 0;
-    max-height: 40vh;
+    flex: 1 1 auto;  /* Can grow and shrink, takes remaining space */
+    min-height: 150px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
