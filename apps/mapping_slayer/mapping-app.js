@@ -342,14 +342,8 @@ class MappingSlayerApp extends SlayerAppBase {
                     <div class="ms-gallery-body">
                         <div class="ms-gallery-main-view">
                             <div class="ms-gallery-main-image" id="gallery-main-image">
-                                <span class="ms-gallery-placeholder">CURRENT PIC</span>
+                                <span class="ms-gallery-placeholder">NO PHOTO</span>
                             </div>
-                        </div>
-                        <div class="ms-gallery-thumbnails">
-                            <div class="ms-gallery-thumb" data-index="0"></div>
-                            <div class="ms-gallery-thumb" data-index="1"></div>
-                            <div class="ms-gallery-thumb" data-index="2"></div>
-                            <div class="ms-gallery-thumb" data-index="3"></div>
                         </div>
                     </div>
                 </div>

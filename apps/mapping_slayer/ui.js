@@ -6054,10 +6054,7 @@ function openGalleryModal(dot) {
     console.log('=== OPENING GALLERY ===');
     console.log('Dot ID:', dot.internalId);
     console.log('Location:', dot.locationNumber);
-    console.log('Photos:', dot.photos ? dot.photos.length : 0);
-    if (dot.photos) {
-        console.log('Photo data exists:', dot.photos.map(p => ({ id: p.id, hasData: !!p.data })));
-    }
+    console.log('Has photo:', !!dot.photo);
     
     // Store current dot reference
     currentGalleryDot = dot;
@@ -6111,122 +6108,54 @@ function closeGalleryModal() {
 
 function populateGallery(dot) {
     const mainImage = document.getElementById('gallery-main-image');
-    let thumbnails = document.querySelectorAll('.ms-gallery-thumb');
 
     console.log('=== POPULATING GALLERY ===');
     console.log('Dot ID:', dot.internalId);
     console.log('Location:', dot.locationNumber);
-    console.log('Number of photos:', dot.photos ? dot.photos.length : 0);
-    console.log('Thumbnails found:', thumbnails.length);
+    console.log('Has photo:', !!dot.photo);
 
-    // Clear current content
+    // Display the photo if it exists, otherwise show placeholder
     if (mainImage) {
-        mainImage.innerHTML = '<span class="ms-gallery-placeholder">CURRENT PIC</span>';
-    }
-
-    // Clear thumbnails and remove old event handlers
-    thumbnails.forEach((thumb, idx) => {
-        // Remove all event listeners by replacing the element with a clean clone
-        const newThumb = thumb.cloneNode(false);
-        newThumb.className = 'ms-gallery-thumb';
-        newThumb.dataset.index = idx;
-        thumb.parentNode.replaceChild(newThumb, thumb);
-    });
-    
-    // Re-query thumbnails after replacement
-    thumbnails = document.querySelectorAll('.ms-gallery-thumb');
-    
-    // Add click handler to empty thumbnails for debugging
-    thumbnails.forEach((thumb, idx) => {
-        thumb.onclick = () => {
-            console.log('=== EMPTY THUMBNAIL CLICKED ===');
-            console.log('Index:', idx);
-            console.log('This thumbnail should be empty!');
-            console.log('Current dot:', currentGalleryDot ? currentGalleryDot.internalId : 'NO DOT');
-        };
-    });
-
-    // If dot has photos, display them
-    if (dot.photos && dot.photos.length > 0) {
-        dot.photos.forEach((photo, index) => {
-            if (index < 4) {
-                const thumb = thumbnails[index];
-                if (thumb) {
-                    const img = document.createElement('img');
-                    img.src = photo.data;
-                    img.alt = `Photo ${index + 1}`;
-                    thumb.appendChild(img);
-
-                    // Set first photo as active
-                    if (index === 0) {
-                        thumb.classList.add('active');
-                        displayMainImage(photo.data, photo.id);
-                    }
-
-                    // Add click handler
-                    thumb.onclick = () => {
-                        console.log('=== THUMBNAIL CLICKED ===');
-                        console.log('Thumbnail index:', index);
-                        console.log('Photo ID:', photo.id);
-                        console.log('Current dot ID:', currentGalleryDot ? currentGalleryDot.internalId : 'NO CURRENT DOT');
-                        console.log('Current dot location:', currentGalleryDot ? currentGalleryDot.locationNumber : 'NO CURRENT DOT');
-                        console.log('Photo belongs to dot:', dot.internalId, 'location:', dot.locationNumber);
-                        console.log('Closure dot data:', { 
-                            id: dot.internalId, 
-                            location: dot.locationNumber,
-                            totalPhotos: dot.photos ? dot.photos.length : 0
-                        });
-                        
-                        thumbnails.forEach(t => t.classList.remove('active'));
-                        thumb.classList.add('active');
-                        displayMainImage(photo.data, photo.id);
-                    };
-                }
-            }
-        });
+        if (dot.photo) {
+            mainImage.innerHTML = `<img src="${dot.photo}" alt="Location photo">`;
+        } else {
+            mainImage.innerHTML = '<span class="ms-gallery-placeholder">NO PHOTO</span>';
+        }
     }
 }
 
-function displayMainImage(imageSrc, photoId = null) {
-    console.log('=== DISPLAYING MAIN IMAGE ===');
-    console.log('Photo ID:', photoId);
-    console.log('Has image data:', !!imageSrc);
-    console.log('Current gallery dot:', currentGalleryDot ? currentGalleryDot.internalId : 'NO CURRENT DOT');
-    
+// This function is no longer needed with single photo, but keeping for compatibility
+function displayMainImage(imageSrc) {
     const mainImage = document.getElementById('gallery-main-image');
     if (mainImage) {
-        mainImage.innerHTML = `
-            <img src="${imageSrc}" alt="Selected photo">
-            ${photoId ? `<button class="ms-gallery-delete-btn" onclick="deletePhotoFromGallery('${photoId}')" title="Delete this photo">🗑️</button>` : ''}
-        `;
+        if (imageSrc) {
+            mainImage.innerHTML = `<img src="${imageSrc}" alt="Location photo">`;
+        } else {
+            mainImage.innerHTML = '<span class="ms-gallery-placeholder">NO PHOTO</span>';
+        }
     }
 }
 
-function deletePhotoFromGallery(photoId) {
+function deletePhotoFromGallery() {
     if (!currentGalleryDot) return;
-
-    if (!confirm('Delete this photo?')) return;
 
     // Get the current dot
     const dots = getCurrentPageDots();
     if (!dots) return;
 
     const dot = dots.get(currentGalleryDot.internalId);
-    if (!dot || !dot.photos) return;
+    if (!dot || !dot.photo) return;
 
-    // Find and remove the photo
-    const photoIndex = dot.photos.findIndex(p => p.id === photoId);
-    if (photoIndex !== -1) {
-        dot.photos.splice(photoIndex, 1);
+    // Remove the photo
+    delete dot.photo;
 
-        // Mark as dirty
-        setDirtyState();
+    // Mark as dirty
+    setDirtyState();
 
-        // Update gallery display
-        populateGallery(dot);
+    // Update gallery display
+    populateGallery(dot);
 
-        console.log(`Photo deleted. Remaining photos: ${dot.photos.length}`);
-    }
+    console.log('Photo deleted from dot:', dot.locationNumber);
 }
 
 // Make delete function globally available
@@ -6237,15 +6166,22 @@ function setupGalleryEventListeners() {
     if (window.galleryListenersSetup) return;
     window.galleryListenersSetup = true;
 
-    // Close button
+    // X button - deletes the current photo
     const closeBtn = document.getElementById('gallery-close-btn');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
-            closeEditModal(); // This will close both modals
+            if (currentGalleryDot) {
+                const dot = getCurrentPageDots().get(currentGalleryDot.internalId);
+                if (dot && dot.photo) {
+                    if (confirm('Delete this photo?')) {
+                        deletePhotoFromGallery();
+                    }
+                }
+            }
         });
     }
 
-    // Add photo button
+    // Add photo button - replaces existing photo
     const addBtn = document.getElementById('gallery-add-btn');
     if (addBtn) {
         addBtn.addEventListener('click', () => {
@@ -6258,12 +6194,7 @@ function setupGalleryEventListeners() {
 function showPhotoOptions() {
     if (!currentGalleryDot) return;
 
-    // Check if dot already has 4 photos
-    const dot = getCurrentPageDots().get(currentGalleryDot.internalId);
-    if (dot && dot.photos && dot.photos.length >= 4) {
-        alert('Maximum 4 photos per location reached.');
-        return;
-    }
+    // No limit check needed - we're replacing, not adding
 
     // Create options modal
     const optionsModal = document.createElement('div');
@@ -6468,7 +6399,7 @@ async function compressImage(blob, maxSizeKB) {
 }
 
 function addPhotoToDot(base64Data) {
-    console.log('=== ADDING PHOTO TO DOT ===');
+    console.log('=== REPLACING PHOTO FOR DOT ===');
     
     if (!currentGalleryDot) {
         console.error('NO currentGalleryDot!');
@@ -6484,9 +6415,6 @@ function addPhotoToDot(base64Data) {
         console.error('No dots map for current page!');
         return;
     }
-    
-    console.log('Looking for dot with ID:', currentGalleryDot.internalId);
-    console.log('Available dot IDs:', Array.from(dots.keys()));
 
     const dot = dots.get(currentGalleryDot.internalId);
     if (!dot) {
@@ -6495,28 +6423,18 @@ function addPhotoToDot(base64Data) {
     }
     
     console.log('Found dot, location:', dot.locationNumber);
+    console.log('Previous photo:', !!dot.photo ? 'exists' : 'none');
 
-    // Initialize photos array if needed
-    if (!dot.photos) {
-        dot.photos = [];
-    }
+    // Replace the photo (single photo, not array)
+    dot.photo = base64Data;
 
-    // Add photo (check max 4)
-    if (dot.photos.length < 4) {
-        dot.photos.push({
-            id: Date.now() + Math.random(), // Unique ID
-            data: base64Data,
-            timestamp: new Date().toISOString()
-        });
+    // Mark as dirty for saving
+    setDirtyState();
 
-        // Mark as dirty for saving
-        setDirtyState();
+    // Update gallery display
+    populateGallery(dot);
 
-        // Update gallery display
-        populateGallery(dot);
-
-        console.log(`Photo added. Total photos: ${dot.photos.length}`);
-    }
+    console.log('Photo replaced for dot:', dot.locationNumber);
 }
 
 // Make gallery functions available globally
