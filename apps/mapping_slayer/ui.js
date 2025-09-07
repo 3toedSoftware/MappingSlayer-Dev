@@ -157,6 +157,12 @@ function updateFilterCheckboxesImmediate() {
         return;
     }
 
+    // Clear any empty state message if we have marker types
+    const emptyState = container.querySelector('.ms-empty-state');
+    if (emptyState) {
+        emptyState.remove();
+    }
+
     // Determine which marker types need to be added/removed/updated
     const existingTypes = new Set(markerTypeElements.keys());
     const currentTypes = new Set(sortedMarkerTypeCodes);
