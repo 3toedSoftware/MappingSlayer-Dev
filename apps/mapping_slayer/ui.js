@@ -181,10 +181,7 @@ function updateFilterCheckboxesImmediate() {
 
         if (item) {
             // Update existing element
-            const countLabel = item.querySelector('.ms-checkbox-label');
-            if (countLabel) {
-                countLabel.textContent = '(' + count + ')';
-            }
+            // Count labels removed - counts shown in legend and list
 
             // Update active state
             if (markerTypeCode === appState.activeMarkerType) {
@@ -293,7 +290,7 @@ function updateFilterCheckboxesImmediate() {
             // Build innerHTML with proper concatenation to avoid template literal issues
             const checkboxInput =
                 '<input type="checkbox" data-marker-type-code="' + markerTypeCode + '" checked>';
-            const countLabel = '<span class="ms-checkbox-label">(' + count + ')</span>';
+            // Count label removed - counts shown in legend and list
             const codeInput =
                 '<input type="text" class="ms-marker-type-code-input" placeholder="Enter code..." value="' +
                 markerTypeCode +
@@ -339,7 +336,6 @@ function updateFilterCheckboxesImmediate() {
 
             item.innerHTML =
                 checkboxInput +
-                countLabel +
                 '<div class="ms-marker-type-inputs">' +
                 codeInput +
                 nameInput +
@@ -6202,7 +6198,7 @@ function showPhotoOptions() {
     optionsModal.innerHTML = `
         <div class="ms-photo-options-content">
             <div class="ms-photo-options-header">
-                <span>Add Photo</span>
+                <span>Update Pic</span>
                 <button class="ms-modal-close" id="close-photo-options">×</button>
             </div>
             <div class="ms-photo-options-body">
