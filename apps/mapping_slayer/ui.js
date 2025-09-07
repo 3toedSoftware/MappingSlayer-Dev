@@ -1898,12 +1898,12 @@ function handleMapClick(e) {
                     updateMapLegend(); // Update the page legend
                     updateProjectLegend(); // Update the project legend
                     setDirtyState();
-                    
+
                     // Check if DOTCAM mode is active for new dots
                     if (isDotcamMode) {
                         // Store the dot reference for photo capture
                         currentGalleryDot = dot;
-                        
+
                         // Open camera directly for the newly created dot
                         openCameraForDotcam();
                     }
@@ -3764,7 +3764,13 @@ function generateFlagSelectors(modalType, dot, multipleDots = null) {
 
 function openEditModal(internalId) {
     const dot = getCurrentPageDots().get(internalId);
-    if (!dot) return;
+    if (!dot) {
+        console.error(`Could not find dot with internalId: ${internalId}`);
+        return;
+    }
+    console.log(
+        `Opening edit modal for dot ${internalId}, location ${dot.locationNumber}, photos: ${dot.photos ? dot.photos.length : 0}`
+    );
 
     // Migrate old properties to new flag system if needed
     migrateDotToFlags(dot);
@@ -4705,7 +4711,7 @@ async function pasteDots() {
 
         // Create new dot with ALL properties including flags
         const newDot = {
-            internalId: appState.nextInternalId++,
+            internalId: String(appState.nextInternalId++).padStart(7, '0'),
             locationNumber: nextLocationNumber,
             x: pasteX,
             y: pasteY,
@@ -4752,7 +4758,7 @@ async function pasteDotAtPosition(x, y) {
 
         // Create new dot object with all copied properties INCLUDING flags
         const newDot = {
-            internalId: appState.nextInternalId++,
+            internalId: String(appState.nextInternalId++).padStart(7, '0'),
             locationNumber: nextLocationNumber,
             x: x,
             y: y,
@@ -6051,6 +6057,10 @@ function openGalleryModal(dot) {
     const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
     if (!galleryModal) return;
 
+    console.log(
+        `Opening gallery for dot ${dot.internalId}, location ${dot.locationNumber}, photos: ${dot.photos ? dot.photos.length : 0}`
+    );
+
     // Store current dot reference
     currentGalleryDot = dot;
 
@@ -6103,6 +6113,16 @@ function closeGalleryModal() {
 function populateGallery(dot) {
     const mainImage = document.getElementById('gallery-main-image');
     const thumbnails = document.querySelectorAll('.ms-gallery-thumb');
+
+    console.log(
+        `Populating gallery for dot ${dot.internalId}, location ${dot.locationNumber}, photos: ${dot.photos ? dot.photos.length : 0}`
+    );
+    if (dot.photos) {
+        console.log(
+            'Photo IDs:',
+            dot.photos.map(p => p.id)
+        );
+    }
 
     // Clear current content
     if (mainImage) {
@@ -6419,14 +6439,29 @@ async function compressImage(blob, maxSizeKB) {
 }
 
 function addPhotoToDot(base64Data) {
-    if (!currentGalleryDot) return;
+    if (!currentGalleryDot) {
+        console.error('No currentGalleryDot set');
+        return;
+    }
+
+    console.log(
+        `Adding photo to dot ${currentGalleryDot.internalId}, location ${currentGalleryDot.locationNumber}`
+    );
 
     // Get the current dot
     const dots = getCurrentPageDots();
-    if (!dots) return;
+    if (!dots) {
+        console.error('No dots found for current page');
+        return;
+    }
 
     const dot = dots.get(currentGalleryDot.internalId);
-    if (!dot) return;
+    if (!dot) {
+        console.error(
+            `Could not find dot with internalId: ${currentGalleryDot.internalId} in current page dots`
+        );
+        return;
+    }
 
     // Initialize photos array if needed
     if (!dot.photos) {
