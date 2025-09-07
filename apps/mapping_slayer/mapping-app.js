@@ -336,7 +336,7 @@ class MappingSlayerApp extends SlayerAppBase {
                         <span class="ms-gallery-title">Gallery</span>
                         <div class="ms-gallery-controls">
                             <button class="ms-gallery-btn ms-gallery-add-btn" id="gallery-add-btn" title="Add Photo">+</button>
-                            <button class="ms-gallery-btn ms-gallery-close-btn" id="gallery-close-btn" title="Close">×</button>
+                            <button class="ms-gallery-btn ms-gallery-close-btn" id="gallery-close-btn" title="Delete Photo">×</button>
                         </div>
                     </div>
                     <div class="ms-gallery-body">

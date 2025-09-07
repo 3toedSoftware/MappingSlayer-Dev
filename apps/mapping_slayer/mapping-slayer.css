@@ -1456,13 +1456,15 @@ body {
 }
 
 .ms-gallery-close-btn {
-    background: #555;
-    color: #ccc;
+    background: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
 }
 
 .ms-gallery-close-btn:hover {
-    background: #666;
+    background: #c82333;
     color: white;
+    border-color: #c82333;
 }
 
 .ms-gallery-body {
