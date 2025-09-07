@@ -733,10 +733,49 @@ function initializeColorPickers(item, markerTypeCode, typeData) {
     });
 }
 
+function setupLegendCollapse() {
+    // Setup collapse functionality for both legends
+    const projectLegend = document.getElementById('project-legend');
+    const mapLegend = document.getElementById('map-legend');
+    
+    if (projectLegend) {
+        const header = projectLegend.querySelector('.ms-map-legend-header');
+        if (header && !header.hasAttribute('data-collapse-setup')) {
+            header.setAttribute('data-collapse-setup', 'true');
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', () => {
+                projectLegend.classList.toggle('ms-collapsed');
+                const content = document.getElementById('project-legend-content');
+                if (content) {
+                    content.style.display = projectLegend.classList.contains('ms-collapsed') ? 'none' : 'block';
+                }
+            });
+        }
+    }
+    
+    if (mapLegend) {
+        const header = mapLegend.querySelector('.ms-map-legend-header');
+        if (header && !header.hasAttribute('data-collapse-setup')) {
+            header.setAttribute('data-collapse-setup', 'true');
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', () => {
+                mapLegend.classList.toggle('ms-collapsed');
+                const content = document.getElementById('map-legend-content');
+                if (content) {
+                    content.style.display = mapLegend.classList.contains('ms-collapsed') ? 'none' : 'block';
+                }
+            });
+        }
+    }
+}
+
 function updateMapLegend() {
     const legend = document.getElementById('map-legend');
     const content = document.getElementById('map-legend-content');
     if (!legend || !content) return;
+    
+    // Setup collapse functionality if not already done
+    setupLegendCollapse();
 
     const usedMarkerTypeCodes = new Set(
         Array.from(getCurrentPageDots().values()).map(d => d.markerType)
@@ -785,6 +824,9 @@ function updateProjectLegend() {
     const legend = document.getElementById('project-legend');
     const content = document.getElementById('project-legend-content');
     if (!legend || !content) return;
+    
+    // Setup collapse functionality if not already done
+    setupLegendCollapse();
 
     const projectCounts = new Map();
     for (const pageData of appState.dotsByPage.values()) {
@@ -5972,6 +6014,7 @@ export {
     updateMarkerTypeSelect,
     updateMapLegend,
     updateProjectLegend,
+    setupLegendCollapse,
     generateDynamicTextFields,
     editFieldName,
     deleteField,
