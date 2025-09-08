@@ -358,7 +358,6 @@ async function automapSingleLocation() {
                     dotInfo.y,
                     markerTypeCode,
                     dotInfo.message,
-                    false,
                     locationNumber
                 );
                 if (dot) {

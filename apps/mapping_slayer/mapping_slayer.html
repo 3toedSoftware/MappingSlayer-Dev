@@ -81,6 +81,12 @@
                     await mappingApp.activate();
                     console.log('✅ Mapping Slayer app initialized successfully!');
                     console.log('🗺️ Ready to integrate existing functionality');
+
+                    // Load Sidekick AI interface
+                    const sidekickScript = document.createElement('script');
+                    sidekickScript.src = './ai-interface.js';
+                    sidekickScript.onload = () => console.log('🤖 Sidekick AI interface loaded');
+                    document.body.appendChild(sidekickScript);
                 } catch (initError) {
                     console.error('❌ Mapping Slayer app failed to initialize:', initError);
                 }

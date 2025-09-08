@@ -1,0 +1,192 @@
+{
+    "name": "Sidekick AI Examples",
+    "description": "Example commands for AI agents to interact with Mapping Slayer",
+    "version": "1.0.0",
+
+    "examples": [
+        {
+            "task": "Change message text for specific dots",
+            "userSays": "Change dots 0001-0005 message from OFFICE to SPACE",
+            "aiCode": [
+                "const state = window.sidekick.getStateJSON();",
+                "const page1 = state.appState.dotsByPage['1'];",
+                "page1.dots.forEach(dot => {",
+                "  const locNum = parseInt(dot.locationNumber);",
+                "  if (locNum >= 1 && locNum <= 5 && dot.message === 'OFFICE') {",
+                "    dot.message = 'SPACE';",
+                "  }",
+                "});",
+                "window.sidekick.applyStateJSON(state);"
+            ]
+        },
+
+        {
+            "task": "Change all marker types",
+            "userSays": "Change all IA.1 markers to IA.2",
+            "aiCode": [
+                "const state = window.sidekick.getStateJSON();",
+                "for (const pageNum in state.appState.dotsByPage) {",
+                "  state.appState.dotsByPage[pageNum].dots.forEach(dot => {",
+                "    if (dot.markerType === 'IA.1') {",
+                "      dot.markerType = 'IA.2';",
+                "    }",
+                "  });",
+                "}",
+                "window.sidekick.applyStateJSON(state);"
+            ]
+        },
+
+        {
+            "task": "Select dots by criteria",
+            "userSays": "Select all dots with RESTROOM in the message",
+            "aiCode": ["window.sidekick.selectDots({", "  message: 'RESTROOM'", "});"]
+        },
+
+        {
+            "task": "Run automap",
+            "userSays": "Find and map all EXIT signs",
+            "aiCode": ["await window.sidekick.runAutomap('EXIT');"]
+        },
+
+        {
+            "task": "Navigate to page",
+            "userSays": "Go to page 5",
+            "aiCode": ["window.sidekick.navigateToPage(5);"]
+        },
+
+        {
+            "task": "Get statistics",
+            "userSays": "How many dots are on each page?",
+            "aiCode": [
+                "const stats = window.sidekick.getDotCount();",
+                "console.log('Total dots:', stats.total);",
+                "console.log('By page:', stats.byPage);",
+                "console.log('By marker type:', stats.byMarkerType);"
+            ]
+        },
+
+        {
+            "task": "Preview changes before applying",
+            "userSays": "Show me what would change if I update all OFFICE to WORKSPACE",
+            "aiCode": [
+                "window.sidekick.setPreviewMode(true);",
+                "const state = window.sidekick.getStateJSON();",
+                "// Make changes",
+                "for (const pageNum in state.appState.dotsByPage) {",
+                "  state.appState.dotsByPage[pageNum].dots.forEach(dot => {",
+                "    if (dot.message === 'OFFICE') {",
+                "      dot.message = 'WORKSPACE';",
+                "    }",
+                "  });",
+                "}",
+                "const preview = window.sidekick.applyStateJSON(state);",
+                "console.log('Preview:', preview);",
+                "// To actually apply: window.sidekick.setPreviewMode(false);"
+            ]
+        },
+
+        {
+            "task": "Batch update multiple properties",
+            "userSays": "For all IA.1 dots, change message to uppercase and mark as installed",
+            "aiCode": [
+                "const state = window.sidekick.getStateJSON();",
+                "for (const pageNum in state.appState.dotsByPage) {",
+                "  state.appState.dotsByPage[pageNum].dots.forEach(dot => {",
+                "    if (dot.markerType === 'IA.1') {",
+                "      dot.message = dot.message.toUpperCase();",
+                "      dot.installed = true;",
+                "    }",
+                "  });",
+                "}",
+                "window.sidekick.applyStateJSON(state);"
+            ]
+        },
+
+        {
+            "task": "Add flags to dots",
+            "userSays": "Add a top-left flag to dots 0010-0015",
+            "aiCode": [
+                "const state = window.sidekick.getStateJSON();",
+                "const currentPage = state.metadata.currentPage;",
+                "state.appState.dotsByPage[currentPage].dots.forEach(dot => {",
+                "  const locNum = parseInt(dot.locationNumber);",
+                "  if (locNum >= 10 && locNum <= 15) {",
+                "    if (!dot.flags) dot.flags = {};",
+                "    dot.flags.topLeft = true;",
+                "  }",
+                "});",
+                "window.sidekick.applyStateJSON(state);"
+            ]
+        },
+
+        {
+            "task": "Undo last AI operation",
+            "userSays": "Undo that last change",
+            "aiCode": ["window.sidekick.undo();"]
+        },
+
+        {
+            "task": "Get current page data only",
+            "userSays": "Show me just the current page data",
+            "aiCode": [
+                "const currentPageState = window.sidekick.getStateJSON({ currentPageOnly: true });",
+                "console.log('Current page data:', currentPageState);"
+            ]
+        },
+
+        {
+            "task": "Update marker type properties",
+            "userSays": "Change the color of IA.1 marker type to blue",
+            "aiCode": [
+                "const state = window.sidekick.getStateJSON();",
+                "if (state.appState.markerTypes['IA.1']) {",
+                "  state.appState.markerTypes['IA.1'].color = '#0000FF';",
+                "}",
+                "window.sidekick.applyStateJSON(state);"
+            ]
+        }
+    ],
+
+    "capabilities": {
+        "stateManagement": [
+            "getStateJSON() - Get full application state",
+            "applyStateJSON(state) - Apply modified state",
+            "getStateJSON({currentPageOnly: true}) - Get current page only"
+        ],
+        "dataModification": [
+            "updatePageDots(pageNum, dots) - Update dots on specific page",
+            "updateMarkerTypes(markerTypes) - Update marker type definitions"
+        ],
+        "actions": [
+            "runAutomap(searchTerm) - Run automap with optional search",
+            "selectDots(criteria) - Select dots by various criteria",
+            "navigateToPage(pageNum) - Navigate to specific page"
+        ],
+        "utilities": [
+            "getDotCount() - Get statistics about dots",
+            "validateState(state) - Validate state structure",
+            "previewChanges(state) - Preview without applying",
+            "undo() - Undo last AI operation",
+            "getStatus() - Get current status and capabilities",
+            "setPreviewMode(enabled) - Enable/disable preview mode"
+        ]
+    },
+
+    "selectionCriteria": {
+        "ids": "Array of specific dot IDs",
+        "markerType": "Select by marker type code",
+        "message": "Select by message content (partial match)",
+        "locationRange": {
+            "start": "Starting location number",
+            "end": "Ending location number"
+        }
+    },
+
+    "notes": [
+        "All operations return a result object with 'success' and 'message' fields",
+        "State modifications are atomic - either all changes apply or none",
+        "Preview mode allows testing changes without applying them",
+        "Undo is available for the last AI operation only",
+        "The interface waits for Mapping Slayer to be fully loaded before initializing"
+    ]
+}
