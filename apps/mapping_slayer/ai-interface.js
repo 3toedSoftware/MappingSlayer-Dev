@@ -460,6 +460,278 @@
              */
             getHistory: function () {
                 return operationHistory;
+            },
+
+            // ===== PDF Rasterization =====
+
+            /**
+             * Extract current PDF page as image data
+             * AI agents can use this to get visual context of the PDF
+             */
+            extractPDFPage: function (pageNum) {
+                try {
+                    const canvas = document.getElementById('pdf-canvas');
+                    if (!canvas) {
+                        return { success: false, error: 'PDF canvas not found' };
+                    }
+
+                    const currentPage = pageNum || window.appState.currentPdfPage || 1;
+                    const pdfName = window.appState.sourcePdfName || 'unnamed.pdf';
+
+                    // Remove .pdf extension and create filename
+                    const baseName = pdfName.replace(/\.pdf$/i, '');
+                    const filename = `${baseName}_page_${currentPage}.png`;
+
+                    // Get image data
+                    const dataURL = canvas.toDataURL('image/png');
+
+                    console.log(`Extracted ${filename} - ${dataURL.length} bytes`);
+
+                    return {
+                        success: true,
+                        filename: filename,
+                        page: currentPage,
+                        pdfName: pdfName,
+                        width: canvas.width,
+                        height: canvas.height,
+                        dataURL: dataURL,
+                        suggestedPath: `apps/mapping_slayer/raster-map-pages/${filename}`
+                    };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            },
+
+            /**
+             * Save extracted page to downloads (since we can't write directly to project folder)
+             * The user will need to move it to raster-map-pages folder manually
+             */
+            downloadExtractedPage: function (pageNum) {
+                try {
+                    // First extract the page
+                    const extracted = this.extractPDFPage(pageNum);
+                    if (!extracted.success) {
+                        return extracted;
+                    }
+
+                    // Convert base64 to blob
+                    const base64Data = extracted.dataURL.split(',')[1];
+                    const byteCharacters = atob(base64Data);
+                    const byteNumbers = new Array(byteCharacters.length);
+
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: 'image/png' });
+
+                    // Create download link
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = extracted.filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    console.log(`Downloaded: ${extracted.filename}`);
+                    console.log(`Please move to: ${extracted.suggestedPath}`);
+
+                    return {
+                        success: true,
+                        message: `Downloaded ${extracted.filename} to Downloads folder`,
+                        filename: extracted.filename,
+                        suggestedPath: extracted.suggestedPath,
+                        note: 'Please move the file to the raster-map-pages folder'
+                    };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            },
+
+            /**
+             * Extract and download all PDF pages
+             */
+            downloadAllPDFPages: async function () {
+                try {
+                    const totalPages = window.appState.totalPages;
+                    const originalPage = window.appState.currentPdfPage;
+                    const results = [];
+
+                    console.log(`Starting extraction of ${totalPages} pages...`);
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        // Navigate to page
+                        this.navigateToPage(i);
+
+                        // Wait for render
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        // Download page
+                        const result = this.downloadExtractedPage(i);
+                        results.push(result);
+
+                        console.log(`Page ${i}/${totalPages} complete`);
+
+                        // Small delay between downloads
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+
+                    // Return to original page
+                    this.navigateToPage(originalPage);
+
+                    return {
+                        success: true,
+                        message: `Downloaded ${results.length} pages to Downloads folder`,
+                        pages: results,
+                        note: 'Please move files to apps/mapping_slayer/raster-map-pages/'
+                    };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            },
+
+            // ===== File System Access API Methods =====
+
+            /**
+             * Let user pick a directory for saving raster pages
+             * Uses File System Access API (requires user interaction)
+             */
+            pickSaveDirectory: async function () {
+                try {
+                    // Check if File System Access API is available
+                    if (!window.showDirectoryPicker) {
+                        return {
+                            success: false,
+                            error: 'File System Access API not supported in this browser',
+                            note: 'Try Chrome, Edge, or Opera'
+                        };
+                    }
+
+                    // Request directory access
+                    const dirHandle = await window.showDirectoryPicker({
+                        mode: 'readwrite',
+                        startIn: 'documents'
+                    });
+
+                    // Store the handle for later use
+                    this._dirHandle = dirHandle;
+
+                    console.log(`Selected directory: ${dirHandle.name}`);
+
+                    return {
+                        success: true,
+                        directoryName: dirHandle.name,
+                        message: 'Directory selected successfully'
+                    };
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        return { success: false, error: 'User cancelled directory selection' };
+                    }
+                    return { success: false, error: error.message };
+                }
+            },
+
+            /**
+             * Save extracted page directly to selected directory
+             * Requires pickSaveDirectory to be called first
+             */
+            savePageToDirectory: async function (pageNum) {
+                try {
+                    if (!this._dirHandle) {
+                        return {
+                            success: false,
+                            error: 'No directory selected. Call pickSaveDirectory() first'
+                        };
+                    }
+
+                    // Extract the page
+                    const extracted = this.extractPDFPage(pageNum);
+                    if (!extracted.success) {
+                        return extracted;
+                    }
+
+                    // Convert base64 to blob
+                    const base64Data = extracted.dataURL.split(',')[1];
+                    const byteCharacters = atob(base64Data);
+                    const byteNumbers = new Array(byteCharacters.length);
+
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: 'image/png' });
+
+                    // Create file in directory
+                    const fileHandle = await this._dirHandle.getFileHandle(extracted.filename, {
+                        create: true
+                    });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+
+                    console.log(`Saved ${extracted.filename} to selected directory`);
+
+                    return {
+                        success: true,
+                        filename: extracted.filename,
+                        message: `Saved ${extracted.filename} directly to selected directory`
+                    };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            },
+
+            /**
+             * Save all PDF pages to selected directory
+             */
+            saveAllPagesToDirectory: async function () {
+                try {
+                    if (!this._dirHandle) {
+                        // Prompt user to select directory first
+                        const dirResult = await this.pickSaveDirectory();
+                        if (!dirResult.success) {
+                            return dirResult;
+                        }
+                    }
+
+                    const totalPages = window.appState.totalPages;
+                    const originalPage = window.appState.currentPdfPage;
+                    const results = [];
+
+                    console.log(`Saving ${totalPages} pages to selected directory...`);
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        // Navigate to page
+                        this.navigateToPage(i);
+
+                        // Wait for render
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        // Save page
+                        const result = await this.savePageToDirectory(i);
+                        results.push(result);
+
+                        console.log(`Page ${i}/${totalPages} complete`);
+
+                        // Small delay between saves
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
+
+                    // Return to original page
+                    this.navigateToPage(originalPage);
+
+                    return {
+                        success: true,
+                        message: `Saved ${results.length} pages to selected directory`,
+                        pages: results
+                    };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
             }
         };
 

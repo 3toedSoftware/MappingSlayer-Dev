@@ -1,8 +1,56 @@
 # Sidekick Guide for AI Agents
 
+**Note**: Sidekick is a programmatic API without a human-facing UI. It's designed exclusively for AI agents to control Mapping Slayer through code execution, not for direct human interaction.
+
+## Important: Documentation Maintenance
+
+**AI agents should update this guide whenever they discover new functionality or learn how to perform new operations in Mapping Slayer.** This ensures future AI sessions have access to accumulated knowledge about the system.
+
+When updating:
+
+- Add new sections for major features
+- Include working code examples with generic placeholders
+- Document selectors, IDs, and class names discovered
+- Note any timing requirements or sequencing needs
+- Keep examples generic (avoid specific data that might not apply universally)
+
+## Prerequisites for Sidekick
+
+### What Sidekick Needs to Load
+
+1. **Mapping Slayer must be loaded in STANDALONE mode**
+    - ✅ Works: `http://localhost:8080/apps/mapping_slayer/mapping_slayer.html`
+    - ❌ Does NOT work: `http://localhost:8080/index.html` (Suite mode)
+
+2. **Required global variables must be available**:
+    - `window.mappingApp` - The main app instance
+    - `window.appState` - The global state object
+    - These are only set when Mapping Slayer initializes properly
+
+3. **A PDF should be loaded** for full functionality
+
+### How Sidekick Initializes
+
+Sidekick (`ai-interface.js`) automatically initializes when:
+
+- The page is loaded in standalone mode
+- `window.mappingApp` and `window.appState` become available
+- If these aren't available, Sidekick retries every 100ms until they are
+
+You'll see this in the console when ready:
+
+```
+🤖 Sidekick: Interface ready. Access via window.sidekick
+🤖 Sidekick: Try sidekick.getStatus() to see available commands
+```
+
+### Why Sidekick Doesn't Work in Suite Mode
+
+In Suite mode, apps are loaded as modules through the app bridge system, and the required globals aren't set the same way. The suite uses a different architecture for cross-app communication.
+
 ## Quick Start for AI Agents
 
-This guide helps AI agents (Claude, ChatGPT, Gemini, etc.) interact with Mapping Slayer through the Sidekick interface.
+This guide helps AI agents (Claude, ChatGPT, Gemini, etc.) interact with Mapping Slayer through the Sidekick JSON API.
 
 ## 1. First Steps - Check Connection
 
@@ -19,6 +67,175 @@ if (window.sidekick) {
 ```
 
 ## 2. Core Operations
+
+### Load a PDF File (Required for Initialization)
+
+```javascript
+// Programmatically load a PDF file into Mapping Slayer
+(async function () {
+    // Fetch the PDF file (adjust path as needed)
+    const response = await fetch('/path/to/your.pdf');
+    const blob = await response.blob();
+    const file = new File([blob], 'filename.pdf', { type: 'application/pdf' });
+
+    // Find the file input element
+    const fileInput = document.querySelector('input[type="file"]');
+
+    if (fileInput) {
+        // Create a DataTransfer object to simulate file selection
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+
+        // Trigger change event to load the PDF
+        const changeEvent = new Event('change', { bubbles: true });
+        fileInput.dispatchEvent(changeEvent);
+
+        console.log('PDF loaded successfully');
+    }
+})();
+```
+
+### Create and Manage Marker Types via Sidekick API
+
+**IMPORTANT**: Always create marker types BEFORE adding dots! Dots with non-existent marker types will not appear in the location list. Mapping Slayer was designed for human use and expects proper setup - just like a human would first create marker types, then use them.
+
+```javascript
+// Get current state
+const state = window.sidekick.getStateJSON();
+
+// Define your marker types with codes, names, and colors
+state.appState.markerTypes = {
+    BE: {
+        code: 'BE',
+        name: 'Building Entrance',
+        color: '#FF0000', // Red
+        textColor: '#FFFFFF' // White text
+    },
+    P: {
+        code: 'P',
+        name: 'Parking',
+        color: '#0000FF', // Blue
+        textColor: '#FFFFFF'
+    },
+    EE: {
+        code: 'EE',
+        name: 'Emergency Exit',
+        color: '#00FF00', // Green
+        textColor: '#000000' // Black text
+    },
+    AE: {
+        code: 'AE',
+        name: 'Accessible Entrance',
+        color: '#FFFF00', // Yellow
+        textColor: '#000000'
+    },
+    I: {
+        code: 'I',
+        name: 'Information',
+        color: '#00FFFF', // Cyan
+        textColor: '#000000'
+    },
+    R: {
+        code: 'R',
+        name: 'Restroom',
+        color: '#FF00FF', // Magenta
+        textColor: '#FFFFFF'
+    },
+    E: {
+        code: 'E',
+        name: 'Elevator',
+        color: '#FFA500', // Orange
+        textColor: '#000000'
+    },
+    S: {
+        code: 'S',
+        name: 'Stairs',
+        color: '#800080', // Purple
+        textColor: '#FFFFFF'
+    },
+    FE: {
+        code: 'FE',
+        name: 'Fire Extinguisher',
+        color: '#FF6B6B', // Light Red
+        textColor: '#FFFFFF'
+    },
+    UM: {
+        code: 'UM',
+        name: 'Unmarked',
+        color: '#808080', // Gray
+        textColor: '#FFFFFF'
+    }
+};
+
+// Apply the updated state
+const result = window.sidekick.applyStateJSON(state);
+console.log('Marker types created:', result);
+```
+
+### Alternative: Update Only Marker Types
+
+```javascript
+// Use the dedicated method for updating just marker types
+const markerTypes = {
+    BE: { code: 'BE', name: 'Building Entrance', color: '#FF0000', textColor: '#FFFFFF' },
+    P: { code: 'P', name: 'Parking', color: '#0000FF', textColor: '#FFFFFF' }
+    // Add more as needed
+};
+
+const result = window.sidekick.updateMarkerTypes(markerTypes);
+console.log('Marker types updated:', result);
+```
+
+### Add Dots to the Map
+
+```javascript
+// Get current state
+const state = window.sidekick.getStateJSON();
+
+// Determine current page
+const currentPage = state.appState.currentPage || '1';
+
+// Initialize page structure if needed
+if (!state.appState.dotsByPage[currentPage]) {
+    state.appState.dotsByPage[currentPage] = { dots: [] };
+}
+
+// Get existing dot count for proper numbering
+const existingDots = state.appState.dotsByPage[currentPage].dots.length;
+
+// Create new dots
+const timestamp = Date.now();
+const newDots = [
+    { x: 200, y: 200, msg: 'MAIN ENTRANCE' },
+    { x: 350, y: 200, msg: 'OFFICE' },
+    { x: 500, y: 200, msg: 'RESTROOM' },
+    { x: 275, y: 350, msg: 'ELEVATOR' },
+    { x: 425, y: 350, msg: 'STAIRS' }
+].map((dot, i) => ({
+    internalId: `dot_${timestamp}_${i}`,
+    locationNumber: String(existingDots + i + 1).padStart(4, '0'),
+    x: dot.x,
+    y: dot.y,
+    message: dot.msg,
+    markerType: 'BE', // Use an existing marker type code
+    flags: {},
+    installed: false
+}));
+
+// Add dots to the state
+state.appState.dotsByPage[currentPage].dots.push(...newDots);
+
+// Apply the updated state
+const result = window.sidekick.applyStateJSON(state);
+console.log('Dots added:', result);
+
+// Verify dots were added
+const stats = window.sidekick.getDotCount();
+console.log('Total dots:', stats.total);
+console.log('Dots by page:', stats.byPage);
+console.log('Dots by marker type:', stats.byMarkerType);
+```
 
 ### Get Current State
 
@@ -124,9 +341,69 @@ window.sidekick.applyStateJSON(state);
 
 ### Run Automap
 
+**IMPORTANT: Automap Configuration**
+
+The automap feature has an "Exact" checkbox that controls how text matching works:
+
+- **Exact checkbox CHECKED (default)**: Only finds exact, full matches
+- **Exact checkbox UNCHECKED**: Finds partial matches (recommended for most searches)
+
+For example, searching for "STAIR" with:
+
+- Exact checked: Would NOT find "STAIR-A", "STAIR-B", etc.
+- Exact unchecked: WOULD find "STAIR-A", "STAIR-B", "STAIRS", etc.
+
 ```javascript
-// Run automap for a search term
+// Method 1: Using Sidekick API directly (always uses partial matching)
 await window.sidekick.runAutomap('EXIT');
+
+// Method 2: Using UI controls for more control
+// First, uncheck the "Exact" checkbox for partial matching
+const exactCheckbox = document.getElementById('automap-exact-phrase');
+if (exactCheckbox) {
+    exactCheckbox.checked = false; // Enable partial matching
+}
+
+// Then find and use the automap UI
+const automapButton = Array.from(document.querySelectorAll('button')).find(btn =>
+    btn.textContent?.toLowerCase().includes('automap')
+);
+
+if (automapButton) {
+    // Find the search input near the button
+    const searchInput =
+        automapButton.parentElement?.querySelector('input[type="text"]') ||
+        automapButton.parentElement?.parentElement?.querySelector('input[type="text"]');
+
+    if (searchInput) {
+        searchInput.value = 'STAIR'; // Your search term
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+        automapButton.click();
+    }
+}
+
+// Method 3: Complete automap workflow
+async function runAutomapWithOptions(searchTerm, exactMatch = false) {
+    // Set the exact match preference
+    const exactCheckbox = document.getElementById('automap-exact-phrase');
+    if (exactCheckbox) {
+        exactCheckbox.checked = exactMatch;
+    }
+
+    // Run automap
+    const result = await window.sidekick.runAutomap(searchTerm);
+
+    // Check results
+    const status = window.sidekick.getStatus();
+    console.log(`Found ${status.dotCount.total} matches for "${searchTerm}"`);
+
+    return status.dotCount;
+}
+
+// Examples:
+await runAutomapWithOptions('STAIR', false); // Find all stair-related text
+await runAutomapWithOptions('EXIT', false); // Find all exit-related text
+await runAutomapWithOptions('ROOM 101', true); // Find exactly "ROOM 101"
 ```
 
 ### Fix Location Numbers
@@ -272,6 +549,29 @@ window.sidekick.applyStateJSON(state);
 ```
 
 ## 7. Troubleshooting
+
+### Automap Not Finding Expected Matches
+
+If automap isn't finding text you expect:
+
+- **Check the "Exact" checkbox setting**: By default, it's checked and only finds exact matches
+- Uncheck "Exact" to enable partial matching (finds "STAIR-A" when searching for "STAIR")
+- The checkbox ID is `automap-exact-phrase`
+- Partial matching is usually more useful for finding variations of text
+
+```javascript
+// Ensure partial matching is enabled
+document.getElementById('automap-exact-phrase').checked = false;
+```
+
+### Dots Not Appearing in Location List
+
+If dots appear on the map but not in the location list:
+
+- **Check marker types exist**: The most common cause is using a marker type code that doesn't exist
+- Dots with invalid marker types are ignored by the location list
+- Always create marker types first, then add dots
+- Use `Object.keys(state.appState.markerTypes)` to see available marker types
 
 ### PDF Not Visible
 

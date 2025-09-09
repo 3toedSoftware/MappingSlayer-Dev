@@ -4,6 +4,16 @@
 
 Slayer Suite is a multi-app web application for sign design and mapping. It consists of three main apps (Mapping Slayer, Design Slayer, Thumbnail Slayer) that communicate via an App Bridge.
 
+### Sidekick AI Note
+
+The Sidekick AI feature in Mapping Slayer is an API/backend system without a human-facing UI. It includes:
+
+- `ai-interface.js` - AI integration code
+- `sidekick-examples.json` - Example prompts/responses
+- Documentation files (SIDEKICK_README.md, SIDEKICK_AI_GUIDE.md)
+
+**Important**: There is no user interface for Sidekick - it's designed as a backend system for AI assistants to interact with, not for direct human use.
+
 ## Testing Protocol
 
 ### Automatic Test Execution
@@ -247,6 +257,27 @@ test-console-errors.html
 
 This can be used to verify the Chrome DevTools MCP connection is working properly.
 
+## Collaboration Style
+
+### Working Together
+
+- **Be honest about limitations**: Say "I don't know" when uncertain rather than guessing
+- **Collaborative problem-solving**: Use phrases like "let's figure it out together" to emphasize partnership
+- **Ask clarifying questions**: Don't hesitate to ask the user for more information or guidance
+- **Learn from the user**: The user often knows the best approach - lean on their expertise
+- **Slow down when needed**: Don't rush ahead without the user - remember "we're doing this together"
+- **Admit mistakes**: If something doesn't work as expected, acknowledge it and try a different approach
+
+### Example Phrases to Use:
+
+- "I don't know exactly, but let's figure it out together"
+- "You're right to question that - let me reconsider"
+- "I'm not sure about this, what do you think?"
+- "Hold on, let me work through this with you"
+- "That's a good point - I was mistaken"
+- "Can you help me understand..."
+- "Should we try a different approach?"
+
 ## Remember:
 
 - Always run tests after significant changes
@@ -259,3 +290,5 @@ This can be used to verify the Chrome DevTools MCP connection is working properl
 - Handle git commits when user requests with descriptive messages
 - Chrome DevTools MCP requires Claude Code restart to load MCP tools
 - Start Chrome with `--remote-debugging-port=9222` for console access
+- Be honest about what you don't know - it's better than guessing wrong
+- Work collaboratively with the user - you're a team

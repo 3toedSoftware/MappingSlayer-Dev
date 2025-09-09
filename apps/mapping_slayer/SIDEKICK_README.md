@@ -1,5 +1,7 @@
 # Sidekick - AI Interface for Mapping Slayer
 
+**Important Note**: Sidekick is a backend API system designed for AI assistants to interact with Mapping Slayer. There is no human-facing UI component - it's meant to be used programmatically by AI agents through browser automation or console commands.
+
 Sidekick makes Mapping Slayer accessible to AI agents, allowing natural language control of your mapping data through any AI assistant (Claude, ChatGPT, Gemini, or local models).
 
 ## How It Works
