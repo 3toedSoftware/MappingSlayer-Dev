@@ -1,0 +1,54 @@
+name: Deploy Standalone Branch
+
+on:
+  push:
+    branches:
+      - mapping-slayer-standalone
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout standalone branch
+        uses: actions/checkout@v3
+        with:
+          ref: mapping-slayer-standalone
+      
+      - name: Checkout main branch for merging
+        uses: actions/checkout@v3
+        with:
+          ref: master
+          path: main-site
+      
+      - name: Create deployment structure
+        run: |
+          # Create a temp directory for combined deployment
+          mkdir -p deploy
+          
+          # Copy main site files
+          cp -r main-site/* deploy/ 2>/dev/null || true
+          cp -r main-site/.* deploy/ 2>/dev/null || true
+          
+          # Create standalone subdirectory and copy standalone version
+          mkdir -p deploy/standalone
+          
+          # Copy everything except .git and main-site folder to standalone
+          find . -maxdepth 1 ! -name '.git' ! -name 'main-site' ! -name 'deploy' ! -name '.' -exec cp -r {} deploy/standalone/ \;
+          
+          # Clean up
+          rm -rf deploy/main-site
+          
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: deploy
+      
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v2
+        id: deployment
