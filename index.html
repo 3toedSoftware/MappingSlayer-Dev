@@ -50,22 +50,9 @@
                 <div class="slayer-app-container">
                     <!-- Unified Header (always visible) -->
                     <div class="slayer-header">
-                        <!-- User Menu -->
-                        <div class="user-menu">
-                            <div class="user-icon">3T</div>
-                            <div class="user-flyout">
-                                <div class="flyout-item">👤 Profile Settings</div>
-                                <div class="flyout-item">⚙️ Preferences</div>
-                                <div class="flyout-item">📊 Usage Stats</div>
-                                <div class="flyout-item">❓ Help & Support</div>
-                                <div class="flyout-item">📄 Documentation</div>
-                                <div class="flyout-item danger">🚪 Sign Out</div>
-                            </div>
-                        </div>
-
                         <!-- Logo Section -->
                         <div class="logo-section">
-                            <img src="./apps/mapping_slayer/MSLogo.svg" alt="Mapping Slayer" class="suite-logo" style="height: 40px; width: auto;" onerror="this.style.display='none'; document.getElementById('logo-text').style.display='inline';">
+                            <img src="./apps/mapping_slayer/MSLogo.svg" alt="Mapping Slayer" class="suite-logo" style="height: 30px; width: auto;" onerror="this.style.display='none'; document.getElementById('logo-text').style.display='inline';">
                             <span id="logo-text" style="display: none;" class="suite-logo">MAPPING SLAYER</span>
                         </div>
 
@@ -193,6 +180,12 @@
                         window.logAlways('Mapping Slayer initialized successfully!');
                         window.logAlways('Ready to map!');
                     }
+                    
+                    // Load Sidekick AI interface
+                    const sidekickScript = document.createElement('script');
+                    sidekickScript.src = './apps/mapping_slayer/ai-interface.js';
+                    sidekickScript.onload = () => console.log('🤖 Sidekick AI interface loaded');
+                    document.body.appendChild(sidekickScript);
                 } catch (error) {
                     console.error('Failed to initialize Mapping Slayer:', error);
                     const container = document.getElementById('app-container');
