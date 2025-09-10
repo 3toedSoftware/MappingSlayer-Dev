@@ -23,15 +23,7 @@
         <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-        <!-- Tabulator for Thumbnail Slayer spreadsheet -->
-        <link
-            href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator_midnight.min.css"
-            rel="stylesheet"
-        />
-        <script
-            type="text/javascript"
-            src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"
-        ></script>
+        <!-- Tabulator removed - not needed for standalone -->
     </head>
     <body>
         <div id="app-container"></div>
@@ -145,9 +137,7 @@
                         .default;
                     const DesignSlayerApp = (await import('./apps/design_slayer/design-app.js'))
                         .default;
-                    const ThumbnailSlayerApp = (
-                        await import('./apps/thumbnail_slayer/thumbnail-app.js')
-                    ).default;
+                    // Thumbnail Slayer not included in standalone version
 
                     // Initialize core
                     initializeCore(true);
@@ -165,8 +155,7 @@
                     // Initialize all apps
                     const apps = {
                         mapping_slayer: new MappingSlayerApp(),
-                        design_slayer: new DesignSlayerApp(),
-                        thumbnail_slayer: new ThumbnailSlayerApp()
+                        design_slayer: new DesignSlayerApp()
                     };
 
                     // Initialize all apps with their own containers in suite mode
