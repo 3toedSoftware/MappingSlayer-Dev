@@ -291,7 +291,7 @@ body {
     flex-direction: column;
     border-right: 1px solid #555;
     height: 100%;
-    overflow: hidden; /* Prevent content from overflowing */
+    overflow: visible; /* Allow collapse button to show */
     transition: transform 0.3s ease;
     position: relative;
     z-index: 10;
@@ -348,7 +348,7 @@ body {
 
 .ms-panel-header {
     background: #333537;
-    color: #ffffff;
+    color: #f07727; /* Changed to orange */
     padding: 12px;
     font-weight: bold;
     font-size: 18px;
@@ -357,6 +357,7 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+    line-height: 1; /* Normalize line height for better vertical centering */
 }
 
 .ms-header-buttons {
@@ -380,9 +381,9 @@ body {
 }
 
 .ms-filter-section {
-    flex: 0 0 auto;  /* Don't grow or shrink, size based on content */
+    flex: 0 0 auto; /* Don't grow or shrink, size based on content */
     min-height: 100px;
-    max-height: 40%;  /* Max 40% of parent height */
+    max-height: 40%; /* Max 40% of parent height */
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -589,7 +590,7 @@ body {
 }
 
 .ms-list-section {
-    flex: 1 1 auto;  /* Can grow and shrink, takes remaining space */
+    flex: 1 1 auto; /* Can grow and shrink, takes remaining space */
     min-height: 150px;
     overflow: hidden;
     display: flex;
