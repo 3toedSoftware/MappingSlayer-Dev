@@ -183,9 +183,11 @@
                     // Just load Mapping Slayer directly - no app switching needed
                     await appBridge.switchToApp('mapping_slayer');
 
-                    // Hide breadcrumb since we're not switching apps
-                    document.getElementById('breadcrumb-sep').style.display = 'none';
-                    document.getElementById('app-name-display').style.display = 'none';
+                    // Hide breadcrumb since we're not switching apps (check if elements exist first)
+                    const breadcrumbSep = document.getElementById('breadcrumb-sep');
+                    const appNameDisplay = document.getElementById('app-name-display');
+                    if (breadcrumbSep) breadcrumbSep.style.display = 'none';
+                    if (appNameDisplay) appNameDisplay.style.display = 'none';
 
                     if (window.logAlways) {
                         window.logAlways('Mapping Slayer initialized successfully!');
