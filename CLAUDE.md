@@ -14,6 +14,32 @@ The Sidekick AI feature in Mapping Slayer is an API/backend system without a hum
 
 **Important**: There is no user interface for Sidekick - it's designed as a backend system for AI assistants to interact with, not for direct human use.
 
+### Sidekick Workflow for Users
+
+**If user has NO existing work:**
+
+1. Ask Claude to help with Mapping Slayer
+2. Claude opens a special browser window
+3. User works normally in that window (load PDF, add markers, etc.)
+4. User asks Claude to automate tasks
+5. Claude uses Sidekick to control that same window
+
+**If user ALREADY has work in progress:**
+
+1. Save your work using SAVE or SAVE AS button in Mapping Slayer
+2. Tell Claude you have existing work saved
+3. Claude opens a special browser window
+4. Use the LOAD button to load your .slayer file
+5. All your work appears in Claude's window
+6. Claude can now automate tasks on your existing work
+
+**Key Points:**
+
+- Claude needs a special debugging-enabled browser window to use Sidekick
+- Your regular browser window can't be controlled by Claude
+- The save/load process bridges your work to Claude's window
+- Once loaded, Claude can see and control everything in that window
+
 ## Testing Protocol
 
 ### Automatic Test Execution

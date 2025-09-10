@@ -87,6 +87,13 @@
                     sidekickScript.src = './ai-interface.js';
                     sidekickScript.onload = () => console.log('🤖 Sidekick AI interface loaded');
                     document.body.appendChild(sidekickScript);
+
+                    // Load Sign Template System
+                    const templateScript = document.createElement('script');
+                    templateScript.type = 'module';
+                    templateScript.src = './sign-template-system.js';
+                    templateScript.onload = () => console.log('🎨 Sign Template System loaded');
+                    document.body.appendChild(templateScript);
                 } catch (initError) {
                     console.error('❌ Mapping Slayer app failed to initialize:', initError);
                 }

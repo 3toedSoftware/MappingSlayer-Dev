@@ -1,0 +1,582 @@
+{
+    "version": "1.0",
+    "exportDate": "2025-08-05T17:27:25.251Z",
+    "markerTypes": {
+        "EA.1": {
+            "name": "ADA Base Room ID Sign",
+            "color": "#F72020",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IA.1": {
+            "name": "ADA Base Room ID Sign",
+            "color": "#F72020",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IA.2": {
+            "name": "ADA Patient ID",
+            "color": "#FF9500",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IA.3": {
+            "name": "ADA Pictogram",
+            "color": "#F8E677",
+            "textColor": "#000000",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IA.4": {
+            "name": "ADA Sm. Window",
+            "color": "#13DB88",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "EA.S": {
+            "name": "Exterior ADA Stair Sign",
+            "color": "#F80094",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IA.5": {
+            "name": "Stair Level Indicator",
+            "color": "#4DA1B3",
+            "textColor": "#000000",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IA.6": {
+            "name": "ADA Small Base Room ID",
+            "color": "#91415B",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IA.S": {
+            "name": "ADA Stair sign",
+            "color": "#F80094",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IA.R": {
+            "name": "ADA Restroom",
+            "color": "#7BD422",
+            "textColor": "#000000",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IA.F": {
+            "name": "ADA ICOF",
+            "color": "#E04B00",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IB.1": {
+            "name": "Non-ADA 8x8",
+            "color": "#65E5FF",
+            "textColor": "#000000",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IB.2": {
+            "name": "Non-Tactile insert (Sm)",
+            "color": "#00C4C4",
+            "textColor": "#000000",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IB.3": {
+            "name": "Non-Tactile insert (Lg)",
+            "color": "#B7700F",
+            "textColor": "#000000",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IB.4": {
+            "name": "Directional/Directory",
+            "color": "#9EF0C7",
+            "textColor": "#000000",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.1": {
+            "name": "Egress Map Window Sign",
+            "color": "#6C40B8",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.2": {
+            "name": "Interior Stairwell ID",
+            "color": "#5C9622",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.3": {
+            "name": "EMTALA",
+            "color": "#CF2020",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.4": {
+            "name": "PRR",
+            "color": "#9E3C0A",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.5": {
+            "name": "NOPP",
+            "color": "#D4AA71",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.6": {
+            "name": "30.06-07 Penal Code Panels",
+            "color": "#96989A",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.7": {
+            "name": "FCO Logo",
+            "color": "#67446A",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.8": {
+            "name": "FCO Logo",
+            "color": "#67446A",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.10": {
+            "name": "Flag-Mounted Panel",
+            "color": "#A440B8",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.9": {
+            "name": "Letter-size Insert Holder",
+            "color": "#00AFEF",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.11": {
+            "name": "Ceiling-Mounted Panel",
+            "color": "#AE0A6B",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.12": {
+            "name": "Wall-Mounted Panel",
+            "color": "#F4C8D8",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "EV.1-3": {
+            "name": "Vinyl Graphics",
+            "color": "#F72020",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "IF.C": {
+            "name": "FCO Panel",
+            "color": "#35457B",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "TBD": {
+            "name": "To Be Determined",
+            "color": "#4DA1B3",
+            "textColor": "#FFFFFF",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "RMV": {
+            "name": "Removal / No Replacement",
+            "color": "#BDBFC1",
+            "textColor": "#FF0000",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        },
+        "NIS": {
+            "name": "Not In Scope",
+            "color": "#FFF212",
+            "textColor": "#FF0000",
+            "codeRequired": false,
+            "defaultVinylBacker": false,
+            "designReference": null,
+            "textFields": [
+                {
+                    "fieldName": "message",
+                    "maxLength": null
+                },
+                {
+                    "fieldName": "message2",
+                    "maxLength": null
+                }
+            ]
+        }
+    }
+}

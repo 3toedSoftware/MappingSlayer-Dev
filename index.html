@@ -6,7 +6,7 @@
             name="viewport"
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
-        <title>Slayer Suite - Professional Signage Workflow Platform</title>
+        <title>Mapping Slayer - Professional Sign Mapping Platform</title>
         <link rel="stylesheet" href="./shared/styles/suite-header.css" />
 
         <!-- App-specific stylesheets should be loaded dynamically by each app, not globally -->
@@ -73,16 +73,13 @@
 
                         <!-- Logo Section -->
                         <div class="logo-section">
-                            <a href="#" class="suite-logo" id="suite-home-link">SLAYER SUITE</a>
-                            <span class="breadcrumb-separator" id="breadcrumb-sep" style="display: none;">/</span>
-                            <div class="app-logo" id="app-name-display" style="display: none;"></div>
+                            <img src="/apps/mapping_slayer/assets/logo.png" alt="Mapping Slayer" class="suite-logo" style="height: 40px; width: auto;" onerror="this.style.display='none'; document.getElementById('logo-text').style.display='inline';">
+                            <span id="logo-text" style="display: none;" class="suite-logo">MAPPING SLAYER</span>
                         </div>
 
                         <!-- App Navigation -->
                         <div class="app-navigation">
-                            <button class="app-nav-btn" data-app="mapping_slayer" data-tooltip="Mapping Slayer">MS</button>
-                            <button class="app-nav-btn" data-app="design_slayer" data-tooltip="Design Slayer">DS</button>
-                            <button class="app-nav-btn" data-app="thumbnail_slayer" data-tooltip="Thumbnail Slayer">TS</button>
+                            <!-- App buttons removed - single app mode -->
                         </div>
 
                         <!-- Project Info -->
@@ -194,63 +191,24 @@
                         window.debugLog('VERBOSE', '📊 [Main] SaveManager made globally available');
                     }
 
-                    // Create a global suite object for navigation
-                    window.slayerSuite = {
-                        switchToApp: async appName => {
-                            // Update header to show app name
-                            document.getElementById('breadcrumb-sep').style.display = 'inline';
-                            document.getElementById('app-name-display').style.display = 'inline';
-                            document.getElementById('app-name-display').textContent =
-                                apps[appName].displayName;
+                    // Just load Mapping Slayer directly - no app switching needed
+                    await appBridge.switchToApp('mapping_slayer');
 
-                            // Update active button
-                            document.querySelectorAll('.app-nav-btn').forEach(btn => {
-                                btn.classList.remove('active');
-                                if (btn.dataset.app === appName) {
-                                    btn.classList.add('active');
-                                }
-                            });
-
-                            // Switch to the app
-                            await appBridge.switchToApp(appName);
-                        }
-                    };
-
-                    // Setup header button handlers
-                    document.querySelectorAll('.app-nav-btn').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const targetApp = btn.dataset.app;
-                            if (targetApp) {
-                                window.slayerSuite.switchToApp(targetApp);
-                            }
-                        });
-                    });
-
-                    // Setup suite logo handler to go to Mapping Slayer
-                    const homeLink = document.getElementById('suite-home-link');
-                    if (homeLink) {
-                        homeLink.addEventListener('click', e => {
-                            e.preventDefault();
-                            window.slayerSuite.switchToApp('mapping_slayer');
-                        });
-                    }
-
-                    // Save/load button handlers are now set up in saveManager.initialize()
-
-                    // Start with Mapping Slayer
-                    await window.slayerSuite.switchToApp('mapping_slayer');
+                    // Hide breadcrumb since we're not switching apps
+                    document.getElementById('breadcrumb-sep').style.display = 'none';
+                    document.getElementById('app-name-display').style.display = 'none';
 
                     if (window.logAlways) {
-                        window.logAlways('Slayer Suite initialized successfully!');
-                        window.logAlways('Ready to rock and roll!');
+                        window.logAlways('Mapping Slayer initialized successfully!');
+                        window.logAlways('Ready to map!');
                     }
                 } catch (error) {
-                    console.error('Failed to initialize Slayer Suite:', error);
+                    console.error('Failed to initialize Mapping Slayer:', error);
                     const container = document.getElementById('app-container');
                     container.innerHTML = `
                     <div style="padding: 40px; text-align: center; color: #ff6b6b;">
                         <h2>Initialization Error</h2>
-                        <p>Failed to load Slayer Suite. Please check the console for details.</p>
+                        <p>Failed to load Mapping Slayer. Please check the console for details.</p>
                         <p>${error.message}</p>
                     </div>
                 `;
