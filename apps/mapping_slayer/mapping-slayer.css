@@ -291,6 +291,7 @@ body {
     flex-direction: column;
     border-right: 1px solid #555;
     height: 100%;
+    max-height: 100%;
     overflow: visible; /* Allow collapse button to show */
     transition: transform 0.3s ease;
     position: relative;
@@ -372,7 +373,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 0;
-    max-height: 100%;
+    height: 100%;
     position: relative;
 }
 
@@ -381,12 +382,18 @@ body {
 }
 
 .ms-filter-section {
-    flex: 0 0 auto; /* Don't grow or shrink, size based on content */
-    min-height: 100px;
-    max-height: 40%; /* Max 40% of parent height */
+    flex: 0 0 auto; /* Don't grow or shrink */
+    height: 35%; /* Fixed percentage of parent */
+    min-height: 100px; /* Minimum height to be usable */
+    max-height: 300px; /* Maximum height cap */
     overflow: hidden;
     display: flex;
     flex-direction: column;
+}
+
+/* Special handling for panel-content inside filter section */
+.ms-filter-section .ms-panel-content {
+    overflow-y: hidden; /* Let the filter-checkboxes handle scrolling */
 }
 
 .ms-filter-checkboxes {
@@ -394,9 +401,11 @@ body {
     flex-direction: column;
     gap: 8px;
     overflow-y: auto;
+    overflow-x: hidden;
     flex: 1;
     min-height: 0;
     max-height: 100%;
+    padding-right: 5px; /* Space for scrollbar */
 }
 
 .ms-filter-checkbox {
@@ -590,9 +599,18 @@ body {
 }
 
 .ms-list-section {
-    flex: 1 1 auto; /* Can grow and shrink, takes remaining space */
-    min-height: 150px;
+    flex: 1 1 0; /* Grow and shrink, start from 0 */
+    min-height: 0; /* Allow it to shrink fully */
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Special handling for panel-content inside list section */
+.ms-list-section .ms-panel-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden; /* Let the location-list handle scrolling */
     display: flex;
     flex-direction: column;
 }
@@ -618,15 +636,18 @@ body {
 #list-with-renumber {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex: 1;
     min-height: 0;
+    overflow: hidden;
 }
 
 #location-list {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     min-height: 0;
     max-height: 100%;
+    padding-right: 5px; /* Space for scrollbar */
 }
 
 .ms-empty-state {
