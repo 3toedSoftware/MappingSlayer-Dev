@@ -1,5 +1,5 @@
 // apps/mapping_slayer/mapping-app.js
-import SlayerAppBase from '../../core/slayer-app-base.js';
+import SlayerAppBase from '../core/slayer-app-base.js';
 import { ProjectIO } from './project-io.js';
 import {
     renderPDFPage,
@@ -1134,7 +1134,7 @@ class MappingSlayerApp extends SlayerAppBase {
                 console.log('✅ .slayer file loaded successfully via SaveManager');
             } else {
                 // Fallback to project manager if SaveManager not available
-                const { projectManager } = await import('../../core/project-manager.js');
+                const { projectManager } = await import('../core/project-manager.js');
                 const success = await projectManager.load(loadedData.file);
 
                 if (success) {

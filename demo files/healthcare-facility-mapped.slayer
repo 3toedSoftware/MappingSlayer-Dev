@@ -1,0 +1,2622 @@
+{
+  "projectName": "healthcare-facility-mapped",
+  "currentPdfPage": 1,
+  "totalPages": 2,
+  "markerTypes": {
+    "EXIT.1": {
+      "code": "EXIT.1",
+      "name": "Exit Sign",
+      "color": "#00FF00",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "ENTRY.1": {
+      "code": "ENTRY.1",
+      "name": "Entry Sign",
+      "color": "#0080FF",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "OFFICE.1": {
+      "code": "OFFICE.1",
+      "name": "Office Sign",
+      "color": "#8000FF",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "RESTROOM.1": {
+      "code": "RESTROOM.1",
+      "name": "Restroom Sign",
+      "color": "#00FFFF",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "CONFERENCE.1": {
+      "code": "CONFERENCE.1",
+      "name": "Conference Room",
+      "color": "#FF00FF",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "LOBBY.1": {
+      "code": "LOBBY.1",
+      "name": "Lobby Sign",
+      "color": "#FFFF00",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "STORAGE.1": {
+      "code": "STORAGE.1",
+      "name": "Storage Room",
+      "color": "#808080",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "BREAK.1": {
+      "code": "BREAK.1",
+      "name": "Break Room",
+      "color": "#00FF80",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "KITCHEN.1": {
+      "code": "KITCHEN.1",
+      "name": "Kitchen Sign",
+      "color": "#FF8080",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "ELEVATOR.1": {
+      "code": "ELEVATOR.1",
+      "name": "Elevator Sign",
+      "color": "#0000FF",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "STAIR.1": {
+      "code": "STAIR.1",
+      "name": "Stairway",
+      "color": "#E91E63",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "ROOM.1": {
+      "code": "ROOM.1",
+      "name": "Room Sign",
+      "color": "#FF8000",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "PAT.1": {
+      "code": "PAT.1",
+      "name": "Patient Room",
+      "color": "#4A90E2",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "PAT.2": {
+      "code": "PAT.2",
+      "name": "Accessible Patient Room",
+      "color": "#5BA3F5",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "PAT.3": {
+      "code": "PAT.3",
+      "name": "Isolation Patient Room",
+      "color": "#FF6B6B",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "NS.1": {
+      "code": "NS.1",
+      "name": "Nurses Station",
+      "color": "#00BFA5",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "MED.1": {
+      "code": "MED.1",
+      "name": "Medication Room",
+      "color": "#FF5252",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "INF.1": {
+      "code": "INF.1",
+      "name": "Infusion Room",
+      "color": "#9C27B0",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "APH.1": {
+      "code": "APH.1",
+      "name": "Apheresis",
+      "color": "#7B1FA2",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "OFF.1": {
+      "code": "OFF.1",
+      "name": "Office",
+      "color": "#607D8B",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "STG.1": {
+      "code": "STG.1",
+      "name": "Storage",
+      "color": "#795548",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "WORK.1": {
+      "code": "WORK.1",
+      "name": "Work Area",
+      "color": "#FF9800",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "TLT.1": {
+      "code": "TLT.1",
+      "name": "Toilet/Restroom",
+      "color": "#00ACC1",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "ELEV.1": {
+      "code": "ELEV.1",
+      "name": "Elevator",
+      "color": "#3F51B5",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "WAIT.1": {
+      "code": "WAIT.1",
+      "name": "Waiting Area",
+      "color": "#FFC107",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "LOUNGE.1": {
+      "code": "LOUNGE.1",
+      "name": "Staff Lounge",
+      "color": "#8BC34A",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "LAB.1": {
+      "code": "LAB.1",
+      "name": "Laboratory",
+      "color": "#673AB7",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "CONSULT.1": {
+      "code": "CONSULT.1",
+      "name": "Consultation Room",
+      "color": "#009688",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "EVS.1": {
+      "code": "EVS.1",
+      "name": "Environmental Services",
+      "color": "#78909C",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "NOUR.1": {
+      "code": "NOUR.1",
+      "name": "Nourishment",
+      "color": "#4CAF50",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "LINEN.1": {
+      "code": "LINEN.1",
+      "name": "Linen/Laundry",
+      "color": "#CFD8DC",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "MECH.1": {
+      "code": "MECH.1",
+      "name": "Mechanical Room",
+      "color": "#37474F",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "ELEC.1": {
+      "code": "ELEC.1",
+      "name": "Electrical Room",
+      "color": "#FFB300",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    },
+    "IT.1": {
+      "code": "IT.1",
+      "name": "IT/Equipment",
+      "color": "#1565C0",
+      "textColor": "#FFFFFF",
+      "designReference": null
+    }
+  },
+  "dotsByPage": {
+    "1": {
+      "dots": [
+        {
+          "internalId": "0000111",
+          "locationNumber": "0001",
+          "x": 1000.8278,
+          "y": 129.46439999999984,
+          "markerType": "PAT.1",
+          "message": "PAT RM 9",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000112",
+          "locationNumber": "0002",
+          "x": 1169.8822,
+          "y": 136.75520000000006,
+          "markerType": "PAT.1",
+          "message": "PAT RM 10",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000113",
+          "locationNumber": "0003",
+          "x": 877.0891999999999,
+          "y": 203.59400000000005,
+          "markerType": "PAT.1",
+          "message": "PAT RM 8",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000114",
+          "locationNumber": "0004",
+          "x": 1288.1478000000002,
+          "y": 223.13160000000016,
+          "markerType": "PAT.1",
+          "message": "PAT RM 11",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000115",
+          "locationNumber": "0005",
+          "x": 790.0907999999998,
+          "y": 326.59040000000005,
+          "markerType": "PAT.1",
+          "message": "ACC PAT RM 7",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000116",
+          "locationNumber": "0006",
+          "x": 1378.2286,
+          "y": 313.5655999999999,
+          "markerType": "PAT.1",
+          "message": "PAT RM 12",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000117",
+          "locationNumber": "0007",
+          "x": 1496.8908000000001,
+          "y": 422.86400000000003,
+          "markerType": "PAT.1",
+          "message": "PAT RM 13",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000118",
+          "locationNumber": "0008",
+          "x": 1544.0276000000001,
+          "y": 521.3284000000001,
+          "markerType": "PAT.1",
+          "message": "PAT RM 14",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000119",
+          "locationNumber": "0009",
+          "x": 568.5333558400002,
+          "y": 662.174,
+          "markerType": "PAT.1",
+          "message": "ISO ACC PAT RM 6",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000120",
+          "locationNumber": "0010",
+          "x": 1529.5930000000003,
+          "y": 698.9688000000001,
+          "markerType": "PAT.1",
+          "message": "PAT RM 15",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000121",
+          "locationNumber": "0011",
+          "x": 549.6915999999999,
+          "y": 792.9688000000001,
+          "markerType": "PAT.1",
+          "message": "ISO PAT RM 5",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000122",
+          "locationNumber": "0012",
+          "x": 1484.2324,
+          "y": 808.2456,
+          "markerType": "PAT.1",
+          "message": "PAT RM 16",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000123",
+          "locationNumber": "0013",
+          "x": 589.6034,
+          "y": 897.2092,
+          "markerType": "PAT.1",
+          "message": "PAT RM 4",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000124",
+          "locationNumber": "0014",
+          "x": 1375.7188,
+          "y": 914.7216000000001,
+          "markerType": "PAT.1",
+          "message": "PAT RM 17",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000125",
+          "locationNumber": "0015",
+          "x": 711.6677999999998,
+          "y": 1003.5208,
+          "markerType": "PAT.1",
+          "message": "PAT RM 3",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000126",
+          "locationNumber": "0016",
+          "x": 786.8765999999999,
+          "y": 1077.4416,
+          "markerType": "PAT.1",
+          "message": "PAT RM 2",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000127",
+          "locationNumber": "0017",
+          "x": 897.3189999999998,
+          "y": 1183.5208,
+          "markerType": "PAT.1",
+          "message": "PAT RM 1",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000128",
+          "locationNumber": "0018",
+          "x": 2084.1246,
+          "y": 1222.2512,
+          "markerType": "PAT.1",
+          "message": "PAT RM 20",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000129",
+          "locationNumber": "0019",
+          "x": 2252.3795999999998,
+          "y": 1217.1216,
+          "markerType": "PAT.1",
+          "message": "PAT RM 21",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000130",
+          "locationNumber": "0020",
+          "x": 1961.3148,
+          "y": 1305.6656,
+          "markerType": "PAT.1",
+          "message": "PAT RM 19",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000131",
+          "locationNumber": "0021",
+          "x": 2373.7103999999995,
+          "y": 1297.5096,
+          "markerType": "PAT.1",
+          "message": "PAT RM 22",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000132",
+          "locationNumber": "0022",
+          "x": 1855.1628,
+          "y": 1397.0592,
+          "markerType": "PAT.1",
+          "message": "PAT RM 18",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000133",
+          "locationNumber": "0023",
+          "x": 2470.4754,
+          "y": 1404.8908,
+          "markerType": "PAT.1",
+          "message": "PAT RM 23",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000134",
+          "locationNumber": "0024",
+          "x": 703.9153999999999,
+          "y": 1491.3552,
+          "markerType": "PAT.1",
+          "message": "ACC PAT RM 46",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000135",
+          "locationNumber": "0025",
+          "x": 2563.2028,
+          "y": 1499.23,
+          "markerType": "PAT.1",
+          "message": "PAT RM 24",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000136",
+          "locationNumber": "0026",
+          "x": 595.6101999999998,
+          "y": 1596.8008,
+          "markerType": "PAT.1",
+          "message": "PAT RM 45",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000137",
+          "locationNumber": "0027",
+          "x": 2619.9388,
+          "y": 1598.8744000000002,
+          "markerType": "PAT.1",
+          "message": "PAT RM 25",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000138",
+          "locationNumber": "0028",
+          "x": 558.1429999999998,
+          "y": 1679.8411999999998,
+          "markerType": "PAT.1",
+          "message": "PAT RM 44",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000139",
+          "locationNumber": "0029",
+          "x": 2610.3586,
+          "y": 1788.5259999999998,
+          "markerType": "PAT.1",
+          "message": "PAT RM 26",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000140",
+          "locationNumber": "0030",
+          "x": 558.1429999999998,
+          "y": 1876.6404,
+          "markerType": "PAT.1",
+          "message": "PAT RM 43",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000141",
+          "locationNumber": "0031",
+          "x": 1570.6256,
+          "y": 1908.6524,
+          "markerType": "PAT.1",
+          "message": "PAT RM 34",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000142",
+          "locationNumber": "0032",
+          "x": 2597.7607999999996,
+          "y": 1891.5212000000001,
+          "markerType": "PAT.1",
+          "message": "PAT RM 27",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000143",
+          "locationNumber": "0033",
+          "x": 604.2569999999998,
+          "y": 1977.9212,
+          "markerType": "PAT.1",
+          "message": "PAT RM 42",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000144",
+          "locationNumber": "0034",
+          "x": 1410.8942000000002,
+          "y": 1973.3404,
+          "markerType": "PAT.1",
+          "message": "ACC PAT RM 35",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000145",
+          "locationNumber": "0035",
+          "x": 1704.7662,
+          "y": 2009.1204,
+          "markerType": "PAT.1",
+          "message": "PAT RM 33",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000146",
+          "locationNumber": "0036",
+          "x": 2461.6882,
+          "y": 1994.9064,
+          "markerType": "PAT.1",
+          "message": "ACC PAT RM 28",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000147",
+          "locationNumber": "0037",
+          "x": 713.3007999999999,
+          "y": 2086.8804,
+          "markerType": "PAT.1",
+          "message": "PAT RM 41",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000148",
+          "locationNumber": "0038",
+          "x": 1285.1452000000002,
+          "y": 2077.3708,
+          "markerType": "PAT.1",
+          "message": "PAT RM 36",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000149",
+          "locationNumber": "0039",
+          "x": 1771.5382,
+          "y": 2081.1204,
+          "markerType": "PAT.1",
+          "message": "PAT RM 32",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000150",
+          "locationNumber": "0040",
+          "x": 813.2145999999998,
+          "y": 2176.6412,
+          "markerType": "PAT.1",
+          "message": "PAT RM 40",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000151",
+          "locationNumber": "0041",
+          "x": 1188.0244,
+          "y": 2181.3896,
+          "markerType": "PAT.1",
+          "message": "PAT RM 37",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000152",
+          "locationNumber": "0042",
+          "x": 1882.9826000000003,
+          "y": 2187.6804,
+          "markerType": "PAT.1",
+          "message": "PAT RM 31",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000153",
+          "locationNumber": "0043",
+          "x": 917.9353999999998,
+          "y": 2235.6812,
+          "markerType": "PAT.1",
+          "message": "PAT RM 39",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000154",
+          "locationNumber": "0044",
+          "x": 1993.2526000000003,
+          "y": 2239.5204,
+          "markerType": "PAT.1",
+          "message": "PAT RM 30",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000155",
+          "locationNumber": "0045",
+          "x": 2160.6713999999993,
+          "y": 2214.9996,
+          "markerType": "PAT.1",
+          "message": "ACC PAT RM 29",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000156",
+          "locationNumber": "0046",
+          "x": 1067.2392,
+          "y": 2273.2616,
+          "markerType": "PAT.1",
+          "message": "PAT RM 38",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000157",
+          "locationNumber": "0047",
+          "x": 1229.6326000000001,
+          "y": 487.9484,
+          "markerType": "NS.1",
+          "message": "NURSES STATION",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000158",
+          "locationNumber": "0048",
+          "x": 874.1483999999998,
+          "y": 825.9212,
+          "markerType": "NS.1",
+          "message": "NURSES STATION",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000159",
+          "locationNumber": "0049",
+          "x": 1930.5226,
+          "y": 1904.8948,
+          "markerType": "NS.1",
+          "message": "NURSES STATION",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000160",
+          "locationNumber": "0050",
+          "x": 1084.4807999999998,
+          "y": 516.3212000000001,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000161",
+          "locationNumber": "0051",
+          "x": 1201.9555999999998,
+          "y": 1145.1216,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000162",
+          "locationNumber": "0052",
+          "x": 1047.5567999999998,
+          "y": 1231.5216,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000163",
+          "locationNumber": "0053",
+          "x": 1050.286,
+          "y": 1514.2412,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000164",
+          "locationNumber": "0054",
+          "x": 930.6515999999999,
+          "y": 1633.2804,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000165",
+          "locationNumber": "0055",
+          "x": 1707.7968,
+          "y": 1630.8812,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000166",
+          "locationNumber": "0056",
+          "x": 2296.6468,
+          "y": 1730.2412,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000167",
+          "locationNumber": "0057",
+          "x": 1081.5167999999999,
+          "y": 1940.9608,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000168",
+          "locationNumber": "0058",
+          "x": 998.9068,
+          "y": 558.0812000000001,
+          "markerType": "MED.1",
+          "message": "MEDS",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000169",
+          "locationNumber": "0059",
+          "x": 2246.0104,
+          "y": 1803.2004,
+          "markerType": "MED.1",
+          "message": "MEDS",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000170",
+          "locationNumber": "0060",
+          "x": 1018.4048,
+          "y": 1869.9212,
+          "markerType": "MED.1",
+          "message": "MEDS",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000171",
+          "locationNumber": "0061",
+          "x": 599.7239999999999,
+          "y": 497.0332000000001,
+          "markerType": "STAIR.1",
+          "message": "STAIR",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000172",
+          "locationNumber": "0062",
+          "x": 2305.5184,
+          "y": 2171.5456,
+          "markerType": "STAIR.1",
+          "message": "STAIR",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000173",
+          "locationNumber": "0063",
+          "x": 1679.4935999999998,
+          "y": 1482.8232,
+          "markerType": "ELEV.1",
+          "message": "ELEV LOBBY",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000174",
+          "locationNumber": "0064",
+          "x": 1280.2867999999999,
+          "y": 1561.2792,
+          "markerType": "ELEV.1",
+          "message": "ELEV LOBBY",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000175",
+          "locationNumber": "0065",
+          "x": 1563.4776,
+          "y": 1332.8012,
+          "markerType": "WAIT.1",
+          "message": "WAITING",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000176",
+          "locationNumber": "0066",
+          "x": 1375.5868,
+          "y": 1346.2408,
+          "markerType": "CONSULT.1",
+          "message": "CONSULT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000177",
+          "locationNumber": "0067",
+          "x": 1013.0508,
+          "y": 471.5552,
+          "markerType": "STG.1",
+          "message": "EQ STG",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000178",
+          "locationNumber": "0068",
+          "x": 1169.03,
+          "y": 624.8008,
+          "markerType": "STG.1",
+          "message": "EQ STG",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000179",
+          "locationNumber": "0069",
+          "x": 1080.0439999999999,
+          "y": 856.3607999999999,
+          "markerType": "STG.1",
+          "message": "EQ STG",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000180",
+          "locationNumber": "0070",
+          "x": 975.9816,
+          "y": 1306.8812,
+          "markerType": "STG.1",
+          "message": "EQ STG",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000181",
+          "locationNumber": "0071",
+          "x": 811.6708,
+          "y": 1404.8012,
+          "markerType": "STG.1",
+          "message": "EQ STG",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000182",
+          "locationNumber": "0072",
+          "x": 1116.2492,
+          "y": 1580.0004,
+          "markerType": "STG.1",
+          "message": "EQ STG",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000183",
+          "locationNumber": "0073",
+          "x": 1062.23,
+          "y": 1748.4804,
+          "markerType": "STG.1",
+          "message": "STG",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000184",
+          "locationNumber": "0074",
+          "x": 1973.2136,
+          "y": 1768.4987999999998,
+          "markerType": "STG.1",
+          "message": "EQ STG",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000185",
+          "locationNumber": "0075",
+          "x": 1495.1096000000002,
+          "y": 1840.6404,
+          "markerType": "STG.1",
+          "message": "STG",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000186",
+          "locationNumber": "0076",
+          "x": 921.0267060000001,
+          "y": 602.3535999999999,
+          "markerType": "WORK.1",
+          "message": "CLEAN WORK/LINEN",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000187",
+          "locationNumber": "0077",
+          "x": 1101.1239999999998,
+          "y": 695.8416,
+          "markerType": "WORK.1",
+          "message": "WORK",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000188",
+          "locationNumber": "0078",
+          "x": 1193.394,
+          "y": 1662.1508,
+          "markerType": "WORK.1",
+          "message": "CLEAN WORK",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000189",
+          "locationNumber": "0079",
+          "x": 1287.7124,
+          "y": 1744.6399999999999,
+          "markerType": "WORK.1",
+          "message": "SOILED WORK",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000190",
+          "locationNumber": "0080",
+          "x": 953.4764,
+          "y": 1814.7204000000002,
+          "markerType": "WORK.1",
+          "message": "WORK",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000191",
+          "locationNumber": "0081",
+          "x": 2160.3232,
+          "y": 1864.2143999999998,
+          "markerType": "WORK.1",
+          "message": "CLEAN WORK/LINEN",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000192",
+          "locationNumber": "0082",
+          "x": 834.8592,
+          "y": 659.8915999999999,
+          "markerType": "TLT.1",
+          "message": "STF TLT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000193",
+          "locationNumber": "0083",
+          "x": 1279.4834,
+          "y": 1252.0648,
+          "markerType": "TLT.1",
+          "message": "PUB TLT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000194",
+          "locationNumber": "0084",
+          "x": 1325.5486,
+          "y": 1300.4464,
+          "markerType": "TLT.1",
+          "message": "PUB TLT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000195",
+          "locationNumber": "0085",
+          "x": 984.6093999999998,
+          "y": 1691.9848,
+          "markerType": "TLT.1",
+          "message": "STF TLT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000196",
+          "locationNumber": "0086",
+          "x": 2131.669000000001,
+          "y": 1957.76,
+          "markerType": "TLT.1",
+          "message": "STF TLT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000197",
+          "locationNumber": "0087",
+          "x": 1284.67,
+          "y": 938.2411999999999,
+          "markerType": "EVS.1",
+          "message": "EVS",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000198",
+          "locationNumber": "0088",
+          "x": 2164.982,
+          "y": 1614.5603999999998,
+          "markerType": "EVS.1",
+          "message": "EVS",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000199",
+          "locationNumber": "0089",
+          "x": 1165.3304,
+          "y": 1850.7204000000002,
+          "markerType": "EVS.1",
+          "message": "EVS",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000200",
+          "locationNumber": "0090",
+          "x": 1155.9224,
+          "y": 782.7212,
+          "markerType": "NOUR.1",
+          "message": "NOURISH",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000201",
+          "locationNumber": "0091",
+          "x": 2007.0847999999999,
+          "y": 1641.4216000000001,
+          "markerType": "NOUR.1",
+          "message": "NOURISH",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000202",
+          "locationNumber": "0092",
+          "x": 1121.5859999999998,
+          "y": 1072.9356,
+          "markerType": "ELEC.1",
+          "message": "ELEC",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000203",
+          "locationNumber": "0093",
+          "x": 1843.3964,
+          "y": 1521.636,
+          "markerType": "ELEC.1",
+          "message": "ELEC",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000204",
+          "locationNumber": "0094",
+          "x": 758.562,
+          "y": 468.3216,
+          "markerType": "IT.1",
+          "message": "IT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000205",
+          "locationNumber": "0095",
+          "x": 2318.7452000000003,
+          "y": 2028.3211999999999,
+          "markerType": "IT.1",
+          "message": "IT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        }
+      ],
+      "nextLocationNumber": 1
+    },
+    "2": {
+      "dots": [
+        {
+          "internalId": "0000206",
+          "locationNumber": "0001",
+          "x": 2168.0508,
+          "y": 1708.1376,
+          "markerType": "INF.1",
+          "message": "INFUSION 13",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000207",
+          "locationNumber": "0002",
+          "x": 2285.048,
+          "y": 1753.5167999999999,
+          "markerType": "INF.1",
+          "message": "INFUSION 14",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000208",
+          "locationNumber": "0003",
+          "x": 1325.6828,
+          "y": 1815.5672,
+          "markerType": "INF.1",
+          "message": "INFUSION 2",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000209",
+          "locationNumber": "0004",
+          "x": 1868.2975999999999,
+          "y": 1789.5216,
+          "markerType": "INF.1",
+          "message": "INFUSION 9",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000210",
+          "locationNumber": "0005",
+          "x": 2402.0452000000005,
+          "y": 1793.9436,
+          "markerType": "INF.1",
+          "message": "INFUSION 15",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000211",
+          "locationNumber": "0006",
+          "x": 1212.7564000000002,
+          "y": 1876.6435999999999,
+          "markerType": "INF.1",
+          "message": "INFUSION 1",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000212",
+          "locationNumber": "0007",
+          "x": 1240.4112,
+          "y": 1990.9436,
+          "markerType": "INF.1",
+          "message": "INFUSION 3",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000213",
+          "locationNumber": "0008",
+          "x": 1555.0276,
+          "y": 1990.9436,
+          "markerType": "INF.1",
+          "message": "INFUSION 4INFUSION 5INFUSION 6INFUSION 7",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000214",
+          "locationNumber": "0009",
+          "x": 1921.6684,
+          "y": 1990.9436,
+          "markerType": "INF.1",
+          "message": "INFUSION 8",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000215",
+          "locationNumber": "0010",
+          "x": 2091.2716,
+          "y": 1993.7308,
+          "markerType": "INF.1",
+          "message": "INFUSION 10",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000216",
+          "locationNumber": "0011",
+          "x": 2227.6416,
+          "y": 2047.0095999999999,
+          "markerType": "INF.1",
+          "message": "INFUSION 11",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000217",
+          "locationNumber": "0012",
+          "x": 2365.5304000000006,
+          "y": 2087.9564,
+          "markerType": "INF.1",
+          "message": "INFUSION 12",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000218",
+          "locationNumber": "0013",
+          "x": 2334.1821999999993,
+          "y": 1152.782,
+          "markerType": "APH.1",
+          "message": "APHERESIS TREATMENT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000219",
+          "locationNumber": "0014",
+          "x": 1639.7934,
+          "y": 516.9064000000001,
+          "markerType": "LAB.1",
+          "message": "STEM CELL LAB",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000220",
+          "locationNumber": "0015",
+          "x": 948.0903999999998,
+          "y": 1100.9612,
+          "markerType": "LAB.1",
+          "message": "CELLULAR THERAPY LAB",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000221",
+          "locationNumber": "0016",
+          "x": 2089.018,
+          "y": 1083.5996,
+          "markerType": "NS.1",
+          "message": "NURSES STN 2",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000222",
+          "locationNumber": "0017",
+          "x": 2109.0564,
+          "y": 1261.976,
+          "markerType": "NS.1",
+          "message": "NURSES STN 1",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000223",
+          "locationNumber": "0018",
+          "x": 1591.2307999999998,
+          "y": 1760.124,
+          "markerType": "NS.1",
+          "message": "NURSES STN",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000224",
+          "locationNumber": "0019",
+          "x": 1221.7060000000001,
+          "y": 495.9387999999999,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000225",
+          "locationNumber": "0020",
+          "x": 1326.4676,
+          "y": 488.64480000000003,
+          "markerType": "OFF.1",
+          "message": "OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000226",
+          "locationNumber": "0021",
+          "x": 1366.7364,
+          "y": 1014.22,
+          "markerType": "OFF.1",
+          "message": "MGR OFFICE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000227",
+          "locationNumber": "0022",
+          "x": 1035.7028,
+          "y": 516.5319999999999,
+          "markerType": "MECH.1",
+          "message": "MECHANICAL",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000228",
+          "locationNumber": "0023",
+          "x": 813.9848,
+          "y": 563.0144,
+          "markerType": "MECH.1",
+          "message": "MECH RM",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000229",
+          "locationNumber": "0024",
+          "x": 1371.8796,
+          "y": 1398.3916,
+          "markerType": "MECH.1",
+          "message": "MECH RM",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000230",
+          "locationNumber": "0025",
+          "x": 2073.8456,
+          "y": 408.87200000000007,
+          "markerType": "STAIR.1",
+          "message": "STAIR 7",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000231",
+          "locationNumber": "0026",
+          "x": 1088.0544,
+          "y": 2066.7204,
+          "markerType": "STAIR.1",
+          "message": "STAIR 9",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000232",
+          "locationNumber": "0027",
+          "x": 2224.3748,
+          "y": 558.8432,
+          "markerType": "ELEV.1",
+          "message": "STAFF ELEV LOBBY",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000233",
+          "locationNumber": "0028",
+          "x": 947.2864,
+          "y": 1891.0403999999999,
+          "markerType": "ELEV.1",
+          "message": "VISITOR ELEV LOBBY",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000234",
+          "locationNumber": "0029",
+          "x": 1383.6484,
+          "y": 1501.8492,
+          "markerType": "WAIT.1",
+          "message": "WAITING",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000235",
+          "locationNumber": "0030",
+          "x": 992.402,
+          "y": 948.4676,
+          "markerType": "TLT.1",
+          "message": "STAFF TLT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000236",
+          "locationNumber": "0031",
+          "x": 1539.6997999999999,
+          "y": 1497.9715999999999,
+          "markerType": "TLT.1",
+          "message": "TLT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000237",
+          "locationNumber": "0032",
+          "x": 2005.8772000000001,
+          "y": 1506.8324,
+          "markerType": "TLT.1",
+          "message": "MENS TLT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000238",
+          "locationNumber": "0033",
+          "x": 1884.4249999999997,
+          "y": 1533.8468,
+          "markerType": "TLT.1",
+          "message": "WOMENS TLT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000239",
+          "locationNumber": "0034",
+          "x": 1552.7115999999999,
+          "y": 1064.0008,
+          "markerType": "LOUNGE.1",
+          "message": "STAFF LOUNGE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000240",
+          "locationNumber": "0035",
+          "x": 1268.1255999999998,
+          "y": 682.3768,
+          "markerType": "WORK.1",
+          "message": "STAFF WORK RM",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000241",
+          "locationNumber": "0036",
+          "x": 1777.6782,
+          "y": 1057.0024,
+          "markerType": "STG.1",
+          "message": "EQUIP STORAGE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000242",
+          "locationNumber": "0037",
+          "x": 1372.8442,
+          "y": 1263.3216,
+          "markerType": "STG.1",
+          "message": "STORAGE",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000243",
+          "locationNumber": "0038",
+          "x": 1755.5095999999999,
+          "y": 1736.4636,
+          "markerType": "MED.1",
+          "message": "MED RM",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000244",
+          "locationNumber": "0039",
+          "x": 1678.8218000000002,
+          "y": 1478.6072,
+          "markerType": "CONSULT.1",
+          "message": "CONSULT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000245",
+          "locationNumber": "0040",
+          "x": 1999.75,
+          "y": 1403.7876,
+          "markerType": "NOUR.1",
+          "message": "NOURISH",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000246",
+          "locationNumber": "0041",
+          "x": 1356.518,
+          "y": 1162.8664,
+          "markerType": "EVS.1",
+          "message": "ENVIR SERV",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000247",
+          "locationNumber": "0042",
+          "x": 1667.8752,
+          "y": 1326.3108,
+          "markerType": "ELEC.1",
+          "message": "ELEC",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000248",
+          "locationNumber": "0043",
+          "x": 1521.806,
+          "y": 1408.8456,
+          "markerType": "ELEC.1",
+          "message": "ELEC",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        },
+        {
+          "internalId": "0000249",
+          "locationNumber": "0044",
+          "x": 851.85,
+          "y": 913.3076000000001,
+          "markerType": "IT.1",
+          "message": "IT",
+          "message2": "",
+          "notes": "",
+          "installed": false,
+          "flags": {
+            "topLeft": false,
+            "topRight": false,
+            "bottomLeft": false,
+            "bottomRight": false
+          }
+        }
+      ],
+      "nextLocationNumber": 1
+    }
+  },
+  "version": "5.0.0",
+  "timestamp": "2025-09-10T06:25:26.314Z"
+}

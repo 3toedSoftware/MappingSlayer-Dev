@@ -341,69 +341,131 @@ window.sidekick.applyStateJSON(state);
 
 ### Run Automap
 
-**IMPORTANT: Automap Configuration**
+**IMPORTANT: How Automap Actually Works**
 
-The automap feature has an "Exact" checkbox that controls how text matching works:
+The Automap feature requires THREE steps in the correct order:
+1. **Select a marker type** from the dropdown first
+2. **Enter the text** you want to search for
+3. **Click the AUTOMAP IT! button**
 
+The automap will ONLY work if you have a marker type selected first! It searches for the text in your PDF and places markers of the selected type at each location where the text is found.
+
+**Automap Configuration:**
+
+The "Exact" checkbox controls how text matching works:
 - **Exact checkbox CHECKED (default)**: Only finds exact, full matches
 - **Exact checkbox UNCHECKED**: Finds partial matches (recommended for most searches)
 
 For example, searching for "STAIR" with:
-
 - Exact checked: Would NOT find "STAIR-A", "STAIR-B", etc.
 - Exact unchecked: WOULD find "STAIR-A", "STAIR-B", "STAIRS", etc.
 
 ```javascript
-// Method 1: Using Sidekick API directly (always uses partial matching)
-await window.sidekick.runAutomap('EXIT');
-
-// Method 2: Using UI controls for more control
-// First, uncheck the "Exact" checkbox for partial matching
-const exactCheckbox = document.getElementById('automap-exact-phrase');
-if (exactCheckbox) {
-    exactCheckbox.checked = false; // Enable partial matching
-}
-
-// Then find and use the automap UI
-const automapButton = Array.from(document.querySelectorAll('button')).find(btn =>
-    btn.textContent?.toLowerCase().includes('automap')
-);
-
-if (automapButton) {
-    // Find the search input near the button
-    const searchInput =
-        automapButton.parentElement?.querySelector('input[type="text"]') ||
-        automapButton.parentElement?.parentElement?.querySelector('input[type="text"]');
-
-    if (searchInput) {
-        searchInput.value = 'STAIR'; // Your search term
-        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-        automapButton.click();
+// Method 1: Correct UI Automation
+// The UI element selectors that actually work:
+function runAutomap(markerType, searchText) {
+    // Step 1: Select the marker type
+    const dropdown = document.querySelector('.ms-automap-select, #automap-marker-type-select');
+    if (dropdown) {
+        dropdown.value = markerType; // e.g., 'PAT.1', 'OFF.1', etc.
+        dropdown.dispatchEvent(new Event('change', { bubbles: true }));
+        console.log(`Selected marker type: ${markerType}`);
+    }
+    
+    // Step 2: Enter search text
+    const input = document.querySelector('.ms-automap-input, #automap-text-input');
+    if (input) {
+        input.value = searchText; // e.g., 'PAT RM', 'OFFICE', etc.
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        console.log(`Entered search text: "${searchText}"`);
+    }
+    
+    // Step 3: Click the automap button
+    const button = document.querySelector('.ms-btn-success, #single-automap-btn');
+    if (button) {
+        button.click();
+        console.log('Clicked AUTOMAP IT! button');
     }
 }
 
-// Method 3: Complete automap workflow
-async function runAutomapWithOptions(searchTerm, exactMatch = false) {
-    // Set the exact match preference
-    const exactCheckbox = document.getElementById('automap-exact-phrase');
+// Example usage:
+runAutomap('PAT.1', 'PAT RM');  // Find all patient rooms
+runAutomap('OFF.1', 'OFFICE');   // Find all offices
+runAutomap('STAIR.1', 'STAIR');  // Find all stairways
+
+// Method 2: Batch Automap for Multiple Room Types
+async function automapMultipleRoomTypes(roomMappings) {
+    // First ensure partial matching is enabled
+    const exactCheckbox = document.querySelector('input[type="checkbox"]');
+    if (exactCheckbox) {
+        exactCheckbox.checked = false; // Enable partial matching
+    }
+    
+    for (let room of roomMappings) {
+        const dropdown = document.querySelector('.ms-automap-select');
+        const input = document.querySelector('.ms-automap-input');
+        const button = document.querySelector('.ms-btn-success');
+        
+        if (dropdown && input && button) {
+            dropdown.value = room.markerType;
+            dropdown.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            input.value = room.searchText;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            
+            button.click();
+            console.log(`Searching for ${room.searchText} with marker ${room.markerType}`);
+            
+            // Wait between searches to let automap complete
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+}
+
+// Example batch usage:
+const healthcareRooms = [
+    { markerType: 'PAT.1', searchText: 'PAT RM' },
+    { markerType: 'NS.1', searchText: 'NURSES STATION' },
+    { markerType: 'OFF.1', searchText: 'OFFICE' },
+    { markerType: 'ELEV.1', searchText: 'ELEV' },
+    { markerType: 'STAIR.1', searchText: 'STAIR' }
+];
+
+await automapMultipleRoomTypes(healthcareRooms);
+
+// Method 3: Using Sidekick API directly (may not respect marker type selection)
+await window.sidekick.runAutomap('EXIT');
+
+// Method 4: Complete automap workflow with validation
+async function runAutomapWithValidation(markerType, searchText, exactMatch = false) {
+    // Validate marker type exists
+    const state = window.sidekick.getStateJSON();
+    if (!state.appState.markerTypes[markerType]) {
+        console.error(`Marker type ${markerType} does not exist!`);
+        return false;
+    }
+    
+    // Set exact match preference
+    const exactCheckbox = document.querySelector('input[type="checkbox"]');
     if (exactCheckbox) {
         exactCheckbox.checked = exactMatch;
     }
-
-    // Run automap
-    const result = await window.sidekick.runAutomap(searchTerm);
-
-    // Check results
-    const status = window.sidekick.getStatus();
-    console.log(`Found ${status.dotCount.total} matches for "${searchTerm}"`);
-
-    return status.dotCount;
+    
+    // Run automap using UI
+    runAutomap(markerType, searchText);
+    
+    // Check results after a delay
+    setTimeout(() => {
+        const stats = window.sidekick.getDotCount();
+        console.log(`Found ${stats.total} total markers`);
+        console.log(`Markers of type ${markerType}: ${stats.byMarkerType[markerType] || 0}`);
+    }, 2000);
 }
 
 // Examples:
-await runAutomapWithOptions('STAIR', false); // Find all stair-related text
-await runAutomapWithOptions('EXIT', false); // Find all exit-related text
-await runAutomapWithOptions('ROOM 101', true); // Find exactly "ROOM 101"
+await runAutomapWithValidation('STAIR.1', 'STAIR', false); // Find all stair-related text
+await runAutomapWithValidation('EXIT.1', 'EXIT', false);   // Find all exit-related text
+await runAutomapWithValidation('PAT.1', 'ROOM 101', true); // Find exactly "ROOM 101"
 ```
 
 ### Fix Location Numbers

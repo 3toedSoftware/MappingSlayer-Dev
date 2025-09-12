@@ -3,7 +3,7 @@
  * Synchronization adapter for Mapping Slayer
  */
 
-import { createSyncManager, SYNC_EVENTS, DataModels } from '../../core/index.js';
+import { createSyncManager, SYNC_EVENTS, DataModels } from '../core/index.js';
 import {
     appState,
     setDirtyState,

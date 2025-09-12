@@ -2,12 +2,190 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta http-equiv="refresh" content="0; url=./apps/mapping_slayer/mapping_slayer.html" />
-        <title>Redirecting to Mapping Slayer...</title>
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+        <title>Mapping Slayer - Professional Sign Mapping Platform</title>
+        <link rel="stylesheet" href="./src/styles/suite-header.css" />
+        <link rel="stylesheet" href="./src/styles/mapping-slayer.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"
+        />
+
+        <!-- External libraries -->
+        <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     </head>
     <body>
-        <script>
-            window.location.href = './apps/mapping_slayer/mapping_slayer.html';
+        <div id="app-container"></div>
+
+        <script type="module">
+            /**
+             * Dynamically loads a script and returns a promise
+             */
+            function loadScript(url) {
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = url;
+                    script.onload = () => resolve();
+                    script.onerror = () => reject(new Error(`Failed to load script: ${url}`));
+                    document.head.appendChild(script);
+                });
+            }
+
+            /**
+             * Creates the main suite structure with permanent header
+             */
+            function createSuiteStructure() {
+                return `
+                <div class="slayer-app-container">
+                    <!-- Unified Header (always visible) -->
+                    <div class="slayer-header">
+                        <!-- Logo Section -->
+                        <div class="logo-section">
+                            <img src="./src/shared/assets/MSLogo.svg" alt="Mapping Slayer" class="suite-logo" style="height: 30px; width: auto;" onerror="this.style.display='none'; document.getElementById('logo-text').style.display='inline';">
+                            <span id="logo-text" style="display: none;" class="suite-logo">MAPPING SLAYER</span>
+                        </div>
+
+                        <!-- App Navigation -->
+                        <div class="app-navigation">
+                            <!-- No app buttons needed for standalone -->
+                        </div>
+
+                        <!-- Project Info -->
+                        <div class="project-info">
+                            <div class="project-name" id="project-name-display">No project loaded</div>
+                            <div class="autosave-container">
+                                <input type="checkbox" id="autosave-checkbox">
+                                <label for="autosave-checkbox">Autosave (5min)</label>
+                            </div>
+                        </div>
+
+                        <!-- Header Controls -->
+                        <div class="header-controls">
+                            <button type="button" class="btn btn-secondary" id="load-project-btn">LOAD</button>
+                            <button type="button" class="btn btn-primary" id="save-project-btn">SAVE</button>
+                            <button type="button" class="btn btn-primary" id="save-as-project-btn">SAVE AS</button>
+                        </div>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div class="app-content" id="app-content"></div>
+                </div>
+            `;
+            }
+
+            /**
+             * Main Mapping Slayer initializer
+             */
+            async function initializeMappingSlayer() {
+                try {
+                    // Load debug configuration first
+                    await loadScript('./src/core/debug-config.js');
+
+                    // Load PDF.js
+                    if (window.debugLog) {
+                        window.debugLog('VERBOSE', 'Loading PDF.js library...');
+                    }
+                    try {
+                        await loadScript(
+                            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
+                        );
+                        if (window.pdfjsLib) {
+                            pdfjsLib.GlobalWorkerOptions.workerSrc =
+                                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                            if (window.debugLog) {
+                                window.debugLog('VERBOSE', 'PDF.js configured successfully.');
+                            }
+                        }
+                    } catch (pdfError) {
+                        console.warn(
+                            'PDF.js failed to load, continuing without PDF support:',
+                            pdfError
+                        );
+                    }
+
+                    // Import core framework
+                    const { initializeCore, appBridge, saveManager } = await import(
+                        './src/core/index.js'
+                    );
+
+                    // Import Mapping Slayer app
+                    const MappingSlayerApp = (await import('./src/app/mapping-app.js')).default;
+
+                    // Initialize core
+                    initializeCore(true);
+
+                    // Expose appBridge to window for communication
+                    window.appBridge = appBridge;
+
+                    // Get main container and create suite structure
+                    const mainContainer = document.getElementById('app-container');
+                    mainContainer.innerHTML = createSuiteStructure();
+
+                    // Get the content area where app will render
+                    const contentArea = document.getElementById('app-content');
+
+                    // Create container for Mapping Slayer
+                    const appContainer = document.createElement('div');
+                    appContainer.id = 'mapping_slayer-container';
+                    appContainer.style.width = '100%';
+                    appContainer.style.height = '100%';
+                    contentArea.appendChild(appContainer);
+
+                    // Initialize Mapping Slayer
+                    const mappingApp = new MappingSlayerApp();
+                    await mappingApp.initialize(appContainer, true);
+
+                    // Initialize the save manager
+                    await saveManager.initialize();
+
+                    // Make saveManager globally available
+                    window.saveManager = saveManager;
+                    if (window.debugLog) {
+                        window.debugLog('VERBOSE', '📊 [Main] SaveManager made globally available');
+                    }
+
+                    // Activate Mapping Slayer
+                    await appBridge.switchToApp('mapping_slayer');
+
+                    if (window.logAlways) {
+                        window.logAlways('Mapping Slayer initialized successfully!');
+                        window.logAlways('Ready to map!');
+                    }
+
+                    // Load Sidekick AI interface
+                    const sidekickScript = document.createElement('script');
+                    sidekickScript.src = './src/app/ai-interface.js';
+                    sidekickScript.onload = () => console.log('🤖 Sidekick AI interface loaded');
+                    document.body.appendChild(sidekickScript);
+
+                    // Load Sign Template System
+                    const templateScript = document.createElement('script');
+                    templateScript.type = 'module';
+                    templateScript.src = './src/app/sign-template-system.js';
+                    templateScript.onload = () => console.log('🎨 Sign Template System loaded');
+                    document.body.appendChild(templateScript);
+                } catch (error) {
+                    console.error('Failed to initialize Mapping Slayer:', error);
+                    const container = document.getElementById('app-container');
+                    container.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #ff6b6b;">
+                        <h2>Initialization Error</h2>
+                        <p>Failed to load Mapping Slayer. Please check the console for details.</p>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+                }
+            }
+
+            // Start the application
+            initializeMappingSlayer();
         </script>
     </body>
 </html>

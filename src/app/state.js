@@ -2,7 +2,7 @@
 
 import { UndoManager } from './undo-manager.js';
 import { CommandUndoManager } from './command-undo.js';
-import { appBridge } from '../../core/index.js';
+import { appBridge } from '../core/index.js';
 
 // Auto-sync system for marker types
 let mappingSyncAdapter = null;
@@ -81,22 +81,23 @@ export const appState = {
 
 export function setDirtyState() {
     appState.isDirty = true;
-    if (window.debugLog)
+    if (window.debugLog) {
         window.debugLog(
             'MAPPING_SLAYER',
             '📊 [Mapping] setDirtyState called - broadcasting project:dirty'
         );
+    }
     // Broadcast to save manager
     if (appBridge) {
         appBridge.broadcast('project:dirty');
-        if (window.debugLog)
-            window.debugLog('MAPPING_SLAYER', '📊 [Mapping] project:dirty broadcast sent');
+        if (window.debugLog) {window.debugLog('MAPPING_SLAYER', '📊 [Mapping] project:dirty broadcast sent');}
     } else {
-        if (window.debugLog)
+        if (window.debugLog) {
             window.debugLog(
                 'MAPPING_SLAYER',
                 '📊 [Mapping] WARNING: appBridge not available to broadcast dirty state'
             );
+        }
     }
 }
 
@@ -254,8 +255,7 @@ function createAutoSyncMarkerTypes(markerTypes) {
  */
 export function enableAutoSync() {
     if (!mappingSyncAdapter) {
-        if (window.logWarn)
-            window.logWarn('⚠️ Cannot enable auto-sync: sync adapter not initialized');
+        if (window.logWarn) {window.logWarn('⚠️ Cannot enable auto-sync: sync adapter not initialized');}
         return;
     }
 

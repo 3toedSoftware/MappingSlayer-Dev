@@ -116,7 +116,7 @@ export default class SlayerAppBase {
                     <a href="#" class="suite-logo">SLAYER SUITE</a>
                     <span class="breadcrumb-separator">/</span>
                     <div class="app-logo">
-                        <img src="../../shared/assets/MSLogo.svg" alt="App" class="app-icon" id="current-app-icon">
+                        <img src="./assets/MSLogo.svg" alt="App" class="app-icon" id="current-app-icon">
                         <span id="current-app-name">${this.displayName}</span>
                     </div>
                 </div>

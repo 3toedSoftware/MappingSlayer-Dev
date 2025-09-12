@@ -54,7 +54,7 @@ export class DesignSVG {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
             // Use path that works both locally and on GitHub Pages
-            const basePath = window.location.pathname.includes('/3toedSoftware/') 
+            const basePath = window.location.pathname.includes('/3toedSoftware/')
                 ? '/3toedSoftware/apps/design_slayer/lib/svg.min.js'
                 : '/apps/design_slayer/lib/svg.min.js';
             script.src = basePath;

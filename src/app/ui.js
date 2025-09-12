@@ -737,7 +737,7 @@ function setupLegendCollapse() {
     // Setup collapse functionality for both legends
     const projectLegend = document.getElementById('project-legend');
     const mapLegend = document.getElementById('map-legend');
-    
+
     if (projectLegend) {
         const header = projectLegend.querySelector('.ms-map-legend-header');
         if (header && !header.hasAttribute('data-collapse-setup')) {
@@ -752,7 +752,7 @@ function setupLegendCollapse() {
             });
         }
     }
-    
+
     if (mapLegend) {
         const header = mapLegend.querySelector('.ms-map-legend-header');
         if (header && !header.hasAttribute('data-collapse-setup')) {
@@ -773,7 +773,7 @@ function updateMapLegend() {
     const legend = document.getElementById('map-legend');
     const content = document.getElementById('map-legend-content');
     if (!legend || !content) return;
-    
+
     // Setup collapse functionality if not already done
     setupLegendCollapse();
 
@@ -824,7 +824,7 @@ function updateProjectLegend() {
     const legend = document.getElementById('project-legend');
     const content = document.getElementById('project-legend-content');
     if (!legend || !content) return;
-    
+
     // Setup collapse functionality if not already done
     setupLegendCollapse();
 
@@ -1942,12 +1942,12 @@ function handleMapClick(e) {
                     updateMapLegend(); // Update the page legend
                     updateProjectLegend(); // Update the project legend
                     setDirtyState();
-                    
+
                     // Check if DOTCAM mode is active for new dots
                     if (isDotcamMode) {
                         // Store the dot reference for photo capture
                         currentGalleryDot = dot;
-                        
+
                         // Open camera directly for the newly created dot
                         openCameraForDotcam();
                     }
