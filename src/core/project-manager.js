@@ -116,11 +116,11 @@ export class ProjectManager {
             this.workerPromises.get(action).push({ resolve, reject });
 
             // Send work to worker (using new format expected by save-worker.js)
-            this.saveWorker.postMessage({ 
+            this.saveWorker.postMessage({
                 id: Date.now(), // Simple ID generation
-                type: action,   // Worker expects 'type' not 'action'
-                data, 
-                options 
+                type: action, // Worker expects 'type' not 'action'
+                data,
+                options
             });
         });
     }
@@ -742,12 +742,12 @@ export class ProjectManager {
     getCurrentProject() {
         return this.currentProject
             ? {
-                id: this.currentProject.meta.id,
-                name: this.currentProject.meta.name,
-                created: this.currentProject.meta.created,
-                modified: this.currentProject.meta.modified,
-                isDirty: this.isDirty
-            }
+                  id: this.currentProject.meta.id,
+                  name: this.currentProject.meta.name,
+                  created: this.currentProject.meta.created,
+                  modified: this.currentProject.meta.modified,
+                  isDirty: this.isDirty
+              }
             : null;
     }
 

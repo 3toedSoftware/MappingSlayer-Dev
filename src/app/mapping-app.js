@@ -17,9 +17,16 @@ import {
     addButtonEventListeners,
     setupModalEventListeners,
     updateAllSectionsForCurrentPage,
-    zoomToFitDots
+    zoomToFitDots,
+    updateFilterCheckboxes,
+    updateLocationList,
+    updateMarkerTypeSelect,
+    updatePageInfo,
+    renderAnnotationLines,
+    updateEditModalOptions,
+    resetKeyboardShortcutsFlag
 } from './ui.js';
-import { withoutAutoSync, triggerManualSync, getCurrentPageDots } from './state.js';
+import { withoutAutoSync, triggerManualSync, getCurrentPageDots, setDirtyState } from './state.js';
 
 class MappingSlayerApp extends SlayerAppBase {
     constructor() {
@@ -41,14 +48,10 @@ class MappingSlayerApp extends SlayerAppBase {
         this.addModalsToBody();
 
         // Reattach event listeners to the newly created modals
-        if (this.uiModule && this.uiModule.setupModalEventListeners) {
-            this.uiModule.setupModalEventListeners();
-        }
+        setupModalEventListeners();
 
         // Update the location list to reflect current dot state
-        if (this.uiModule && this.uiModule.updateLocationList) {
-            this.uiModule.updateLocationList();
-        }
+        updateLocationList();
     }
 
     async deactivate() {
@@ -80,9 +83,7 @@ class MappingSlayerApp extends SlayerAppBase {
         });
 
         // Reset keyboard shortcuts flag to prevent duplicate listeners
-        if (this.uiModule && this.uiModule.resetKeyboardShortcutsFlag) {
-            this.uiModule.resetKeyboardShortcutsFlag();
-        }
+        resetKeyboardShortcutsFlag();
 
         // Call parent deactivate
         await super.deactivate();
@@ -586,7 +587,6 @@ class MappingSlayerApp extends SlayerAppBase {
         }
 
         this.initializeDefaultMarkerTypes();
-        this.uiModule = await import('./ui.js');
 
         // Initialize flag customization UI
         const flagUIModule = await import('./flag-ui.js');
@@ -658,7 +658,7 @@ class MappingSlayerApp extends SlayerAppBase {
         (async () => {
             this.updateFilterCheckboxes();
             this.updateLocationList();
-            this.uiModule.updateMarkerTypeSelect();
+            updateMarkerTypeSelect();
             this.enableButtons();
 
             // Initialize tolerance inputs
@@ -928,9 +928,7 @@ class MappingSlayerApp extends SlayerAppBase {
                 dotSizeTimeout = setTimeout(async () => {
                     await renderDotsForCurrentPage();
                     // Also ensure annotation lines are rendered
-                    if (this.uiModule && this.uiModule.renderAnnotationLines) {
-                        this.uiModule.renderAnnotationLines();
-                    }
+                    renderAnnotationLines();
                 }, 10);
             });
 
@@ -1092,7 +1090,7 @@ class MappingSlayerApp extends SlayerAppBase {
             }
         });
 
-        this.uiModule.updateMarkerTypeSelect();
+        updateMarkerTypeSelect();
     }
 
     // Note: updateAutomapSelect is now handled by updateMarkerTypeSelect in ui.js
@@ -1165,6 +1163,17 @@ class MappingSlayerApp extends SlayerAppBase {
         this.appState.totalPages = loadedData.pdfDoc.numPages;
         this.appState.currentPdfPage = 1;
 
+        // Convert PDF buffer to base64 for saving
+        if (loadedData.pdfBuffer) {
+            const uint8Array = new Uint8Array(loadedData.pdfBuffer);
+            let binary = '';
+            for (let i = 0; i < uint8Array.length; i++) {
+                binary += String.fromCharCode(uint8Array[i]);
+            }
+            this.appState.sourcePdfBase64 = btoa(binary);
+            console.log('PDF converted to base64, length:', this.appState.sourcePdfBase64.length);
+        }
+
         // DEBUG: Track PDF buffer state
 
         if (loadedData.isProject && loadedData.projectData) {
@@ -1216,7 +1225,7 @@ class MappingSlayerApp extends SlayerAppBase {
 
         updateAllSectionsForCurrentPage();
 
-        this.uiModule.updatePageInfo();
+        updatePageInfo();
 
         this.enableButtons();
 
@@ -1258,6 +1267,20 @@ class MappingSlayerApp extends SlayerAppBase {
         this.appState.sourcePdfBuffer = loadedData.pdfBuffer;
         this.appState.sourcePdfName = file.name;
 
+        // Convert PDF buffer to base64 for saving
+        if (loadedData.pdfBuffer) {
+            const uint8Array = new Uint8Array(loadedData.pdfBuffer);
+            let binary = '';
+            for (let i = 0; i < uint8Array.length; i++) {
+                binary += String.fromCharCode(uint8Array[i]);
+            }
+            this.appState.sourcePdfBase64 = btoa(binary);
+            console.log(
+                'Replacement PDF converted to base64, length:',
+                this.appState.sourcePdfBase64.length
+            );
+        }
+
         // Check if page count changed
         const newTotalPages = loadedData.pdfDoc.numPages;
         if (newTotalPages < this.appState.totalPages) {
@@ -1287,7 +1310,7 @@ class MappingSlayerApp extends SlayerAppBase {
         await renderDotsForCurrentPage();
         updateAllSectionsForCurrentPage();
 
-        this.uiModule.updatePageInfo();
+        updatePageInfo();
 
         if (uploadArea) {
             uploadArea.style.display = 'none';
@@ -1300,15 +1323,11 @@ class MappingSlayerApp extends SlayerAppBase {
     }
 
     updateFilterCheckboxes() {
-        if (this.uiModule && this.uiModule.updateFilterCheckboxes) {
-            this.uiModule.updateFilterCheckboxes();
-        }
+        updateFilterCheckboxes();
     }
 
     updateLocationList() {
-        if (this.uiModule && this.uiModule.updateLocationList) {
-            this.uiModule.updateLocationList();
-        }
+        updateLocationList();
     }
 
     serializeAnnotationLines(annotationLinesMap) {
@@ -1383,10 +1402,10 @@ class MappingSlayerApp extends SlayerAppBase {
                 // Include crop data
                 cropData: this.cropTool
                     ? {
-                        cropBoundsPerPage: Array.from(this.cropTool.cropBoundsPerPage.entries()),
-                        globalCropBounds: this.cropTool.globalCropBounds,
-                        cropAllPages: this.cropTool.cropAllPages
-                    }
+                          cropBoundsPerPage: Array.from(this.cropTool.cropBoundsPerPage.entries()),
+                          globalCropBounds: this.cropTool.globalCropBounds,
+                          cropAllPages: this.cropTool.cropAllPages
+                      }
                     : null,
                 // Include PDF data
                 sourcePdfBase64: pdfBase64,
@@ -1411,12 +1430,8 @@ class MappingSlayerApp extends SlayerAppBase {
         this.appState.activeMarkerType = savedActiveMarkerType;
 
         // Update UI to reflect the preserved marker types
-        if (this.uiModule && this.uiModule.updateFilterCheckboxes) {
-            this.uiModule.updateFilterCheckboxes();
-        }
-        if (this.uiModule && this.uiModule.updateMarkerTypeSelect) {
-            this.uiModule.updateMarkerTypeSelect();
-        }
+        updateFilterCheckboxes();
+        updateMarkerTypeSelect();
 
         // Trigger manual sync after restoring marker types
         triggerManualSync();
@@ -1485,11 +1500,9 @@ class MappingSlayerApp extends SlayerAppBase {
         }
 
         // Update UI to reflect cleared state
-        if (this.uiModule) {
-            this.uiModule.updateFilterCheckboxes();
-            this.uiModule.updateLocationList();
-            this.uiModule.updatePageInfo();
-        }
+        updateFilterCheckboxes();
+        updateLocationList();
+        updatePageInfo();
 
         // Final verification
         const remainingDots = document.querySelectorAll('.ms-map-dot');
@@ -1513,7 +1526,26 @@ class MappingSlayerApp extends SlayerAppBase {
         // Reset dirty state when importing
         this.appState.isDirty = false;
 
-        const stateToImport = data.appState || data;
+        // Handle different data structures - old suite format vs new format
+        let stateToImport;
+        if (data.appState) {
+            // New format from getExportData
+            stateToImport = data.appState;
+            console.log('🔍 Using new format (has appState wrapper)');
+        } else if (data.data && data.data.appState) {
+            // Old suite format has appState nested in data
+            stateToImport = data.data.appState;
+            console.log('🔍 Using old suite format (data.appState)');
+        } else if (data.data) {
+            // Old suite format might have data directly
+            stateToImport = data.data;
+            console.log('🔍 Using old suite format (data directly)');
+        } else {
+            // Direct data
+            stateToImport = data;
+            console.log('🔍 Using direct data (no wrapper)');
+        }
+
         console.log('🔍 stateToImport has sourcePdfBase64?', !!stateToImport.sourcePdfBase64);
         if (stateToImport.sourcePdfBase64) {
             console.log(
@@ -1636,6 +1668,9 @@ class MappingSlayerApp extends SlayerAppBase {
         }
 
         // Load PDF if available
+        console.log('🔍 importData: Checking for PDF data...');
+        console.log('🔍 Has sourcePdfBase64?', !!stateToImport.sourcePdfBase64);
+        console.log('🔍 Has sourcePdfBuffer?', !!this.appState.sourcePdfBuffer);
         if (stateToImport.sourcePdfBase64) {
             console.log(
                 '🔍 importData: Found PDF base64 data, length:',
@@ -1651,7 +1686,9 @@ class MappingSlayerApp extends SlayerAppBase {
                 }
 
                 this.appState.sourcePdfBuffer = bytes.buffer;
-                this.appState.sourcePdfName = stateToImport.sourcePdfName || 'imported.pdf';
+                this.appState.sourcePdfBase64 = stateToImport.sourcePdfBase64; // Keep the base64 for future saves
+                this.appState.sourcePdfName =
+                    stateToImport.pdfFileName || stateToImport.sourcePdfName || 'imported.pdf';
                 console.log(
                     '🔍 importData: PDF buffer restored, size:',
                     this.appState.sourcePdfBuffer.byteLength
@@ -1661,13 +1698,17 @@ class MappingSlayerApp extends SlayerAppBase {
                 const pdfBufferCopy = bytes.buffer.slice(0);
 
                 // Load the PDF document with the copy
-                const loadingTask = pdfjsLib.getDocument({ data: pdfBufferCopy });
+                const loadingTask = window.pdfjsLib.getDocument({ data: pdfBufferCopy });
                 this.appState.pdfDoc = await loadingTask.promise;
                 this.appState.totalPages = this.appState.pdfDoc.numPages;
+                console.log('🔍 PDF loaded successfully, pages:', this.appState.totalPages);
+                console.log('🔍 pdfDoc exists?', !!this.appState.pdfDoc);
 
                 // Clear PDF cache and render first page
                 clearPDFCache();
+                console.log('🔍 About to render PDF page:', this.appState.currentPdfPage || 1);
                 await renderPDFPage(this.appState.currentPdfPage || 1);
+                console.log('🔍 PDF page rendered');
 
                 // Hide upload area
                 const uploadArea = document.getElementById('upload-area');
@@ -1696,13 +1737,11 @@ class MappingSlayerApp extends SlayerAppBase {
         // Update UI after importing with a delay to ensure DOM is ready
         // This 500ms delay allows filter checkboxes to initialize properly so the location list can populate
         // Without this delay, dots get filtered out and the list appears empty
-        if (this.uiModule) {
-            setTimeout(() => {
-                this.uiModule.updateFilterCheckboxes();
-                this.uiModule.updateLocationList();
-                this.uiModule.updateAllSectionsForCurrentPage();
-            }, 500);
-        }
+        setTimeout(() => {
+            updateFilterCheckboxes();
+            updateLocationList();
+            updateAllSectionsForCurrentPage();
+        }, 500);
 
         // Update dot size slider if available
         const dotSizeSlider = document.getElementById('dot-size-slider');
@@ -1711,14 +1750,11 @@ class MappingSlayerApp extends SlayerAppBase {
         }
 
         // Render dots for current page
-        if (this.renderModule && this.renderModule.renderDotsForCurrentPage) {
-            this.renderModule.renderDotsForCurrentPage();
-        }
+        await renderDotsForCurrentPage();
 
         // Render annotation lines
-        if (this.uiModule && this.uiModule.renderAnnotationLines) {
-            this.uiModule.renderAnnotationLines();
-        }
+        const { renderAnnotationLines } = await import('./ui.js');
+        renderAnnotationLines();
 
         // CRITICAL: Sync loaded marker types with other apps via App Bridge
         // This was missing, causing DS to not receive marker types from .slayer files
@@ -1830,9 +1866,7 @@ class MappingSlayerApp extends SlayerAppBase {
                 });
 
                 // Update the marker type dropdown
-                if (this.uiModule && this.uiModule.updateMarkerTypeDropdown) {
-                    this.uiModule.updateMarkerTypeDropdown();
-                }
+                updateMarkerTypeSelect();
 
                 // Broadcast the creation
                 if (window.appBridge) {
@@ -1896,8 +1930,8 @@ class MappingSlayerApp extends SlayerAppBase {
                         totalPages: this.appState.totalPages || 0,
                         pageLabels: this.appState.pageLabels
                             ? Array.from(this.appState.pageLabels.entries()).map(
-                                ([num, label]) => ({ pageNumber: num, label: label })
-                            )
+                                  ([num, label]) => ({ pageNumber: num, label: label })
+                              )
                             : []
                     },
                     // Include global flag configuration so Thumbnail Slayer can use proper names
@@ -2023,10 +2057,8 @@ class MappingSlayerApp extends SlayerAppBase {
                     }
 
                     // Update UI if available
-                    if (this.uiModule) {
-                        this.uiModule.updateFilterCheckboxes();
-                        this.uiModule.updateEditModalOptions();
-                    }
+                    updateFilterCheckboxes();
+                    updateEditModalOptions();
 
                     // Broadcast marker type created event
                     if (window.appBridge) {
@@ -2098,6 +2130,75 @@ class MappingSlayerApp extends SlayerAppBase {
             default:
                 return { error: 'Unknown query type' };
         }
+    }
+
+    async getExportData() {
+        if (!this.appState) {
+            throw new Error('State not initialized');
+        }
+
+        // Serialize dots data
+        const serializedDotsByPage = {};
+        for (const [pageNum, pageData] of this.appState.dotsByPage.entries()) {
+            serializedDotsByPage[pageNum] = {
+                dots: Array.from(pageData.dots.values())
+            };
+        }
+
+        // Serialize annotation lines
+        const serializedAnnotationLines = {};
+        for (const [pageNum, linesMap] of this.appState.annotationLines.entries()) {
+            serializedAnnotationLines[pageNum] = Array.from(linesMap.values());
+        }
+
+        // Convert page labels Map to object
+        const pageLabelsObj = {};
+        for (const [pageNum, label] of this.appState.pageLabels.entries()) {
+            pageLabelsObj[pageNum] = label;
+        }
+
+        return {
+            appState: {
+                dotsByPage: serializedDotsByPage,
+                markerTypes: this.appState.markerTypes || {},
+                globalFlagConfiguration: this.appState.globalFlagConfiguration || null,
+                customIconLibrary: this.appState.customIconLibrary || [],
+                nextInternalId: this.appState.nextInternalId || 1,
+                dotSize: this.appState.dotSize || 1,
+                currentPdfPage: this.appState.currentPdfPage || 1,
+                totalPages: this.appState.totalPages || 0,
+                pageLabels: pageLabelsObj,
+                recentSearches: this.appState.recentSearches || [],
+                automapExactPhrase:
+                    this.appState.automapExactPhrase !== undefined
+                        ? this.appState.automapExactPhrase
+                        : true,
+                scrapeHorizontalTolerance: this.appState.scrapeHorizontalTolerance || 1,
+                scrapeVerticalTolerance: this.appState.scrapeVerticalTolerance || 25,
+                annotationLines: serializedAnnotationLines,
+                showAnnotationEndpoints: this.appState.showAnnotationEndpoints || false,
+                nextAnnotationId: this.appState.nextAnnotationId || 1,
+                activeMarkerType: this.appState.activeMarkerType || null,
+                sourcePdfBase64: this.appState.sourcePdfBase64 || null,
+                pdfFileName: this.appState.sourcePdfName || this.appState.pdfFileName || null,
+                sourcePdfName: this.appState.sourcePdfName || null, // Also include for backward compatibility
+                pdfDimensions: this.appState.pdfDimensions || null,
+                pageNames: this.appState.pageNames
+                    ? Object.fromEntries(this.appState.pageNames)
+                    : {},
+                pageOffsets: this.appState.pageOffsets || {},
+                pageRotations: this.appState.pageRotations || {},
+                dotColorOverrides: this.appState.dotColorOverrides || {},
+                dotMetadata: this.appState.dotMetadata || {},
+                lastSearchTerm: this.appState.lastSearchTerm || '',
+                mapTransform: this.appState.mapTransform || null,
+                showMarkerSettings: this.appState.showMarkerSettings || {},
+                selectedDots: this.appState.selectedDots
+                    ? Array.from(this.appState.selectedDots)
+                    : [],
+                isDirty: false // Reset dirty state on export
+            }
+        };
     }
 }
 

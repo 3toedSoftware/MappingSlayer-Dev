@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Check PDF State</title>
+        <style>
+            body {
+                font-family: monospace;
+                padding: 20px;
+                background: #1a1a1a;
+                color: #0f0;
+            }
+            button {
+                background: #0f0;
+                color: #000;
+                border: none;
+                padding: 10px 20px;
+                margin: 10px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            button:hover {
+                background: #0a0;
+            }
+            pre {
+                background: #000;
+                padding: 15px;
+                border: 1px solid #0f0;
+                overflow-x: auto;
+            }
+            .error {
+                color: #f00;
+            }
+            .warning {
+                color: #ff0;
+            }
+            .success {
+                color: #0f0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🔍 Check Current PDF State in Mapping Slayer</h1>
+
+        <p>
+            Open Mapping Slayer in another tab, load a PDF, then click the button below to check the
+            state:
+        </p>
+
+        <button onclick="checkState()">Check Current State</button>
+        <button onclick="testSave()">Test Save Process</button>
+        <button onclick="fixBase64()">Fix Base64 Encoding</button>
+
+        <div id="output"></div>
+
+        <script>
+            function checkState() {
+                const output = document.getElementById('output');
+
+                // Check if mapping app exists
+                if (!window.opener && !window.parent.mappingApp) {
+                    output.innerHTML =
+                        '<pre class="error">❌ Cannot access Mapping Slayer. Please open this from the main app or use the browser console instead.</pre>';
+
+                    // Provide console commands
+                    output.innerHTML += `
+<pre class="warning">Instead, open the browser console (F12) in your Mapping Slayer tab and run:
+
+// Check if PDF base64 exists:
+console.log('Has base64?', !!window.mappingApp?.appState?.sourcePdfBase64);
+
+// Check base64 length:
+console.log('Base64 length:', window.mappingApp?.appState?.sourcePdfBase64?.length || 0);
+
+// Check if PDF buffer exists:
+console.log('Has buffer?', !!window.mappingApp?.appState?.sourcePdfBuffer);
+
+// Check complete state:
+console.log('PDF State:', {
+    hasDoc: !!window.mappingApp?.appState?.pdfDoc,
+    hasBuffer: !!window.mappingApp?.appState?.sourcePdfBuffer,
+    hasBase64: !!window.mappingApp?.appState?.sourcePdfBase64,
+    base64Length: window.mappingApp?.appState?.sourcePdfBase64?.length || 0,
+    fileName: window.mappingApp?.appState?.sourcePdfName
+});
+
+// Test getExportData:
+window.mappingApp?.getExportData().then(data => {
+    console.log('Export data has base64?', !!data.appState?.sourcePdfBase64);
+    console.log('Base64 length in export:', data.appState?.sourcePdfBase64?.length || 0);
+});
+</pre>`;
+                    return;
+                }
+
+                try {
+                    const app = window.opener?.mappingApp || window.parent.mappingApp;
+                    const state = app?.appState;
+
+                    if (!state) {
+                        output.innerHTML = '<pre class="error">❌ No appState found</pre>';
+                        return;
+                    }
+
+                    const info = {
+                        hasPdfDoc: !!state.pdfDoc,
+                        hasSourceBuffer: !!state.sourcePdfBuffer,
+                        hasSourceBase64: !!state.sourcePdfBase64,
+                        base64Length: state.sourcePdfBase64?.length || 0,
+                        bufferSize: state.sourcePdfBuffer?.byteLength || 0,
+                        fileName: state.sourcePdfName,
+                        totalPages: state.totalPages,
+                        currentPage: state.currentPdfPage
+                    };
+
+                    output.innerHTML =
+                        '<pre class="success">' + JSON.stringify(info, null, 2) + '</pre>';
+
+                    if (!info.hasSourceBase64 && info.hasSourceBuffer) {
+                        output.innerHTML +=
+                            '<pre class="warning">⚠️ Buffer exists but no base64! This is the problem.</pre>';
+                    }
+                } catch (error) {
+                    output.innerHTML = '<pre class="error">Error: ' + error.message + '</pre>';
+                }
+            }
+
+            async function testSave() {
+                const output = document.getElementById('output');
+
+                output.innerHTML += `
+<pre class="warning">Run this in the Mapping Slayer console:
+
+// Test the save process:
+(async () => {
+    const app = window.mappingApp;
+    if (!app) {
+        console.error('No mapping app found');
+        return;
+    }
+
+    console.log('Getting export data...');
+    const exportData = await app.getExportData();
+
+    console.log('Export data structure:', {
+        hasAppState: !!exportData.appState,
+        hasBase64: !!exportData.appState?.sourcePdfBase64,
+        base64Length: exportData.appState?.sourcePdfBase64?.length || 0
+    });
+
+    if (exportData.appState?.sourcePdfBase64) {
+        console.log('✅ Base64 IS in export data');
+        console.log('First 100 chars:', exportData.appState.sourcePdfBase64.substring(0, 100));
+    } else {
+        console.error('❌ Base64 NOT in export data!');
+    }
+})();
+</pre>`;
+            }
+
+            function fixBase64() {
+                const output = document.getElementById('output');
+
+                output.innerHTML += `
+<pre class="warning">Run this in the Mapping Slayer console to manually fix base64:
+
+// Manually convert buffer to base64:
+(() => {
+    const app = window.mappingApp;
+    if (!app?.appState?.sourcePdfBuffer) {
+        console.error('No PDF buffer found');
+        return;
+    }
+
+    console.log('Converting buffer to base64...');
+    const uint8Array = new Uint8Array(app.appState.sourcePdfBuffer);
+    let binary = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+        binary += String.fromCharCode(uint8Array[i]);
+    }
+    app.appState.sourcePdfBase64 = btoa(binary);
+
+    console.log('✅ Base64 created, length:', app.appState.sourcePdfBase64.length);
+    console.log('Now try saving again!');
+})();
+</pre>`;
+            }
+        </script>
+    </body>
+</html>

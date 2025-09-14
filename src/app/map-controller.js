@@ -63,7 +63,10 @@ function getVisibleDots() {
 }
 
 async function renderPDFPage(pageNum) {
+    console.log('🔍 renderPDFPage called with pageNum:', pageNum);
+    console.log('🔍 appState.pdfDoc exists?', !!appState.pdfDoc);
     if (!appState.pdfDoc) {
+        console.log('🔍 No pdfDoc found, skipping render');
         return;
     }
 
@@ -73,6 +76,11 @@ async function renderPDFPage(pageNum) {
     }
 
     const canvas = document.getElementById('pdf-canvas');
+    console.log('🔍 Canvas element found?', !!canvas);
+    if (!canvas) {
+        console.error('🔍 ERROR: pdf-canvas element not found!');
+        return;
+    }
     const context = canvas.getContext('2d');
 
     // Check if we already have this page cached
@@ -96,6 +104,7 @@ async function renderPDFPage(pageNum) {
     canvas.width = viewport.width;
     canvas.height = viewport.height;
     canvas.style.display = 'block';
+    console.log('🔍 Canvas dimensions set:', canvas.width, 'x', canvas.height);
 
     // Create a new cache canvas for this page
     const cacheCanvas = document.createElement('canvas');
@@ -603,8 +612,8 @@ function handleTouchMove(e) {
 
             // Find center point between touches
             const rect = e.currentTarget.getBoundingClientRect();
-            const centerX = ((touch1.clientX + touch2.clientX) / 2) - rect.left;
-            const centerY = ((touch1.clientY + touch2.clientY) / 2) - rect.top;
+            const centerX = (touch1.clientX + touch2.clientX) / 2 - rect.left;
+            const centerY = (touch1.clientY + touch2.clientY) / 2 - rect.top;
 
             // Zoom towards center point
             const scaleChange = newScale / appState.mapTransform.scale;
