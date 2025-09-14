@@ -8,7 +8,6 @@ import {
     getDotsForPage,
     setDirtyState,
     getCurrentPageData,
-    UndoManager,
     CommandUndoManager,
     getCurrentPageAnnotationLines,
     withoutAutoSync,
@@ -747,7 +746,9 @@ function setupLegendCollapse() {
                 projectLegend.classList.toggle('ms-collapsed');
                 const content = document.getElementById('project-legend-content');
                 if (content) {
-                    content.style.display = projectLegend.classList.contains('ms-collapsed') ? 'none' : 'block';
+                    content.style.display = projectLegend.classList.contains('ms-collapsed')
+                        ? 'none'
+                        : 'block';
                 }
             });
         }
@@ -762,7 +763,9 @@ function setupLegendCollapse() {
                 mapLegend.classList.toggle('ms-collapsed');
                 const content = document.getElementById('map-legend-content');
                 if (content) {
-                    content.style.display = mapLegend.classList.contains('ms-collapsed') ? 'none' : 'block';
+                    content.style.display = mapLegend.classList.contains('ms-collapsed')
+                        ? 'none'
+                        : 'block';
                 }
             });
         }
@@ -6148,7 +6151,6 @@ function closeGalleryModal() {
 
 function populateGallery(dot) {
     const mainImage = document.getElementById('gallery-main-image');
-
 
     // Display the photo if it exists, otherwise show placeholder
     if (mainImage) {
