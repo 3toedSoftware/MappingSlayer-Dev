@@ -1,6 +1,6 @@
 // scrape.js
 
-import { appState, getCurrentPageDots, UndoManager } from './state.js';
+import { appState, getCurrentPageDots } from './state.js';
 import { showCSVStatus, addDotToData, isCollision, updateAllSectionsForCurrentPage } from './ui.js';
 import { renderDotsForCurrentPage } from './map-controller.js';
 import { clusterTextItems } from './automap.js';
@@ -317,11 +317,10 @@ async function finishOCRScrape() {
 
         const {
             data: { text }
-        } = await Tesseract.recognize(tempCanvas, 'eng', {
+        } = await window.Tesseract.recognize(tempCanvas, 'eng', {
             logger: m => {
                 if (m.status === 'recognizing text') {
-                    const progress = Math.round(m.progress * 100);
-                    showCSVStatus(`OCR SCANNING: ${progress}%`, true, 20000);
+                    showCSVStatus(`OCR SCANNING: ${Math.round(m.progress * 100)}%`, true, 20000);
                 }
             }
         });

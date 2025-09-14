@@ -1,6 +1,5 @@
 // state.js - Mapping Slayer state management for unified framework
 
-import { UndoManager } from './undo-manager.js';
 import { CommandUndoManager } from './command-undo.js';
 import { appBridge } from '../core/index.js';
 
@@ -90,7 +89,9 @@ export function setDirtyState() {
     // Broadcast to save manager
     if (appBridge) {
         appBridge.broadcast('project:dirty');
-        if (window.debugLog) {window.debugLog('MAPPING_SLAYER', '📊 [Mapping] project:dirty broadcast sent');}
+        if (window.debugLog) {
+            window.debugLog('MAPPING_SLAYER', '📊 [Mapping] project:dirty broadcast sent');
+        }
     } else {
         if (window.debugLog) {
             window.debugLog(
@@ -255,7 +256,9 @@ function createAutoSyncMarkerTypes(markerTypes) {
  */
 export function enableAutoSync() {
     if (!mappingSyncAdapter) {
-        if (window.logWarn) {window.logWarn('⚠️ Cannot enable auto-sync: sync adapter not initialized');}
+        if (window.logWarn) {
+            window.logWarn('⚠️ Cannot enable auto-sync: sync adapter not initialized');
+        }
         return;
     }
 
@@ -296,5 +299,5 @@ if (!appState.customIconLibrary) {
 // Store state reference globally
 window.appState = appState;
 
-// Re-export UndoManager for convenience
-export { UndoManager, CommandUndoManager };
+// Re-export CommandUndoManager for convenience
+export { CommandUndoManager };

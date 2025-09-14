@@ -6,8 +6,9 @@
     "main": "automated-debug.js",
     "scripts": {
         "dev": "http-server -p 8080 -c-1",
-        "test": "node test-runner.js",
-        "test:watch": "node test-runner.js --watch",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:ui": "vitest --ui",
         "debug": "node automated-debug.js",
         "debug-headless": "node -e \"const {runAutomatedDebugging, CONFIG} = require('./automated-debug.js'); CONFIG.headless = true; runAutomatedDebugging().catch(console.error);\"",
         "help": "cat CHEATSHEET.md",
@@ -26,12 +27,15 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.33.0",
+        "@vitest/ui": "^3.2.4",
         "eslint": "^9.33.0",
         "eslint-config-prettier": "^10.1.8",
+        "happy-dom": "^18.0.1",
         "http-server": "^14.1.1",
         "husky": "^9.1.7",
         "lint-staged": "^16.1.5",
-        "prettier": "^3.6.2"
+        "prettier": "^3.6.2",
+        "vitest": "^3.2.4"
     },
     "keywords": [
         "debugging",

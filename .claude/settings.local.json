@@ -105,7 +105,8 @@
             "mcp__chrome-devtools__get_document",
             "Bash(git push:*)",
             "Bash(git config:*)",
-            "mcp__chrome-devtools__navigate_to_url"
+            "mcp__chrome-devtools__navigate_to_url",
+            "Bash(netstat:*)"
         ],
         "deny": [],
         "defaultMode": "acceptEdits",

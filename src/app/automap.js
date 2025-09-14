@@ -1,6 +1,6 @@
 // automap.js
 
-import { appState, setDirtyState, UndoManager } from './state.js';
+import { appState, setDirtyState } from './state.js';
 import {
     addDotToData,
     isCollision,
