@@ -39,9 +39,9 @@ export class ProjectManager {
     initializeWorker() {
         try {
             // Use relative path that works both locally and on GitHub Pages
-            const basePath = window.location.pathname.includes('/3toedSoftware/')
-                ? '/3toedSoftware/src/shared/workers/saveWorker.js'
-                : '/src/shared/workers/saveWorker.js';
+            const basePath = window.location.pathname.includes('/MappingSlayer/')
+                ? '/MappingSlayer/src/core/workers/saveWorker.js'
+                : '/src/core/workers/saveWorker.js';
             this.saveWorker = new Worker(basePath);
 
             this.saveWorker.onmessage = e => {
