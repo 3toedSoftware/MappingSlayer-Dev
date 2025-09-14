@@ -1,7 +1,6 @@
 // state.js - Mapping Slayer state management for unified framework
 
 import { CommandUndoManager } from './command-undo.js';
-import { appBridge } from '../core/index.js';
 
 // Auto-sync system for marker types
 let mappingSyncAdapter = null;
@@ -83,22 +82,13 @@ export function setDirtyState() {
     if (window.debugLog) {
         window.debugLog(
             'MAPPING_SLAYER',
-            '📊 [Mapping] setDirtyState called - broadcasting project:dirty'
+            '📊 [Mapping] setDirtyState called - dispatching project:dirty event'
         );
     }
-    // Broadcast to save manager
-    if (appBridge) {
-        appBridge.broadcast('project:dirty');
-        if (window.debugLog) {
-            window.debugLog('MAPPING_SLAYER', '📊 [Mapping] project:dirty broadcast sent');
-        }
-    } else {
-        if (window.debugLog) {
-            window.debugLog(
-                'MAPPING_SLAYER',
-                '📊 [Mapping] WARNING: appBridge not available to broadcast dirty state'
-            );
-        }
+    // Dispatch custom event for save manager
+    window.dispatchEvent(new CustomEvent('project:dirty'));
+    if (window.debugLog) {
+        window.debugLog('MAPPING_SLAYER', '📊 [Mapping] project:dirty event dispatched');
     }
 }
 
@@ -208,7 +198,7 @@ function debouncedSync() {
         isSyncInProgress = true;
         try {
             if (window.debugLog) window.debugLog('SYNC', '🔄 Auto-syncing marker types...');
-            await mappingSyncAdapter.syncMarkerTypes(appBridge);
+            await mappingSyncAdapter.syncMarkerTypes(null); // No longer using appBridge
         } catch (error) {
             if (window.logError) window.logError('❌ Auto-sync failed:', error);
         } finally {

@@ -1,9 +1,8 @@
 /**
- * Save Manager for Slayer Suite with Persistent Permissions
+ * Save Manager for Mapping Slayer with Persistent Permissions
  * Handles saving and loading .slayer files with File System Access API
  */
 
-import { appBridge } from './app-bridge.js';
 import { fileHandleStore } from './file-handle-store.js';
 
 class SaveManager {
@@ -87,36 +86,30 @@ class SaveManager {
             }
         }
 
-        // Listen for project dirty state
+        // Listen for project dirty state via custom events
         if (window.debugLog) {
-            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Subscribing to appBridge events...');
+            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Setting up event listeners...');
         }
-        appBridge.subscribe('project:dirty', data => {
+
+        // Listen for dirty state changes
+        window.addEventListener('project:dirty', () => {
             if (window.debugLog) {
-                window.debugLog(
-                    'SAVE_MANAGER',
-                    '📊 [SaveManager] Received project:dirty event',
-                    data
-                );
+                window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Project marked as dirty');
             }
             this.hasUnsavedChanges = true;
             this.updateSaveButton();
         });
 
-        appBridge.subscribe('project:saved', data => {
+        window.addEventListener('project:saved', () => {
             if (window.debugLog) {
-                window.debugLog(
-                    'SAVE_MANAGER',
-                    '📊 [SaveManager] Received project:saved event',
-                    data
-                );
+                window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Project marked as saved');
             }
             this.hasUnsavedChanges = false;
             this.updateSaveButton();
         });
 
         if (window.debugLog) {
-            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Event subscriptions complete');
+            window.debugLog('SAVE_MANAGER', '📊 [SaveManager] Event listeners setup complete');
         }
 
         // Initial button state
@@ -206,16 +199,23 @@ class SaveManager {
         if (saveBtn) saveBtn.textContent = 'SAVING...';
 
         try {
-            // Get data from all apps
-            const projectData = await appBridge.getProjectData();
+            // Get data from Mapping Slayer
+            const mappingApp = window.mappingApp || window.currentApp;
+            if (!mappingApp) {
+                throw new Error('Mapping Slayer app not found');
+            }
+
+            const exportData = await mappingApp.getExportData();
 
             // Create save data
             const saveData = {
-                type: 'slayer_suite_project',
+                type: 'mapping_slayer_project',
                 version: '1.0',
                 saved: new Date().toISOString(),
                 projectName: this.projectName,
-                apps: projectData.apps
+                apps: {
+                    mapping_slayer: exportData
+                }
             };
 
             // Convert to JSON
@@ -279,7 +279,7 @@ class SaveManager {
 
             // Mark as saved
             this.hasUnsavedChanges = false;
-            appBridge.broadcast('project:saved');
+            window.dispatchEvent(new CustomEvent('project:saved'));
         } catch (error) {
             console.error('❌ Save failed:', error);
             alert(`Failed to save project: ${error.message}`);
@@ -507,8 +507,20 @@ class SaveManager {
                 throw new Error('Invalid slayer file - no apps data found');
             }
 
-            // Load data into apps
-            const results = await appBridge.loadProjectData(appsData);
+            // Load data into Mapping Slayer
+            const mappingApp = window.mappingApp || window.currentApp;
+            if (!mappingApp) {
+                throw new Error('Mapping Slayer app not found');
+            }
+
+            // Get the mapping_slayer data
+            const mappingData = appsData.apps?.mapping_slayer || appsData.mapping_slayer;
+            if (!mappingData) {
+                throw new Error('No Mapping Slayer data found in file');
+            }
+
+            // Import the data
+            await mappingApp.importData(mappingData);
 
             // Update project name from filename
             this.projectName = file.name.replace('.slayer', '');
@@ -525,11 +537,6 @@ class SaveManager {
                     !!this.fileHandle,
                     'Save button updated'
                 );
-            }
-
-            // Switch to first successfully loaded app
-            if (results.success.length > 0) {
-                await window.slayerSuite.switchToApp(results.success[0]);
             }
 
             if (window.logAlways) window.logAlways('✅ Project loaded successfully');
@@ -550,16 +557,23 @@ class SaveManager {
         if (saveAsBtn) saveAsBtn.textContent = 'SAVING...';
 
         try {
-            // Get data from all apps
-            const projectData = await appBridge.getProjectData();
+            // Get data from Mapping Slayer
+            const mappingApp = window.mappingApp || window.currentApp;
+            if (!mappingApp) {
+                throw new Error('Mapping Slayer app not found');
+            }
+
+            const exportData = await mappingApp.getExportData();
 
             // Create save data
             const saveData = {
-                type: 'slayer_suite_project',
+                type: 'mapping_slayer_project',
                 version: '1.0',
                 saved: new Date().toISOString(),
                 projectName: this.projectName,
-                apps: projectData.apps
+                apps: {
+                    mapping_slayer: exportData
+                }
             };
 
             // Convert to JSON
@@ -607,7 +621,7 @@ class SaveManager {
 
             // Mark as saved
             this.hasUnsavedChanges = false;
-            appBridge.broadcast('project:saved');
+            window.dispatchEvent(new CustomEvent('project:saved'));
         } catch (error) {
             console.error('❌ Save failed:', error);
             alert(`Failed to save project: ${error.message}`);
@@ -762,7 +776,7 @@ window.checkSaveState = () => {
 window.testSaveButton = () => {
     console.log('🧪 Testing save button flow...');
     console.log('1. Simulating project:dirty event');
-    appBridge.broadcast('project:dirty');
+    window.dispatchEvent(new CustomEvent('project:dirty'));
     setTimeout(() => {
         console.log('2. Checking state after dirty event:');
         window.checkSaveState();
