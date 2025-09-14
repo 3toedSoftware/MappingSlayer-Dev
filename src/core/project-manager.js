@@ -40,8 +40,8 @@ export class ProjectManager {
         try {
             // Use relative path that works both locally and on GitHub Pages
             const basePath = window.location.pathname.includes('/MappingSlayer/')
-                ? '/MappingSlayer/src/core/workers/saveWorker.js'
-                : '/src/core/workers/saveWorker.js';
+                ? '/MappingSlayer/src/core/workers/save-worker.js'
+                : '/src/core/workers/save-worker.js';
             this.saveWorker = new Worker(basePath);
 
             this.saveWorker.onmessage = e => {
@@ -64,11 +64,13 @@ export class ProjectManager {
      * Handle messages from the save worker
      */
     handleWorkerMessage(data) {
-        const { action, success, result, error, progress, phase } = data;
+        // Handle both old and new worker message formats
+        const { id, type, action, success, result, error, progress, phase } = data;
+        const messageAction = action || type;
 
         if (progress !== undefined) {
             // Handle progress updates
-            const progressCallbacks = this.workerPromises.get(`${action}_progress`);
+            const progressCallbacks = this.workerPromises.get(`${messageAction}_progress`);
             if (progressCallbacks) {
                 progressCallbacks.forEach(callback => callback(progress, phase));
             }
@@ -76,14 +78,19 @@ export class ProjectManager {
         }
 
         // Handle completion
-        const promises = this.workerPromises.get(action);
+        const promises = this.workerPromises.get(messageAction);
         if (promises && promises.length > 0) {
             const { resolve, reject } = promises.shift();
 
-            if (success) {
+            if (result !== undefined) {
+                // New worker format
                 resolve(result);
-            } else {
+            } else if (error) {
+                // Error from worker
                 reject(new Error(error));
+            } else if (success !== undefined) {
+                // Old format compatibility
+                success ? resolve(result) : reject(new Error(error));
             }
 
             // Clean up if no more promises waiting
@@ -108,8 +115,13 @@ export class ProjectManager {
             }
             this.workerPromises.get(action).push({ resolve, reject });
 
-            // Send work to worker
-            this.saveWorker.postMessage({ action, data, options });
+            // Send work to worker (using new format expected by save-worker.js)
+            this.saveWorker.postMessage({ 
+                id: Date.now(), // Simple ID generation
+                type: action,   // Worker expects 'type' not 'action'
+                data, 
+                options 
+            });
         });
     }
 
