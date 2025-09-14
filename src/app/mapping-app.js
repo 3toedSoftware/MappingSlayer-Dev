@@ -1120,10 +1120,10 @@ class MappingSlayerApp extends SlayerAppBase {
             return;
         }
 
-        // Handle .slayer files - delegate to suite-level save manager
+        // Handle .slayer files - delegate to save manager
         if (loadedData.isSlayerFile && loadedData.requiresSuiteHandling) {
-            console.log('🔄 Delegating .slayer file to suite save manager');
-            if (uploadArea) uploadArea.innerHTML = '<div>🔄 Loading suite project...</div>';
+            console.log('🔄 Delegating .slayer file to save manager');
+            if (uploadArea) uploadArea.innerHTML = '<div>🔄 Loading project...</div>';
 
             // Use SaveManager to load the file (which won't have a file handle from drag-drop)
             if (window.saveManager) {

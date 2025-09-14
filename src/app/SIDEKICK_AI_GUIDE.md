@@ -18,9 +18,8 @@ When updating:
 
 ### What Sidekick Needs to Load
 
-1. **Mapping Slayer must be loaded in STANDALONE mode**
-    - ✅ Works: `http://localhost:8080/apps/mapping_slayer/mapping_slayer.html`
-    - ❌ Does NOT work: `http://localhost:8080/index.html` (Suite mode)
+1. **Mapping Slayer must be loaded**
+    - URL: `http://localhost:8080/apps/mapping_slayer/mapping_slayer.html`
 
 2. **Required global variables must be available**:
     - `window.mappingApp` - The main app instance
@@ -33,7 +32,7 @@ When updating:
 
 Sidekick (`ai-interface.js`) automatically initializes when:
 
-- The page is loaded in standalone mode
+- The page is loaded
 - `window.mappingApp` and `window.appState` become available
 - If these aren't available, Sidekick retries every 100ms until they are
 

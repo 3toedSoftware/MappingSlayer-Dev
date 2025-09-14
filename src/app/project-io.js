@@ -114,11 +114,11 @@ const ProjectIO = {
                     pdfBuffer: fileBuffer // Return the original, unconsumed buffer
                 };
             }
-            // --- Handle .slayer project files (suite-level) ---
+            // --- Handle .slayer project files ---
             else if (fileName.endsWith('.slayer')) {
-                console.log('🔄 Detected .slayer file - delegating to suite project manager');
-                // This is a suite-level project file - should be handled by the main project manager
-                // Return a special indicator so the app knows to let the suite handle this
+                console.log('🔄 Detected .slayer file - delegating to project manager');
+                // This is a project file - should be handled by the main project manager
+                // Return a special indicator so the app knows to let the project manager handle this
                 return {
                     isSlayerFile: true,
                     requiresSuiteHandling: true,

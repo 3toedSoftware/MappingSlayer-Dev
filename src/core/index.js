@@ -1,6 +1,6 @@
 // core/index.js
 /**
- * Core Module Exports - Central import point for all Slayer Suite core utilities
+ * Core Module Exports - Central import point for all Mapping Slayer core utilities
  * Import everything from here: import { appBridge, projectManager } from '../core/index.js'
  */
 
@@ -180,7 +180,7 @@ export function initializeCore(debugMode = false) {
 
     // Set up global error handling for unhandled promises
     window.addEventListener('unhandledrejection', event => {
-        console.error('Unhandled promise rejection in Slayer Suite:', event.reason);
+        console.error('Unhandled promise rejection in Mapping Slayer:', event.reason);
         // Only broadcast if appBridge is available
         if (typeof appBridge !== 'undefined') {
             appBridge.broadcast('system:error', {
@@ -200,7 +200,7 @@ export function initializeCore(debugMode = false) {
         }
     });
 
-    appLog('CORE', 'Slayer Suite core systems initialized');
+    appLog('CORE', 'Mapping Slayer core systems initialized');
 }
 
 /**

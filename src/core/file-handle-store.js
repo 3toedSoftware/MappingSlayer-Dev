@@ -5,7 +5,7 @@
 
 class FileHandleStore {
     constructor() {
-        this.dbName = 'slayer-suite-file-handles';
+        this.dbName = 'mapping-slayer-file-handles';
         this.storeName = 'handles';
         this.db = null;
     }

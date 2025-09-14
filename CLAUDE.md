@@ -1,8 +1,8 @@
-# Claude Code Instructions for Slayer Suite
+# Claude Code Instructions for Mapping Slayer
 
 ## Project Overview
 
-Slayer Suite is a multi-app web application for sign design and mapping. It consists of three main apps (Mapping Slayer, Design Slayer, Thumbnail Slayer) that communicate via an App Bridge.
+Mapping Slayer is a professional sign mapping platform for creating detailed maps with marker placement, PDF integration, and comprehensive project management.
 
 ### Sidekick AI Note
 
@@ -168,7 +168,7 @@ taskkill /F /IM node.exe
 
 ### Using ESLint for Code Quality
 
-The Slayer Suite uses ESLint for maintaining code quality and consistency.
+Mapping Slayer uses ESLint for maintaining code quality and consistency.
 
 ### Linting Commands
 

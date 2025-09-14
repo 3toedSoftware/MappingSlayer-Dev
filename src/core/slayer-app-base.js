@@ -55,7 +55,7 @@ export default class SlayerAppBase {
             appLog(this.appName, 'Initializing base app structure...');
 
             if (!isSuiteMode) {
-                // Create unified app structure only in standalone mode
+                // Create unified app structure
                 this.createAppStructure();
 
                 // Load shared styles
@@ -113,7 +113,7 @@ export default class SlayerAppBase {
 
                 <!-- Logo Section -->
                 <div class="logo-section">
-                    <a href="#" class="suite-logo">SLAYER SUITE</a>
+                    <a href="#" class="mapping-logo">MAPPING SLAYER</a>
                     <span class="breadcrumb-separator">/</span>
                     <div class="app-logo">
                         <img src="./assets/MSLogo.svg" alt="App" class="app-icon" id="current-app-icon">
@@ -237,7 +237,7 @@ export default class SlayerAppBase {
             .flyout-item.danger:hover { background: #5a2626; color: #ff6b6b; }
 
             .logo-section { display: flex; align-items: center; gap: 15px; margin-right: 30px; min-width: 400px; }
-            .suite-logo { font-size: 20px; font-weight: bold; color: #f07727; text-decoration: none; }
+            .mapping-logo { font-size: 20px; font-weight: bold; color: #f07727; text-decoration: none; }
             .breadcrumb-separator { color: #666; font-size: 20px; }
             .app-logo { font-size: 20px; font-weight: bold; color: #ccc; display: flex; align-items: center; gap: 8px; }
             .app-icon { width: 24px; height: 24px; }
