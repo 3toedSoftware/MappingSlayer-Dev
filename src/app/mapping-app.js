@@ -30,15 +30,9 @@ class MappingSlayerApp extends SlayerAppBase {
     }
 
     async activate() {
-        // Load CSS if not already loaded
-        if (!this.cssLoaded && this.isSuiteMode) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = './apps/mapping_slayer/mapping-slayer.css';
-            link.id = 'mapping-slayer-css';
-            document.head.appendChild(link);
-            this.cssLoaded = true;
-        }
+        // CSS is now loaded in the main HTML file
+        // No need to dynamically load it anymore
+        this.cssLoaded = true;
 
         // Call parent activate
         await super.activate();
