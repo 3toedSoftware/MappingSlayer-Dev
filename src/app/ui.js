@@ -3727,9 +3727,10 @@ function generateFlagSelectors(modalType, dot, multipleDots = null) {
 
         flagDiv.innerHTML = `
             <label for="${checkboxId}">${config.name}</label>
-            <input type="checkbox" 
-                   id="${checkboxId}" 
+            <input type="checkbox"
+                   id="${checkboxId}"
                    data-position="${position}"
+                   title="Toggle ${config.name} flag"
                    ${isChecked ? 'checked' : ''}
                    ${isIndeterminate ? 'indeterminate' : ''}>
         `;
