@@ -3064,17 +3064,19 @@ function addMarkerTypeEventListener() {
     // Add right-click handler to marker types header for flag configuration
     // Use setTimeout to ensure DOM is ready
     setTimeout(() => {
-        const markerTypesHeader = document.querySelector('.ms-filter-section .ms-panel-header');
-        if (markerTypesHeader) {
-            markerTypesHeader.addEventListener('contextmenu', e => {
+        const markerTypesText = document.querySelector(
+            '.ms-filter-section .ms-panel-header > span'
+        );
+        if (markerTypesText) {
+            markerTypesText.addEventListener('contextmenu', e => {
                 e.preventDefault();
                 e.stopPropagation();
                 openFlagModal(); // Open global flag configuration modal
             });
 
-            // Add visual hint that header is right-clickable
-            markerTypesHeader.style.cursor = 'context-menu';
-            markerTypesHeader.title = 'Right-click to configure flags';
+            // Add visual hint that text is right-clickable
+            markerTypesText.style.cursor = 'context-menu';
+            markerTypesText.title = 'Right-click to configure flags';
         }
     }, 100);
 
@@ -3231,16 +3233,6 @@ function setupModalEventListeners() {
             const controlsModal = document.getElementById('mapping-slayer-controls-modal');
             if (controlsModal) {
                 controlsModal.style.display = 'none';
-            }
-        });
-    }
-
-    const tooltipsBtn = document.getElementById('tooltips-btn');
-    if (tooltipsBtn) {
-        tooltipsBtn.addEventListener('click', () => {
-            // Access tooltipManager from mapping app
-            if (window.mappingApp && window.mappingApp.tooltipManager) {
-                window.mappingApp.tooltipManager.toggle();
             }
         });
     }

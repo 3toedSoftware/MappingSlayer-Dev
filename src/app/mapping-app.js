@@ -207,7 +207,7 @@ class MappingSlayerApp extends SlayerAppBase {
                             <div>📄 Upload PDF or .slayer file</div>
                             <div style="margin-top: 10px; font-size: 14px;">Click to browse or drag and drop</div>
                             <div class="ms-upload-area-note">Use live text PDFs for enhanced functionality.</div>
-                            <input type="file" id="file-input" accept=".pdf,.mslay,.slayer" style="display: none;">
+                            <input type="file" id="file-input" accept=".pdf,.slayer" style="display: none;">
                         </div>
 
                         <div id="scrape-controls" class="ms-scrape-controls">
@@ -544,8 +544,8 @@ class MappingSlayerApp extends SlayerAppBase {
                         <li><strong>Clear Selection:</strong> Escape</li>
                     </ul>
                     <div class="ms-modal-buttons">
-                        <button class="ms-btn ms-btn-secondary ms-btn-compact" id="tooltips-btn">TOOL TIPS</button>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact" id="guide-btn">FULL GUIDE</button>
+                        <button class="ms-btn ms-btn-secondary ms-btn-compact" id="tooltips-btn">TOOL TIPS</button>
                         <button class="ms-btn ms-btn-primary" id="close-controls-modal-btn">CLOSE</button>
                     </div>
                 </div>
@@ -580,10 +580,9 @@ class MappingSlayerApp extends SlayerAppBase {
         this.cropTool = cropTool;
         this.cropTool.initialize();
 
-        // Initialize TooltipManager
-        const { TooltipManager } = await import('./tooltips.js');
-        this.tooltipManager = TooltipManager;
-        this.tooltipManager.init();
+        // Initialize native tooltips toggle
+        this.tooltipsEnabled = false; // Start with tooltips off
+        this.setupNativeTooltips();
 
         this.setupAllEventListeners();
 
@@ -672,13 +671,11 @@ class MappingSlayerApp extends SlayerAppBase {
             });
         }
 
-        // Tooltips button
+        // Tooltips button for native tooltips
         const tooltipsBtn = document.getElementById('tooltips-btn');
         if (tooltipsBtn) {
             tooltipsBtn.addEventListener('click', () => {
-                if (this.tooltipManager) {
-                    this.tooltipManager.toggle();
-                }
+                this.toggleNativeTooltips();
             });
         }
 
@@ -694,63 +691,8 @@ class MappingSlayerApp extends SlayerAppBase {
         const fileInput = this.container.querySelector('#file-input');
         if (uploadArea && fileInput) {
             uploadArea.addEventListener('click', async () => {
-                // For .slayer files, try to use File System Access API for SAVE support
-                if ('showOpenFilePicker' in window) {
-                    try {
-                        const [fileHandle] = await window.showOpenFilePicker({
-                            types: [
-                                {
-                                    description: 'Supported Files',
-                                    accept: {
-                                        'application/pdf': ['.pdf'],
-                                        'application/json': ['.slayer', '.map', '.json']
-                                    }
-                                }
-                            ],
-                            multiple: false
-                        });
-
-                        const file = await fileHandle.getFile();
-                        console.log('📊 [Click Upload] File selected with handle:', file.name);
-
-                        // Special handling for .slayer files with file handle
-                        if (file.name.toLowerCase().endsWith('.slayer')) {
-                            console.log('📊 [Click Upload] .slayer file, checking saveManager...');
-                            console.log(
-                                '📊 [Click Upload] window.saveManager available:',
-                                !!window.saveManager
-                            );
-
-                            if (window.saveManager) {
-                                console.log(
-                                    '📊 [Click Upload] Loading .slayer file WITH file handle for SAVE support'
-                                );
-                                await window.saveManager.loadFileWithHandle(file, fileHandle);
-                                return;
-                            } else {
-                                console.log(
-                                    '📊 [Click Upload] SaveManager not available, will use regular load'
-                                );
-                            }
-                        }
-
-                        // For other files or if SaveManager not available, use regular load
-                        await this.loadFile(file);
-                    } catch (err) {
-                        if (err.name === 'AbortError') {
-                            // User cancelled, do nothing
-                            return;
-                        }
-                        // Fall back to regular file input if API fails
-                        console.log(
-                            '📊 [Click Upload] File System Access API failed, using fallback'
-                        );
-                        fileInput.click();
-                    }
-                } else {
-                    // Fallback for browsers without File System Access API
-                    fileInput.click();
-                }
+                // Just use the simple file input approach that works
+                fileInput.click();
             });
 
             const handleFileChange = async e => {
@@ -2155,6 +2097,54 @@ class MappingSlayerApp extends SlayerAppBase {
                 isDirty: false // Reset dirty state on export
             }
         };
+    }
+
+    setupNativeTooltips() {
+        // Store all title attributes so we can toggle them
+        this.tooltipElements = new Map();
+
+        // Define all the native tooltips
+        const tooltipDefinitions = [
+            { selector: '#add-marker-type-btn', title: 'Add a new marker type' },
+            { selector: '#save-btn', title: 'Save project' },
+            { selector: '#load-btn', title: 'Load project' },
+            { selector: '#create-pdf-btn', title: 'Create PDF report' },
+            { selector: '#export-html-btn', title: 'Export to HTML' },
+            { selector: '#help-btn', title: 'Show keyboard shortcuts' },
+            { selector: '#toggle-locations-btn', title: 'Toggle location numbers' },
+            { selector: '#toggle-messages-btn', title: 'Toggle message 1 visibility' },
+            { selector: '#toggle-messages2-btn', title: 'Toggle message 2 visibility' },
+            { selector: '#renumber-btn', title: 'Renumber all locations' },
+            { selector: '#dotcam-btn', title: 'Focus on selected dot' }
+            // Add more as needed
+        ];
+
+        // Store the title attributes
+        tooltipDefinitions.forEach(def => {
+            const element = document.querySelector(def.selector);
+            if (element) {
+                this.tooltipElements.set(element, def.title);
+            }
+        });
+    }
+
+    toggleNativeTooltips() {
+        this.tooltipsEnabled = !this.tooltipsEnabled;
+        const button = document.getElementById('tooltips-btn');
+
+        if (this.tooltipsEnabled) {
+            // Add all title attributes
+            this.tooltipElements.forEach((title, element) => {
+                element.setAttribute('title', title);
+            });
+            button?.classList.add('ms-active');
+        } else {
+            // Remove all title attributes
+            this.tooltipElements.forEach((title, element) => {
+                element.removeAttribute('title');
+            });
+            button?.classList.remove('ms-active');
+        }
     }
 }
 

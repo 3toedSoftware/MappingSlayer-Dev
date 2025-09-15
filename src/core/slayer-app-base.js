@@ -508,11 +508,21 @@ export default class SlayerAppBase {
     async loadProject() {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.slayer';
+        input.accept = '.pdf,.slayer';
         input.onchange = async e => {
             const file = e.target.files[0];
             if (file) {
-                await projectManager.load(file);
+                // Check if it's a PDF or slayer file
+                if (file.name.toLowerCase().endsWith('.pdf')) {
+                    // For PDFs, use the mapping app's loadFile method
+                    const mappingApp = window.mappingApp || this;
+                    if (mappingApp && mappingApp.loadFile) {
+                        await mappingApp.loadFile(file);
+                    }
+                } else if (file.name.toLowerCase().endsWith('.slayer')) {
+                    // For slayer files, use projectManager
+                    await projectManager.load(file);
+                }
             }
         };
         input.click();

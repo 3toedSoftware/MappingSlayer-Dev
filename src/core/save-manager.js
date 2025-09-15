@@ -80,7 +80,26 @@ class SaveManager {
         }
 
         if (loadBtn) {
-            loadBtn.addEventListener('click', () => this.load());
+            loadBtn.addEventListener('click', () => {
+                // Just use a simple file input like the upload area does
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.pdf,.slayer';
+                input.onchange = async e => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (file.name.toLowerCase().endsWith('.slayer')) {
+                            await this.loadFileDirectly(file);
+                        } else if (file.name.toLowerCase().endsWith('.pdf')) {
+                            // For PDFs, use the mapping app's loadFile method
+                            if (window.mappingApp && window.mappingApp.loadFile) {
+                                await window.mappingApp.loadFile(file);
+                            }
+                        }
+                    }
+                };
+                input.click();
+            });
             if (window.debugLog) {
                 window.debugLog('SAVE_MANAGER', '📊 [SaveManager] LOAD button listener attached');
             }
@@ -310,8 +329,11 @@ class SaveManager {
                 const [fileHandle] = await window.showOpenFilePicker({
                     types: [
                         {
-                            description: 'Slayer Project',
-                            accept: { 'application/json': ['.slayer'] }
+                            description: 'Supported Files',
+                            accept: {
+                                'application/pdf': ['.pdf'],
+                                'application/octet-stream': ['.slayer']
+                            }
                         }
                     ],
                     multiple: false
