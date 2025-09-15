@@ -683,7 +683,7 @@ class MappingSlayerApp extends SlayerAppBase {
         const guideBtn = document.getElementById('guide-btn');
         if (guideBtn) {
             guideBtn.addEventListener('click', () => {
-                window.open('/apps/mapping_slayer/ms_user_guide.html', '_blank');
+                window.open('/ms_user_guide.html', '_blank');
             });
         }
 
