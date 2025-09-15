@@ -3465,35 +3465,6 @@ function setupModalEventListeners() {
             }
         });
     }
-
-    // Character Warning Modal Event Listeners
-    const characterWarningModal = document.getElementById('mapping-slayer-character-warning-modal');
-    const proceedCharacterChangesBtn = document.getElementById('proceed-character-changes-btn');
-    const cancelCharacterChangesBtn = document.getElementById('cancel-character-changes-btn');
-
-    if (proceedCharacterChangesBtn) {
-        proceedCharacterChangesBtn.addEventListener('click', () => {
-            if (window.characterWarningResolver) {
-                window.characterWarningResolver(true);
-                window.characterWarningResolver = null;
-            }
-            if (characterWarningModal) {
-                characterWarningModal.style.display = 'none';
-            }
-        });
-    }
-
-    if (cancelCharacterChangesBtn) {
-        cancelCharacterChangesBtn.addEventListener('click', () => {
-            if (window.characterWarningResolver) {
-                window.characterWarningResolver(false);
-                window.characterWarningResolver = null;
-            }
-            if (characterWarningModal) {
-                characterWarningModal.style.display = 'none';
-            }
-        });
-    }
 }
 
 function addButtonEventListeners() {
@@ -3659,7 +3630,6 @@ function addButtonEventListeners() {
 
     const createPdfBtn = document.querySelector('#create-pdf-btn');
     const createScheduleBtn = document.querySelector('#create-schedule-btn');
-    const exportFdfBtn = document.querySelector('#export-fdf-btn');
 
     if (createPdfBtn) {
         createPdfBtn.addEventListener('click', async () => {
@@ -3672,13 +3642,6 @@ function addButtonEventListeners() {
         createScheduleBtn.addEventListener('click', async () => {
             const { createMessageSchedule } = await import('./export.js');
             createMessageSchedule();
-        });
-    }
-
-    if (exportFdfBtn) {
-        exportFdfBtn.addEventListener('click', async () => {
-            const { exportToBluebeam } = await import('./export.js');
-            exportToBluebeam();
         });
     }
 

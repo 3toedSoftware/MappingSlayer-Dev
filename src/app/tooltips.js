@@ -185,11 +185,6 @@ const TooltipManager = {
                 text: 'Import changes from a CSV file to update location messages and properties in bulk.',
                 position: 'top'
             },
-            {
-                selector: '#export-fdf-btn',
-                text: 'Export annotations in Bluebeam Revu BAX format for importing into Revu projects.',
-                position: 'top'
-            },
 
             // Left panel - List section toggle
             {

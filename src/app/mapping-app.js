@@ -265,7 +265,6 @@ class MappingSlayerApp extends SlayerAppBase {
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="create-pdf-btn" disabled="">CREATE PDF</button>
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="create-schedule-btn" disabled="">CREATE MESSAGE SCHEDULE</button>
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="update-from-schedule-btn" disabled="">UPDATE FROM MESSAGE SCHEDULE</button>
-                        <button class="ms-btn ms-btn-primary ms-btn-compact" id="export-fdf-btn" disabled="">EXPORT REVU MARKUPS (BETA)</button>
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="export-html-btn" disabled="">EXPORT HTML</button>
                     </div>
                 </div>
@@ -515,21 +514,6 @@ class MappingSlayerApp extends SlayerAppBase {
                     </div>
                     <div class="ms-modal-buttons">
                         <button class="ms-btn ms-btn-secondary" id="cancel-pdf-export-btn">CANCEL</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Character Warning Modal -->
-            <div id="mapping-slayer-character-warning-modal" class="ms-modal">
-                <div class="ms-modal-content">
-                    <h2>⚠️ Character Compatibility Warning</h2>
-                    <p>The following characters will be replaced for Bluebeam compatibility:</p>
-                    <div id="mapping-slayer-character-changes-preview"></div>
-                    <p class="ms-affected-count">This affects <span id="mapping-slayer-affected-locations-count">0</span> location(s).</p>
-                    <p>A log file will be created with all changes. Do you want to proceed?</p>
-                    <div class="ms-button-row">
-                        <button class="ms-btn ms-btn-primary" id="proceed-character-changes-btn">Proceed with Export</button>
-                        <button class="ms-btn ms-btn-secondary" id="cancel-character-changes-btn">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -1062,7 +1046,6 @@ class MappingSlayerApp extends SlayerAppBase {
             '#create-pdf-btn',
             '#create-schedule-btn',
             '#update-from-schedule-btn',
-            '#export-fdf-btn',
             '#export-html-btn',
             '#single-automap-btn'
         ];

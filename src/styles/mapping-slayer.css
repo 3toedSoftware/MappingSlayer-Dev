@@ -510,38 +510,6 @@ body {
     line-height: 1.5;
 }
 
-/* Character Warning Modal Styles */
-#character-warning-modal .ms-modal-content {
-    max-width: 500px;
-}
-
-.ms-character-changes-preview {
-    background: #333;
-    border: 1px solid #444;
-    border-radius: 4px;
-    padding: 10px;
-    margin: 10px 0;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.ms-character-changes-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.ms-character-change-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 8px;
-    background: #3a3a3a;
-    border-radius: 3px;
-    font-family: monospace;
-    font-size: 14px;
-}
-
 .ms-original-char {
     color: #ff6b6b;
     font-weight: bold;
@@ -2769,7 +2737,6 @@ body {
 #mapping-slayer-group-edit-modal,
 #mapping-slayer-renumber-modal,
 #mapping-slayer-pdf-export-modal,
-#mapping-slayer-character-warning-modal,
 #mapping-slayer-controls-modal,
 #mapping-slayer-ocr-info-modal,
 #mapping-slayer-save-roomlist-modal,
@@ -2808,7 +2775,6 @@ body {
 #mapping-slayer-group-edit-modal.modal .modal-content,
 #mapping-slayer-renumber-modal.modal .modal-content,
 #mapping-slayer-pdf-export-modal.modal .modal-content,
-#mapping-slayer-character-warning-modal.modal .modal-content,
 #mapping-slayer-controls-modal.modal .ms-modal-content {
     position: fixed !important;
     top: 50% !important;
@@ -3046,7 +3012,6 @@ body {
 #mapping-slayer-group-edit-modal[style*='display: block'],
 #mapping-slayer-renumber-modal[style*='display: block'],
 #mapping-slayer-pdf-export-modal[style*='display: block'],
-#mapping-slayer-character-warning-modal[style*='display: block'],
 #mapping-slayer-controls-modal[style*='display: block'],
 #mapping-slayer-ocr-info-modal[style*='display: block'],
 #mapping-slayer-save-roomlist-modal[style*='display: block'],
