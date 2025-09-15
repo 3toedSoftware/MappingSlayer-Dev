@@ -236,6 +236,7 @@ function updateFilterCheckboxesImmediate() {
                     const emptyDiv = document.createElement('div');
                     emptyDiv.className = 'ms-design-reference-empty';
                     emptyDiv.style.display = typeData.designReference ? 'none' : 'flex';
+                    emptyDiv.title = 'Click to upload design reference image';
                     emptyDiv.innerHTML = '<span class="ms-upload-plus-icon">+</span>';
 
                     const filledDiv = document.createElement('div');
@@ -292,16 +293,18 @@ function updateFilterCheckboxesImmediate() {
 
             // Build innerHTML with proper concatenation to avoid template literal issues
             const checkboxInput =
-                '<input type="checkbox" data-marker-type-code="' + markerTypeCode + '" checked>';
+                '<input type="checkbox" data-marker-type-code="' +
+                markerTypeCode +
+                '" checked title="Show/hide this marker type">';
             // Count label removed - counts shown in legend and list
             const codeInput =
-                '<input type="text" class="ms-marker-type-code-input" placeholder="Enter code..." value="' +
+                '<input type="text" class="ms-marker-type-code-input" placeholder="Enter code..." title="Marker type code" value="' +
                 markerTypeCode +
                 '" data-original-code="' +
                 markerTypeCode +
                 '">';
             const nameInput =
-                '<input type="text" class="ms-marker-type-name-input" placeholder="Enter name..." value="' +
+                '<input type="text" class="ms-marker-type-name-input" placeholder="Enter name..." title="Marker type name" value="' +
                 typeData.name +
                 '" data-original-name="' +
                 typeData.name +
@@ -314,7 +317,7 @@ function updateFilterCheckboxesImmediate() {
                 '">' +
                 '<div class="ms-design-reference-empty" style="display: ' +
                 (typeData.designReference ? 'none' : 'flex') +
-                ';"><span class="ms-upload-plus-icon">+</span></div>' +
+                ';" title="Click to upload design reference image"><span class="ms-upload-plus-icon">+</span></div>' +
                 '<div class="ms-design-reference-filled" style="display: ' +
                 (typeData.designReference ? 'flex' : 'none') +
                 ';"><img class="ms-design-reference-thumbnail" src="' +
@@ -328,14 +331,14 @@ function updateFilterCheckboxesImmediate() {
             const colorPickers =
                 '<div class="ms-color-picker-wrapper" data-marker-type-code="' +
                 markerTypeCode +
-                '" data-color-type="dot"></div>' +
+                '" data-color-type="dot" title="Dot color"></div>' +
                 '<div class="ms-color-picker-wrapper" data-marker-type-code="' +
                 markerTypeCode +
-                '" data-color-type="text"></div>';
+                '" data-color-type="text" title="Text color"></div>';
             const deleteBtn =
                 '<button class="ms-delete-marker-type-btn" data-marker-type-code="' +
                 markerTypeCode +
-                '">×</button>';
+                '" title="Delete marker type">×</button>';
 
             item.innerHTML =
                 checkboxInput +
@@ -919,14 +922,14 @@ function addSingleDotToLocationList(dot) {
         dot.locationNumber +
         '</span>' +
         '<div class="ms-location-messages">' +
-        '<input type="text" class="ms-location-message-input ms-message1" placeholder="MESSAGE 1" value="' +
+        '<input type="text" class="ms-location-message-input ms-message1" placeholder="MESSAGE 1" title="Edit message 1" value="' +
         dot.message +
         '" data-dot-id="' +
         dot.internalId +
         '" data-field="message" style="width: ' +
         message1Length +
         'px;">' +
-        '<input type="text" class="ms-location-message-input ms-message2" placeholder="MESSAGE 2" value="' +
+        '<input type="text" class="ms-location-message-input ms-message2" placeholder="MESSAGE 2" title="Edit message 2" value="' +
         (dot.message2 || '') +
         '" data-dot-id="' +
         dot.internalId +
@@ -5665,6 +5668,7 @@ function createTextFieldItem(field, index, markerTypeCode) {
     const removeBtn = document.createElement('button');
     removeBtn.className = 'ms-remove-field-btn';
     removeBtn.textContent = 'Remove';
+    removeBtn.title = 'Remove this field from the form';
 
     // Don't allow removing standard fields
     if (field.fieldName === 'message' || field.fieldName === 'message2') {

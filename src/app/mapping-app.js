@@ -291,7 +291,7 @@ class MappingSlayerApp extends SlayerAppBase {
                             <h3 class="ms-modal-title">Edit Location</h3>
                             <div class="ms-form-group-inline" style="margin-top: 10px;">
                                 <label for="edit-installed">Installed</label>
-                                <input type="checkbox" id="edit-installed">
+                                <input type="checkbox" id="edit-installed" title="Mark as installed">
                             </div>
                         </div>
                         <div class="ms-modal-header-flags" id="edit-modal-flags">
@@ -301,23 +301,23 @@ class MappingSlayerApp extends SlayerAppBase {
                     <div class="ms-modal-body">
                         <div class="ms-form-group">
                             <label class="ms-form-label">Marker Type</label>
-                            <select class="ms-form-input" id="edit-marker-type"></select>
+                            <select class="ms-form-input" id="edit-marker-type" title="Select marker type"></select>
                         </div>
                         <div class="ms-form-group" id="edit-location-group">
                             <label class="ms-form-label">Location Number</label>
-                            <input type="text" class="ms-form-input" id="edit-location-number" placeholder="Enter location number">
+                            <input type="text" class="ms-form-input" id="edit-location-number" placeholder="Enter location number" title="Enter location number">
                         </div>
                         <!-- Dynamic text fields will be inserted here -->
                         <div id="edit-dynamic-fields" class="ms-dynamic-fields-container"></div>
                         <div class="ms-form-group">
                             <label class="ms-form-label">Notes</label>
-                            <textarea class="ms-form-input ms-form-textarea" id="edit-notes" placeholder="Enter notes..."></textarea>
+                            <textarea class="ms-form-input ms-form-textarea" id="edit-notes" placeholder="Enter notes..." title="Enter additional notes"></textarea>
                         </div>
                     </div>
                     <div class="ms-modal-buttons">
-                        <button class="ms-btn ms-btn-danger" id="delete-dot-btn">DELETE</button>
-                        <button class="ms-btn ms-btn-secondary" id="cancel-modal-btn">CANCEL</button>
-                        <button class="ms-btn ms-btn-primary" id="update-dot-btn">UPDATE</button>
+                        <button class="ms-btn ms-btn-danger" id="delete-dot-btn" title="Delete this location">DELETE</button>
+                        <button class="ms-btn ms-btn-secondary" id="cancel-modal-btn" title="Cancel changes and close">CANCEL</button>
+                        <button class="ms-btn ms-btn-primary" id="update-dot-btn" title="Save changes">UPDATE</button>
                     </div>
                 </div>
             </div>
@@ -328,8 +328,8 @@ class MappingSlayerApp extends SlayerAppBase {
                     <div class="ms-gallery-header">
                         <span class="ms-gallery-title">Gallery</span>
                         <div class="ms-gallery-controls">
-                            <button class="ms-gallery-btn ms-gallery-add-btn" id="gallery-add-btn" title="Add Photo">+</button>
-                            <button class="ms-gallery-btn ms-gallery-close-btn" id="gallery-close-btn" title="Delete Photo">−</button>
+                            <button class="ms-gallery-btn ms-gallery-add-btn" id="gallery-add-btn" title="Add photo to gallery">+</button>
+                            <button class="ms-gallery-btn ms-gallery-close-btn" id="gallery-close-btn" title="Delete selected photo">−</button>
                         </div>
                     </div>
                     <div class="ms-gallery-body">
@@ -351,7 +351,7 @@ class MappingSlayerApp extends SlayerAppBase {
                             <div class="ms-modal-subheader">(<span id="mapping-slayer-group-edit-count">0</span> selected)</div>
                             <div class="ms-form-group-inline" style="margin-top: 10px;">
                                 <label for="group-edit-installed">Installed</label>
-                                <input type="checkbox" id="group-edit-installed">
+                                <input type="checkbox" id="group-edit-installed" title="Mark all as installed">
                             </div>
                         </div>
                         <div class="ms-modal-header-flags" id="group-edit-modal-flags">
@@ -361,7 +361,7 @@ class MappingSlayerApp extends SlayerAppBase {
                     <div class="ms-modal-body">
                         <div class="ms-form-group">
                             <label class="ms-form-label">Marker Type</label>
-                            <select class="ms-form-input" id="group-edit-marker-type">
+                            <select class="ms-form-input" id="group-edit-marker-type" title="Change marker type for all selected">
                                 <option value="">-- Keep Individual Types --</option>
                             </select>
                         </div>
@@ -369,13 +369,13 @@ class MappingSlayerApp extends SlayerAppBase {
                         <div id="group-edit-dynamic-fields" class="ms-dynamic-fields-container"></div>
                         <div class="ms-form-group">
                             <label class="ms-form-label">Notes</label>
-                            <textarea class="ms-form-input ms-form-textarea" id="group-edit-notes" placeholder="Enter notes to overwrite all selected locations..."></textarea>
+                            <textarea class="ms-form-input ms-form-textarea" id="group-edit-notes" placeholder="Enter notes to overwrite all selected locations..." title="Notes will replace existing notes for all selected"></textarea>
                         </div>
                     </div>
                     <div class="ms-modal-buttons">
-                        <button class="ms-btn ms-btn-danger" id="group-delete-btn">DELETE ALL</button>
-                        <button class="ms-btn ms-btn-secondary" id="group-cancel-btn">CANCEL</button>
-                        <button class="ms-btn ms-btn-primary" id="group-update-btn">UPDATE ALL</button>
+                        <button class="ms-btn ms-btn-danger" id="group-delete-btn" title="Delete all selected locations">DELETE ALL</button>
+                        <button class="ms-btn ms-btn-secondary" id="group-cancel-btn" title="Cancel changes and close">CANCEL</button>
+                        <button class="ms-btn ms-btn-primary" id="group-update-btn" title="Apply changes to all selected">UPDATE ALL</button>
                     </div>
                 </div>
             </div>
@@ -385,46 +385,46 @@ class MappingSlayerApp extends SlayerAppBase {
                 <div class="ms-modal-content ms-flag-modal-content">
                     <div class="ms-modal-header">
                         <span>Flag Customization</span>
-                        <button class="ms-modal-close" onclick="closeFlagModal()">&times;</button>
+                        <button class="ms-modal-close" onclick="closeFlagModal()" title="Close flag customization">&times;</button>
                     </div>
                     <div class="ms-modal-body ms-flag-modal-body">
                         <div class="ms-flag-visual-container">
                             <div class="ms-flag-corner ms-flag-top-left">
-                                <input type="text" class="ms-flag-name-input" placeholder="Flag 1" data-position="topLeft">
+                                <input type="text" class="ms-flag-name-input" placeholder="Flag 1" data-position="topLeft" title="Enter flag name">
                                 <div class="ms-flag-symbol-selector" data-position="topLeft">
-                                    <button class="ms-flag-prev-btn" data-position="topLeft">&lt;</button>
+                                    <button class="ms-flag-prev-btn" data-position="topLeft" title="Previous symbol">&lt;</button>
                                     <div class="ms-flag-symbol-display" data-position="topLeft"></div>
-                                    <button class="ms-flag-next-btn" data-position="topLeft">&gt;</button>
+                                    <button class="ms-flag-next-btn" data-position="topLeft" title="Next symbol">&gt;</button>
                                 </div>
                                 <input type="file" class="ms-flag-upload-input" data-position="topLeft" accept=".png,.jpg,.jpeg,.svg,.gif,.webp" style="display:none">
                                 <button class="ms-flag-upload-btn" data-position="topLeft" title="Upload custom icon">📁</button>
                             </div>
                             <div class="ms-flag-corner ms-flag-top-right">
-                                <input type="text" class="ms-flag-name-input" placeholder="Flag 2" data-position="topRight">
+                                <input type="text" class="ms-flag-name-input" placeholder="Flag 2" data-position="topRight" title="Enter flag name">
                                 <div class="ms-flag-symbol-selector" data-position="topRight">
-                                    <button class="ms-flag-prev-btn" data-position="topRight">&lt;</button>
+                                    <button class="ms-flag-prev-btn" data-position="topRight" title="Previous symbol">&lt;</button>
                                     <div class="ms-flag-symbol-display" data-position="topRight"></div>
-                                    <button class="ms-flag-next-btn" data-position="topRight">&gt;</button>
+                                    <button class="ms-flag-next-btn" data-position="topRight" title="Next symbol">&gt;</button>
                                 </div>
                                 <input type="file" class="ms-flag-upload-input" data-position="topRight" accept=".png,.jpg,.jpeg,.svg,.gif,.webp" style="display:none">
                                 <button class="ms-flag-upload-btn" data-position="topRight" title="Upload custom icon">📁</button>
                             </div>
                             <div class="ms-flag-corner ms-flag-bottom-left">
-                                <input type="text" class="ms-flag-name-input" placeholder="Flag 3" data-position="bottomLeft">
+                                <input type="text" class="ms-flag-name-input" placeholder="Flag 3" data-position="bottomLeft" title="Enter flag name">
                                 <div class="ms-flag-symbol-selector" data-position="bottomLeft">
-                                    <button class="ms-flag-prev-btn" data-position="bottomLeft">&lt;</button>
+                                    <button class="ms-flag-prev-btn" data-position="bottomLeft" title="Previous symbol">&lt;</button>
                                     <div class="ms-flag-symbol-display" data-position="bottomLeft"></div>
-                                    <button class="ms-flag-next-btn" data-position="bottomLeft">&gt;</button>
+                                    <button class="ms-flag-next-btn" data-position="bottomLeft" title="Next symbol">&gt;</button>
                                 </div>
                                 <input type="file" class="ms-flag-upload-input" data-position="bottomLeft" accept=".png,.jpg,.jpeg,.svg,.gif,.webp" style="display:none">
                                 <button class="ms-flag-upload-btn" data-position="bottomLeft" title="Upload custom icon">📁</button>
                             </div>
                             <div class="ms-flag-corner ms-flag-bottom-right">
-                                <input type="text" class="ms-flag-name-input" placeholder="Flag 4" data-position="bottomRight">
+                                <input type="text" class="ms-flag-name-input" placeholder="Flag 4" data-position="bottomRight" title="Enter flag name">
                                 <div class="ms-flag-symbol-selector" data-position="bottomRight">
-                                    <button class="ms-flag-prev-btn" data-position="bottomRight">&lt;</button>
+                                    <button class="ms-flag-prev-btn" data-position="bottomRight" title="Previous symbol">&lt;</button>
                                     <div class="ms-flag-symbol-display" data-position="bottomRight"></div>
-                                    <button class="ms-flag-next-btn" data-position="bottomRight">&gt;</button>
+                                    <button class="ms-flag-next-btn" data-position="bottomRight" title="Next symbol">&gt;</button>
                                 </div>
                                 <input type="file" class="ms-flag-upload-input" data-position="bottomRight" accept=".png,.jpg,.jpeg,.svg,.gif,.webp" style="display:none">
                                 <button class="ms-flag-upload-btn" data-position="bottomRight" title="Upload custom icon">📁</button>
@@ -432,7 +432,7 @@ class MappingSlayerApp extends SlayerAppBase {
                         </div>
                     </div>
                     <div class="ms-modal-buttons">
-                        <button class="ms-btn ms-btn-secondary" id="flag-save-btn">SAVE</button>
+                        <button class="ms-btn ms-btn-secondary" id="flag-save-btn" title="Save flag configuration">SAVE</button>
                         <!-- Apply to All button no longer needed with global flags -->
                         <!-- <button class="ms-btn ms-btn-primary" id="flag-apply-all-btn">APPLY TO ALL</button> -->
                     </div>
@@ -448,26 +448,26 @@ class MappingSlayerApp extends SlayerAppBase {
                     <div class="ms-modal-body">
                         <p class="ms-modal-text">Choose how you want to renumber the locations:</p>
                         <div class="ms-renumber-options">
-                            <button class="ms-btn ms-btn-primary ms-renumber-option-btn" onclick="performRenumber('page')">
+                            <button class="ms-btn ms-btn-primary ms-renumber-option-btn" onclick="performRenumber('page')" title="Renumber locations on current page only">
                                 <strong>Current Page Only</strong><br>
                                 <small>Renumber dots on this page by position (top to bottom, left to right)</small>
                             </button>
-                            <button class="ms-btn ms-btn-primary ms-renumber-option-btn" onclick="performRenumber('page-by-type')">
+                            <button class="ms-btn ms-btn-primary ms-renumber-option-btn" onclick="performRenumber('page-by-type')" title="Renumber by marker type on current page">
                                 <strong>Current Page by Marker Type</strong><br>
                                 <small>Renumber each marker type separately on this page</small>
                             </button>
-                            <button class="ms-btn ms-btn-primary ms-renumber-option-btn" onclick="performRenumber('all')">
+                            <button class="ms-btn ms-btn-primary ms-renumber-option-btn" onclick="performRenumber('all')" title="Renumber all locations across all pages">
                                 <strong>All Pages</strong><br>
                                 <small>Renumber all dots across all pages continuously</small>
                             </button>
-                            <button class="ms-btn ms-btn-primary ms-renumber-option-btn" onclick="performRenumber('all-by-type')">
+                            <button class="ms-btn ms-btn-primary ms-renumber-option-btn" onclick="performRenumber('all-by-type')" title="Renumber by marker type across all pages">
                                 <strong>All Pages by Marker Type</strong><br>
                                 <small>Renumber each marker type separately across all pages</small>
                             </button>
                         </div>
                     </div>
                     <div class="ms-modal-buttons">
-                        <button class="ms-btn ms-btn-secondary" id="cancel-renumber-btn">CANCEL</button>
+                        <button class="ms-btn ms-btn-secondary" id="cancel-renumber-btn" title="Close without renumbering">CANCEL</button>
                     </div>
                 </div>
             </div>
@@ -483,8 +483,8 @@ class MappingSlayerApp extends SlayerAppBase {
                     <div class="ms-automap-activity-feed" id="mapping-slayer-automap-activity-feed"></div>
                     <div class="ms-automap-results" id="mapping-slayer-automap-results"></div>
                     <div class="ms-automap-buttons">
-                        <button class="ms-btn ms-btn-secondary" id="cancel-automap-btn">CANCEL</button>
-                        <button class="ms-btn ms-btn-primary" id="close-automap-btn" style="display: none;">CLOSE</button>
+                        <button class="ms-btn ms-btn-secondary" id="cancel-automap-btn" title="Cancel automap operation">CANCEL</button>
+                        <button class="ms-btn ms-btn-primary" id="close-automap-btn" style="display: none;" title="Close results">CLOSE</button>
                     </div>
                 </div>
             </div>
@@ -498,22 +498,22 @@ class MappingSlayerApp extends SlayerAppBase {
                     <div class="ms-modal-body">
                         <p class="ms-modal-text">Choose your PDF export format:</p>
                         <div class="ms-pdf-export-options">
-                            <button class="ms-btn ms-btn-primary ms-pdf-export-option-btn" onclick="performPDFExport('current-with-details')">
+                            <button class="ms-btn ms-btn-primary ms-pdf-export-option-btn" onclick="performPDFExport('current-with-details')" title="Export current map with detail pages">
                                 <strong>Current Map - With Detail Pages</strong><br>
                                 <small>This map + clickable detail pages for each location</small>
                             </button>
-                            <button class="ms-btn ms-btn-primary ms-pdf-export-option-btn" onclick="performPDFExport('current-only')">
+                            <button class="ms-btn ms-btn-primary ms-pdf-export-option-btn" onclick="performPDFExport('current-only')" title="Export current map only">
                                 <strong>Current Map Only</strong><br>
                                 <small>Just this map page with location dots</small>
                             </button>
-                            <button class="ms-btn ms-btn-primary ms-pdf-export-option-btn" onclick="performPDFExport('all-maps-only')">
+                            <button class="ms-btn ms-btn-primary ms-pdf-export-option-btn" onclick="performPDFExport('all-maps-only')" title="Export all maps without details">
                                 <strong>All Maps Only</strong><br>
                                 <small>All map pages with dots (no detail pages)</small>
                             </button>
                         </div>
                     </div>
                     <div class="ms-modal-buttons">
-                        <button class="ms-btn ms-btn-secondary" id="cancel-pdf-export-btn">CANCEL</button>
+                        <button class="ms-btn ms-btn-secondary" id="cancel-pdf-export-btn" title="Close without exporting">CANCEL</button>
                     </div>
                 </div>
             </div>
@@ -544,9 +544,9 @@ class MappingSlayerApp extends SlayerAppBase {
                         <li><strong>Clear Selection:</strong> Escape</li>
                     </ul>
                     <div class="ms-modal-buttons">
-                        <button class="ms-btn ms-btn-secondary ms-btn-compact" id="guide-btn">FULL GUIDE</button>
-                        <button class="ms-btn ms-btn-secondary ms-btn-compact" id="tooltips-btn">TOOL TIPS</button>
-                        <button class="ms-btn ms-btn-primary" id="close-controls-modal-btn">CLOSE</button>
+                        <button class="ms-btn ms-btn-secondary ms-btn-compact" id="guide-btn" title="Open user guide">FULL GUIDE</button>
+                        <button class="ms-btn ms-btn-secondary ms-btn-compact" id="tooltips-btn" title="Toggle tooltips on/off">TOOL TIPS</button>
+                        <button class="ms-btn ms-btn-primary" id="close-controls-modal-btn" title="Close controls">CLOSE</button>
                     </div>
                 </div>
             </div>
@@ -2105,18 +2105,91 @@ class MappingSlayerApp extends SlayerAppBase {
 
         // Define all the native tooltips
         const tooltipDefinitions = [
-            { selector: '#add-marker-type-btn', title: 'Add a new marker type' },
+            // Header buttons
             { selector: '#save-btn', title: 'Save project' },
             { selector: '#load-btn', title: 'Load project' },
-            { selector: '#create-pdf-btn', title: 'Create PDF report' },
-            { selector: '#export-html-btn', title: 'Export to HTML' },
-            { selector: '#help-btn', title: 'Show keyboard shortcuts' },
-            { selector: '#toggle-locations-btn', title: 'Toggle location numbers' },
-            { selector: '#toggle-messages-btn', title: 'Toggle message 1 visibility' },
-            { selector: '#toggle-messages2-btn', title: 'Toggle message 2 visibility' },
-            { selector: '#renumber-btn', title: 'Renumber all locations' },
-            { selector: '#dotcam-btn', title: 'Focus on selected dot' }
-            // Add more as needed
+
+            // Marker type controls
+            { selector: '#add-marker-type-btn', title: 'Add a new marker type' },
+            { selector: '#import-marker-types-btn', title: 'Import marker types from file' },
+            { selector: '#export-marker-types-btn', title: 'Export marker types to file' },
+
+            // List controls
+            { selector: '#sort-toggle-btn', title: 'Toggle sort by location or name' },
+            { selector: '#toggle-view-btn', title: 'Toggle grouped/ungrouped view' },
+            { selector: '#all-pages-checkbox', title: 'Show locations from all pages' },
+
+            // Find/Replace
+            { selector: '#find-all-btn', title: 'Find all matching text' },
+            { selector: '#find-input', title: 'Enter text to search for' },
+            { selector: '#replace-input', title: 'Enter replacement text' },
+            { selector: '#replace-btn', title: 'Replace all occurrences' },
+
+            // Control buttons
+            { selector: '#help-btn', title: 'Show keyboard shortcuts and controls' },
+            { selector: '#toggle-locations-btn', title: 'Show/hide location numbers' },
+            { selector: '#toggle-messages-btn', title: 'Show/hide message 1' },
+            { selector: '#toggle-messages2-btn', title: 'Show/hide message 2' },
+            { selector: '#toggle-inst-display-btn', title: 'Cycle installed display modes' },
+            { selector: '#renumber-btn', title: 'Renumber all locations sequentially' },
+            { selector: '#dotcam-btn', title: 'Focus camera on selected location' },
+
+            // Navigation
+            { selector: '#prev-page', title: 'Previous page' },
+            { selector: '#next-page', title: 'Next page' },
+            { selector: '#page-label-input', title: 'Set custom page label' },
+
+            // Crop controls
+            { selector: '#crop-toggle-btn', title: 'Toggle crop mode' },
+            { selector: '#crop-all-pages-checkbox', title: 'Apply crop to all pages' },
+
+            // Scrape controls
+            { selector: '#h-tolerance-input', title: 'Horizontal text grouping distance' },
+            { selector: '#v-tolerance-input', title: 'Vertical text grouping distance' },
+            { selector: '#dot-size-slider', title: 'Adjust location dot size' },
+
+            // Automap
+            { selector: '#automap-text-input', title: 'Text to search and map' },
+            { selector: '#automap-exact-phrase', title: 'Match exact phrase only' },
+            { selector: '#single-automap-btn', title: 'Find and map all occurrences' },
+
+            // Export buttons
+            { selector: '#create-pdf-btn', title: 'Create detailed PDF report' },
+            { selector: '#create-schedule-btn', title: 'Export CSV message schedule' },
+            { selector: '#update-from-schedule-btn', title: 'Import updates from CSV' },
+            { selector: '#export-html-btn', title: 'Export interactive HTML report' },
+
+            // Modal buttons and fields
+            { selector: '#delete-dot-btn', title: 'Delete this location' },
+            { selector: '#cancel-modal-btn', title: 'Cancel without saving' },
+            { selector: '#update-dot-btn', title: 'Save changes' },
+            { selector: '#edit-installed', title: 'Mark as installed' },
+            { selector: '#edit-location-number', title: 'Change location number' },
+            { selector: '#edit-notes', title: 'Add notes for this location' },
+
+            // Gallery buttons
+            { selector: '#gallery-add-btn', title: 'Add photo to location' },
+            { selector: '#gallery-close-btn', title: 'Remove photo from location' },
+
+            // Group edit buttons and fields
+            { selector: '#group-delete-btn', title: 'Delete all selected locations' },
+            { selector: '#group-cancel-btn', title: 'Cancel without changes' },
+            { selector: '#group-update-btn', title: 'Apply changes to all selected' },
+            { selector: '#group-edit-installed', title: 'Mark all as installed' },
+            { selector: '#group-edit-notes', title: 'Set notes for all selected locations' },
+
+            // Other modal buttons
+            { selector: '#flag-save-btn', title: 'Save flag configuration' },
+            { selector: '#cancel-renumber-btn', title: 'Cancel renumbering' },
+            { selector: '#cancel-automap-btn', title: 'Cancel automap operation' },
+            { selector: '#close-automap-btn', title: 'Close results' },
+            { selector: '#cancel-pdf-export-btn', title: 'Cancel PDF export' },
+            { selector: '#guide-btn', title: 'Open full user guide' },
+            { selector: '#tooltips-btn', title: 'Toggle tooltips on/off' },
+            { selector: '#close-controls-modal-btn', title: 'Close this dialog' },
+
+            // Panel controls
+            { selector: '#left-panel-collapse-btn', title: 'Collapse/expand left panel' }
         ];
 
         // Store the title attributes
