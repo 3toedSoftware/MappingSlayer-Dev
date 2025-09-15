@@ -9,9 +9,7 @@ import {
     setDirtyState,
     getCurrentPageData,
     CommandUndoManager,
-    getCurrentPageAnnotationLines,
-    withoutAutoSync,
-    triggerManualSync
+    getCurrentPageAnnotationLines
 } from './state.js';
 import {
     renderDotsForCurrentPage,
@@ -1559,11 +1557,6 @@ function renderGroupedLocationList(allDots, container) {
                                     }
                                 }
                             }
-
-                            // Sync with other apps (only for message1)
-                            if (field === 'message' && window.mappingSync) {
-                                window.mappingSync.syncMessageChange(dot.internalId, newValue);
-                            }
                         }
                     }
                 });
@@ -2730,10 +2723,8 @@ function handleMarkerTypeCodeChange(input) {
     }
 
     // Update the marker types object
-    withoutAutoSync(() => {
-        delete appState.markerTypes[originalCode];
-        appState.markerTypes[newCode] = typeData;
-    });
+    delete appState.markerTypes[originalCode];
+    appState.markerTypes[newCode] = typeData;
 
     // Update all dots across all pages that use this marker type
     for (const [pageNum, pageData] of appState.dotsByPage.entries()) {
@@ -2780,11 +2771,6 @@ function handleMarkerTypeCodeChange(input) {
 
         console.log(`Marker type ${originalCode} changed to ${newCode}, UI updated`);
     }, 10); // Small delay to ensure DOM updates have completed
-
-    // Sync with other apps if sync is active
-    if (window.mappingSync) {
-        window.mappingSync.syncMarkerTypeUpdate(originalCode, newCode);
-    }
 }
 
 function handleMarkerTypeNameChange(input) {
@@ -2997,16 +2983,14 @@ function importMarkerTypes() {
 
             // Add/update marker types (don't clear existing ones)
             for (const [code, typeData] of Object.entries(importData.markerTypes)) {
-                withoutAutoSync(() => {
-                    appState.markerTypes[code] = {
-                        name: typeData.name || code,
-                        color: typeData.color || '#FF6B6B',
-                        textColor: typeData.textColor || '#FFFFFF',
-                        defaultVinylBacker: typeData.defaultVinylBacker || false,
-                        designReference: typeData.designReference || null,
-                        textFields: typeData.textFields || []
-                    };
-                });
+                appState.markerTypes[code] = {
+                    name: typeData.name || code,
+                    color: typeData.color || '#FF6B6B',
+                    textColor: typeData.textColor || '#FFFFFF',
+                    defaultVinylBacker: typeData.defaultVinylBacker || false,
+                    designReference: typeData.designReference || null,
+                    textFields: typeData.textFields || []
+                };
             }
 
             // Update UI
@@ -3017,7 +3001,6 @@ function importMarkerTypes() {
             updateProjectLegend();
 
             // Trigger manual sync after bulk import
-            triggerManualSync();
 
             renderDotsForCurrentPage();
             setDirtyState();
@@ -5391,15 +5374,13 @@ window.performPDFExport = async exportType => {
 // Helper function for direct marker type creation
 function createMarkerTypeDirectly(newCode) {
     // Create new marker type with default values
-    withoutAutoSync(() => {
-        appState.markerTypes[newCode] = {
-            code: newCode,
-            name: 'Marker Type Name',
-            color: '#F72020',
-            textColor: '#FFFFFF',
-            designReference: null
-        };
-    });
+    appState.markerTypes[newCode] = {
+        code: newCode,
+        name: 'Marker Type Name',
+        color: '#F72020',
+        textColor: '#FFFFFF',
+        designReference: null
+    };
 
     // Set the new marker type as active
     appState.activeMarkerType = newCode;

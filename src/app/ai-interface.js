@@ -163,11 +163,6 @@
                     // Update marker types
                     window.appState.markerTypes = markerTypes;
 
-                    // Trigger sync if available
-                    if (window.triggerManualSync) {
-                        window.triggerManualSync();
-                    }
-
                     this.refreshUI();
                     return { success: true, message: 'Marker types updated' };
                 } catch (error) {

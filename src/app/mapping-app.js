@@ -26,7 +26,7 @@ import {
     updateEditModalOptions,
     resetKeyboardShortcutsFlag
 } from './ui.js';
-import { withoutAutoSync, triggerManualSync, getCurrentPageDots, setDirtyState } from './state.js';
+import { getCurrentPageDots, setDirtyState } from './state.js';
 
 class MappingSlayerApp extends SlayerAppBase {
     constructor() {
@@ -596,17 +596,6 @@ class MappingSlayerApp extends SlayerAppBase {
         this.cropTool = cropTool;
         this.cropTool.initialize();
 
-        // Initialize sync adapter
-        const { mappingSyncAdapter } = await import('./mapping-sync.js');
-        this.syncAdapter = mappingSyncAdapter;
-
-        // Initialize sync with app bridge if available
-        if (window.appBridge) {
-            this.syncAdapter.initialize(window.appBridge);
-            // Sync existing marker types
-            await this.syncAdapter.syncMarkerTypes(window.appBridge);
-        }
-
         // Initialize TooltipManager
         const { TooltipManager } = await import('./tooltips.js');
         this.tooltipManager = TooltipManager;
@@ -621,23 +610,19 @@ class MappingSlayerApp extends SlayerAppBase {
     initializeDefaultMarkerTypes() {
         // Initialize empty if no marker types exist
         if (!this.appState.markerTypes) {
-            withoutAutoSync(() => {
-                this.appState.markerTypes = {};
-            });
+            this.appState.markerTypes = {};
         }
 
         // Process any from DEFAULT_MARKER_TYPES if they exist
         this.stateModule.DEFAULT_MARKER_TYPES.forEach(markerType => {
             if (!this.appState.markerTypes[markerType.code]) {
-                withoutAutoSync(() => {
-                    this.appState.markerTypes[markerType.code] = {
-                        code: markerType.code,
-                        name: markerType.name,
-                        color: markerType.color,
-                        textColor: markerType.textColor,
-                        designReference: null
-                    };
-                });
+                this.appState.markerTypes[markerType.code] = {
+                    code: markerType.code,
+                    name: markerType.name,
+                    color: markerType.color,
+                    textColor: markerType.textColor,
+                    designReference: null
+                };
             }
         });
 
@@ -1423,9 +1408,7 @@ class MappingSlayerApp extends SlayerAppBase {
         this.clearAllData();
 
         // Restore marker types and active marker type
-        withoutAutoSync(() => {
-            this.appState.markerTypes = savedMarkerTypes;
-        });
+        this.appState.markerTypes = savedMarkerTypes;
         this.appState.activeMarkerType = savedActiveMarkerType;
 
         // Update UI to reflect the preserved marker types
@@ -1433,7 +1416,6 @@ class MappingSlayerApp extends SlayerAppBase {
         updateMarkerTypeSelect();
 
         // Trigger manual sync after restoring marker types
-        triggerManualSync();
     }
 
     clearAllData() {
@@ -1456,9 +1438,7 @@ class MappingSlayerApp extends SlayerAppBase {
         this.appState.dotsByPage.clear();
 
         // Clear marker types
-        withoutAutoSync(() => {
-            this.appState.markerTypes = {};
-        });
+        this.appState.markerTypes = {};
 
         // Clear annotation lines
         this.appState.annotationLines.clear();
@@ -1567,9 +1547,7 @@ class MappingSlayerApp extends SlayerAppBase {
         );
 
         // Import marker types directly
-        withoutAutoSync(() => {
-            this.appState.markerTypes = stateToImport.markerTypes || {};
-        });
+        this.appState.markerTypes = stateToImport.markerTypes || {};
 
         // Import flag configurations (migrate from old per-marker to global)
         if (stateToImport.globalFlagConfiguration) {
@@ -1849,20 +1827,16 @@ class MappingSlayerApp extends SlayerAppBase {
 
                 // Add the new marker type
                 if (!this.appState.markerTypes) {
-                    withoutAutoSync(() => {
-                        this.appState.markerTypes = {};
-                    });
+                    this.appState.markerTypes = {};
                 }
 
-                withoutAutoSync(() => {
-                    this.appState.markerTypes[query.signType.code] = {
-                        code: query.signType.code,
-                        name: query.signType.name,
-                        color: query.signType.color || '#F72020',
-                        textColor: query.signType.textColor || '#FFFFFF',
-                        designReference: null
-                    };
-                });
+                this.appState.markerTypes[query.signType.code] = {
+                    code: query.signType.code,
+                    name: query.signType.name,
+                    color: query.signType.color || '#F72020',
+                    textColor: query.signType.textColor || '#FFFFFF',
+                    designReference: null
+                };
 
                 // Update the marker type dropdown
                 updateMarkerTypeSelect();

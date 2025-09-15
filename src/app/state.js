@@ -2,12 +2,6 @@
 
 import { CommandUndoManager } from './command-undo.js';
 
-// Auto-sync system for marker types
-let mappingSyncAdapter = null;
-let syncDebounceTimer = null;
-let isSyncInProgress = false;
-const SYNC_DEBOUNCE_DELAY = 100; // 100ms debounce
-
 export const DEFAULT_MARKER_TYPES = [];
 
 export const appState = {
@@ -173,113 +167,6 @@ export function deserializeDotsByPage(serializedObj) {
 // export function initializeUndoManager() {
 //     // This function is no longer used - keeping for reference only
 // }
-
-/**
- * Initialize the sync adapter reference
- * @param {Object} syncAdapter - The mapping sync adapter instance
- */
-export function initializeSyncAdapter(syncAdapter) {
-    mappingSyncAdapter = syncAdapter;
-}
-
-/**
- * Debounced sync function to prevent rapid sync calls
- */
-function debouncedSync() {
-    if (syncDebounceTimer) {
-        clearTimeout(syncDebounceTimer);
-    }
-
-    syncDebounceTimer = setTimeout(async () => {
-        if (!mappingSyncAdapter || isSyncInProgress) {
-            return;
-        }
-
-        isSyncInProgress = true;
-        try {
-            if (window.debugLog) window.debugLog('SYNC', '🔄 Auto-syncing marker types...');
-            await mappingSyncAdapter.syncMarkerTypes(null); // No longer using appBridge
-        } catch (error) {
-            if (window.logError) window.logError('❌ Auto-sync failed:', error);
-        } finally {
-            isSyncInProgress = false;
-        }
-    }, SYNC_DEBOUNCE_DELAY);
-}
-
-/**
- * Create a proxy for markerTypes that automatically syncs changes
- * @param {Object} markerTypes - The original markerTypes object
- * @returns {Proxy} Proxied markerTypes object
- */
-function createAutoSyncMarkerTypes(markerTypes) {
-    return new Proxy(markerTypes, {
-        set(target, property, value, receiver) {
-            // Set the value first
-            const result = Reflect.set(target, property, value, receiver);
-
-            // Trigger auto-sync if not already in progress and sync adapter is available
-            if (!isSyncInProgress && mappingSyncAdapter) {
-                debouncedSync();
-            }
-
-            return result;
-        },
-
-        deleteProperty(target, property) {
-            // Delete the property first
-            const result = Reflect.deleteProperty(target, property);
-
-            // Trigger auto-sync if not already in progress and sync adapter is available
-            if (!isSyncInProgress && mappingSyncAdapter) {
-                debouncedSync();
-            }
-
-            return result;
-        }
-    });
-}
-
-/**
- * Replace the markerTypes object with an auto-syncing proxy
- * This should be called after the sync adapter is initialized
- */
-export function enableAutoSync() {
-    if (!mappingSyncAdapter) {
-        if (window.logWarn) {
-            window.logWarn('⚠️ Cannot enable auto-sync: sync adapter not initialized');
-        }
-        return;
-    }
-
-    if (window.debugLog) window.debugLog('SYNC', '✅ Enabling automatic marker type sync');
-    appState.markerTypes = createAutoSyncMarkerTypes(appState.markerTypes);
-}
-
-/**
- * Temporarily disable auto-sync (for bulk operations)
- * @returns {Function} Function to re-enable auto-sync
- */
-export function withoutAutoSync(callback) {
-    const wasInProgress = isSyncInProgress;
-    isSyncInProgress = true;
-
-    try {
-        return callback();
-    } finally {
-        isSyncInProgress = wasInProgress;
-    }
-}
-
-/**
- * Manually trigger a sync (useful for bulk operations)
- */
-export function triggerManualSync() {
-    if (!mappingSyncAdapter || isSyncInProgress) {
-        return;
-    }
-    debouncedSync();
-}
 
 // Initialize custom icon library if not present
 if (!appState.customIconLibrary) {

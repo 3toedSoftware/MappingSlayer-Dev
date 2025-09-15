@@ -106,6 +106,14 @@ function generateCharacterChangeLog(locationChanges) {
 }
 
 function getMapFileName() {
+    // First try to get from saveManager (actual saved filename)
+    if (window.saveManager?.projectName) {
+        return window.saveManager.projectName
+            .replace('.pdf', '')
+            .replace('.mslay', '')
+            .replace('.slayer', '');
+    }
+
     // Try to get from the unified header project name
     const projectNameEl = document.getElementById('project-name');
     if (projectNameEl && projectNameEl.textContent !== 'No Project') {
@@ -649,8 +657,11 @@ function createDetailPage(pdf, dot, sourcePageNum, originalToNewPageMap) {
         currentY,
         { align: 'center' }
     );
+    // Use the saved filename if available, otherwise fall back to default
     const projectName =
-        document.getElementById('project-name')?.textContent || 'Mapping Slayer Project';
+        window.saveManager?.projectName ||
+        document.getElementById('project-name')?.textContent ||
+        'Mapping Slayer Project';
     pdf.text(`Project: ${projectName}`, pageWidth / 2, currentY + 12, { align: 'center' });
     const pageLabel = appState.pageLabels.get(sourcePageNum) || '';
     if (pageLabel) {
@@ -960,7 +971,7 @@ function createMessageSchedule() {
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
     const mapFileName = getMapFileName();
-    link.setAttribute('download', `${mapFileName}_MessageSchedule.csv`);
+    link.setAttribute('download', `${mapFileName}_report.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -1147,10 +1158,7 @@ async function performPDFExport(exportType) {
             let suffix = '';
             switch (exportType) {
                 case 'current-with-details':
-                    const pageLabel =
-                        appState.pageLabels.get(appState.currentPdfPage) ||
-                        `Page${appState.currentPdfPage}`;
-                    suffix = `_${pageLabel}_Interactive`;
+                    suffix = '_report';
                     break;
                 case 'current-only':
                     const currentLabel =
@@ -1773,8 +1781,8 @@ async function exportToHTML() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    const fileName =
-        (appState.sourcePdfName || 'export').replace(/\.pdf$/i, '') + '_locations.html';
+    const mapFileName = getMapFileName();
+    const fileName = `${mapFileName}_report.html`;
     link.download = fileName;
     document.body.appendChild(link);
     link.click();
