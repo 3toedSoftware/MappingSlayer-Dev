@@ -375,6 +375,7 @@ function updateFilterCheckboxesImmediate() {
                 e.preventDefault();
                 appState.activeMarkerType = markerTypeCode;
                 updateFilterCheckboxes();
+                updateMarkerTypeSelect(); // Update automap display
             });
 
             // Double-click to select all dots of this marker type on current page
@@ -428,21 +429,10 @@ function updateFilterCheckboxesImmediate() {
 }
 
 function updateMarkerTypeSelect() {
-    const select = document.getElementById('automap-marker-type-select');
-    if (!select) return;
-
-    const markerTypes = Object.keys(appState.markerTypes);
-    select.innerHTML = markerTypes
-        .map(code => {
-            const typeData = appState.markerTypes[code];
-            return '<option value="' + code + '">' + code + ' - ' + typeData.name + '</option>';
-        })
-        .join('');
-
-    select.disabled = markerTypes.length === 0 || !appState.pdfDoc;
-
+    // Enable/disable automap text input based on whether we have marker types and PDF
     const textInput = document.getElementById('automap-text-input');
     if (textInput) {
+        const markerTypes = Object.keys(appState.markerTypes);
         textInput.disabled = markerTypes.length === 0 || !appState.pdfDoc;
     }
 }

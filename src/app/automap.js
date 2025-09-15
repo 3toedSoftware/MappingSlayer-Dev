@@ -184,17 +184,16 @@ async function automapSingleLocation() {
     }
 
     const textInput = document.getElementById('automap-text-input');
-    const markerTypeSelect = document.getElementById('automap-marker-type-select');
     const exactMatchCheckbox = document.getElementById('automap-exact-phrase');
     const searchTerm = textInput.value.trim();
-    const markerTypeCode = markerTypeSelect.value;
+    const markerTypeCode = appState.activeMarkerType;
 
     if (!searchTerm) {
         updateAutomapStatus('Please enter text to find.', true);
         return;
     }
     if (!markerTypeCode) {
-        updateAutomapStatus('Please select a marker type.', true);
+        updateAutomapStatus('Please select a marker type first.', true);
         return;
     }
 

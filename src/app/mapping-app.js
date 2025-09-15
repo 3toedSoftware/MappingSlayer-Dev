@@ -251,7 +251,6 @@ class MappingSlayerApp extends SlayerAppBase {
                 <!-- Footer Controls -->
                 <div class="ms-footer-controls">
                     <div class="ms-automap-container" id="single-automap-container">
-                        <select class="ms-form-input ms-automap-select" id="automap-marker-type-select" disabled=""></select>
                         <input type="text" class="ms-form-input ms-automap-input" id="automap-text-input" placeholder="Enter text to find..." list="recent-searches-datalist" disabled="">
                         <datalist id="recent-searches-datalist"></datalist>
                         <div class="ms-automap-checkbox-group">
