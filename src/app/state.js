@@ -19,7 +19,7 @@ export const appState = {
     dragStart: { x: 0, y: 0 },
     dragOriginalPositions: new Map(), // Stores original positions before dragging
     hasMoved: false,
-    messagesVisible: false,
+    messagesVisible: true,
     messages2Visible: false,
     locationsVisible: true,
     instFilterMode: 'showInst', // 'instOnly', 'hideInst', 'showInst'

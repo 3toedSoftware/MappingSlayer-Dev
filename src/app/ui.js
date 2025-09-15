@@ -3575,6 +3575,9 @@ function addButtonEventListeners() {
     }
 
     if (toggleMessagesBtn) {
+        // Set initial button text based on current state
+        toggleMessagesBtn.textContent = appState.messagesVisible ? 'HIDE MSG1' : 'SHOW MSG1';
+
         toggleMessagesBtn.addEventListener('click', () => {
             appState.messagesVisible = !appState.messagesVisible;
             toggleMessagesBtn.textContent = appState.messagesVisible ? 'HIDE MSG1' : 'SHOW MSG1';
