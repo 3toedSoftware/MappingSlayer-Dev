@@ -50,4 +50,5 @@ backups/
 
 # Chrome DevTools MCP folders
 Usersiam3toedchrome-devtools-mcp/
-chrome-devtools-mcp/
+chrome-devtools-mcp/lib/liblouis/
+lib/
