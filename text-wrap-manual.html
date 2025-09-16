@@ -5,9 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Manual SVG Text Wrapping Demo</title>
         <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-        <!-- LibLouis for braille translation -->
+        <!-- LibLouis for proper Grade 2 Braille translation -->
         <script src="lib/liblouis/easy-api.js"></script>
         <script src="lib/liblouis/build-no-tables-utf16.js"></script>
+        <!-- Fallback Grade 2 if LibLouis fails -->
+        <script src="braille-grade2.js"></script>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -411,29 +413,78 @@ STORAGE</textarea
                     // Load braille font first
                     await loadBrailleFont();
 
-                    // Initialize LibLouis
-                    if (typeof liblouis !== 'undefined') {
-                        const lou = liblouis.enableOnNodeRuntime();
+                    // Wait a bit for LibLouis to load
+                    await new Promise(resolve => setTimeout(resolve, 500));
 
-                        // Load the English Grade 2 braille table
-                        const tableUrl = 'lib/liblouis/tables/en-us-g2.ctb';
-                        const response = await fetch(tableUrl);
-                        const tableData = await response.text();
+                    // Try to find LibLouis in various places
+                    let lou = null;
 
-                        lou.registerTableResolver(tableName => {
-                            return tableData; // Return our table for any request
+                    // Check if LiblouisEasyApi is available
+                    if (typeof LiblouisEasyApi !== 'undefined') {
+                        console.log('Found LiblouisEasyApi, initializing...');
+                        lou = new LiblouisEasyApi({
+                            capi: 'lib/build-no-tables-utf16.js',
+                            easyapi: 'lib/easy-api.js'
                         });
+                    } else if (typeof Module !== 'undefined' && Module.ccall) {
+                        console.log('Found Module with ccall, using directly...');
+                        // Try to use Module directly
+                        lou = Module;
+                    }
 
-                        brailleTranslator = lou;
-                        brailleReady = true;
-                        console.log('Braille translator initialized');
+                    if (lou) {
+                        // Enable on-demand table loading - much simpler and more reliable!
+                        if (lou.enableOnDemandTableLoading) {
+                            try {
+                                lou.enableOnDemandTableLoading('lib/tables/');
+                                console.log('LibLouis: On-demand table loading enabled');
+
+                                // Test that Grade 2 is working
+                                const test1 = lou.translateString('en-us-g2.ctb', 'and');
+                                const test2 = lou.translateString('en-us-g2.ctb', 'STORAGE');
+                                console.log('LibLouis Grade 2 tests:');
+                                console.log(
+                                    '  "and" -> "' + test1 + '" (length: ' + test1.length + ')'
+                                );
+                                console.log(
+                                    '  "STORAGE" -> "' + test2 + '" (length: ' + test2.length + ')'
+                                );
+
+                                // Store the translator
+                                brailleTranslator = lou;
+                                brailleReady = true;
+                                console.log(
+                                    'LibLouis Grade 2 translator initialized successfully!'
+                                );
+                            } catch (e) {
+                                console.error('Failed to enable on-demand loading:', e);
+                                // Fall back to manual loading if needed
+                                brailleReady = true;
+                            }
+                        } else {
+                            // Fall back to manual table loading
+                            const tableUrl = 'lib/tables/en-us-g2.ctb';
+                            const response = await fetch(tableUrl);
+
+                            if (!response.ok) {
+                                throw new Error('Failed to load Grade 2 table');
+                            }
+
+                            const tableData = await response.text();
+                            console.log('Loaded Grade 2 table manually, size:', tableData.length);
+
+                            // Store the translator
+                            brailleTranslator = lou;
+                            brailleReady = true;
+                            console.log('LibLouis Grade 2 translator initialized (manual loading)');
+                        }
                     } else {
-                        console.warn('LibLouis not available, using simple braille mapping');
-                        // Fallback to simple character mapping
+                        console.warn('LibLouis not found, using fallback Grade 2 translation');
                         brailleReady = true;
                     }
                 } catch (error) {
-                    console.error('Error initializing braille:', error);
+                    console.error('Error initializing LibLouis:', error);
+                    console.log('Will use fallback Grade 2 translation');
                     brailleReady = true; // Use fallback
                 }
             }
@@ -481,20 +532,32 @@ STORAGE</textarea
 
             // Translate text to braille
             function translateToBraille(text) {
-                if (brailleTranslator) {
+                // Try LibLouis first for proper Grade 2
+                if (brailleTranslator && brailleTranslator.translateString) {
                     try {
-                        return brailleTranslator.translateString('en-us-g2.ctb', text);
+                        const result = brailleTranslator.translateString('en-us-g2.ctb', text);
+                        console.log(`LibLouis Grade 2: "${text}" -> "${result}"`);
+                        return result;
                     } catch (error) {
-                        console.error('Translation error, using fallback:', error);
+                        console.error('LibLouis translation failed:', error);
                     }
                 }
 
-                // Fallback to simple mapping
-                return text
+                // Use JavaScript Grade 2 translation if available
+                if (typeof window.translateToGrade2Braille === 'function') {
+                    const result = window.translateToGrade2Braille(text);
+                    console.log(`Fallback Grade 2: "${text}" -> "${result}"`);
+                    return result;
+                }
+
+                // Last resort: simple mapping
+                const result = text
                     .toUpperCase()
                     .split('')
                     .map(char => simpleBrailleMap[char] || char)
                     .join('');
+                console.log(`Simple mapping: "${text}" -> "${result}"`);
+                return result;
             }
 
             // Load stored fonts from localStorage on startup

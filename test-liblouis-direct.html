@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Direct LibLouis Test</title>
+        <style>
+            @font-face {
+                font-family: 'Braille';
+                src: url('BRAILLE.TTF') format('truetype');
+            }
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 20px;
+            }
+            .test-box {
+                margin: 20px 0;
+                padding: 20px;
+                background: #f5f5f5;
+                border-radius: 8px;
+            }
+            .braille-output {
+                font-family: 'Braille', monospace;
+                font-size: 36px;
+                line-height: 1.5;
+                background: white;
+                padding: 15px;
+                margin: 10px 0;
+                border: 2px solid #003875;
+                border-radius: 4px;
+                min-height: 50px;
+            }
+            input,
+            button {
+                padding: 10px;
+                font-size: 16px;
+                margin: 5px;
+            }
+            input {
+                width: 300px;
+            }
+            .status {
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 4px;
+            }
+            .status.success {
+                background: #d4edda;
+                color: #155724;
+            }
+            .status.error {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            .status.warning {
+                background: #fff3cd;
+                color: #856404;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Direct LibLouis Grade 2 Test</h1>
+
+        <div class="test-box">
+            <h2>Status</h2>
+            <div id="status" class="status warning">Loading LibLouis...</div>
+        </div>
+
+        <div class="test-box">
+            <h2>Manual Test</h2>
+            <input
+                type="text"
+                id="text-input"
+                placeholder="Enter text to translate"
+                value="STORAGE"
+            />
+            <button onclick="translateText()">Translate to Grade 2</button>
+
+            <h3>Grade 2 Braille Output:</h3>
+            <div id="braille-output" class="braille-output"></div>
+
+            <h3>Debug Info:</h3>
+            <div
+                id="debug-info"
+                style="
+                    font-family: monospace;
+                    background: #f0f0f0;
+                    padding: 10px;
+                    border-radius: 4px;
+                "
+            ></div>
+        </div>
+
+        <div class="test-box">
+            <h2>Grade 2 Contraction Tests</h2>
+            <button onclick="runTests()">Run Tests</button>
+            <div id="test-results"></div>
+        </div>
+
+        <!-- Load LibLouis -->
+        <script src="lib/build-no-tables-utf16.js"></script>
+        <script src="lib/easy-api.js"></script>
+
+        <!-- Grade 2 fallback -->
+        <script src="braille-grade2.js"></script>
+
+        <script>
+            let translator = null;
+            let tableData = null;
+
+            // Initialize after page loads
+            window.addEventListener('DOMContentLoaded', function () {
+                setTimeout(initLibLouis, 1000); // Give LibLouis time to load
+            });
+
+            async function initLibLouis() {
+                const statusDiv = document.getElementById('status');
+
+                try {
+                    console.log('Checking for liblouis global object...');
+
+                    // Check if liblouis global was created
+                    if (typeof liblouis !== 'undefined') {
+                        console.log('Found global liblouis object!');
+                        translator = liblouis;
+                    } else if (typeof LiblouisEasyApi !== 'undefined') {
+                        console.log('Found LiblouisEasyApi, creating instance...');
+
+                        // Try to create without arguments (uses default build)
+                        try {
+                            translator = new LiblouisEasyApi();
+                            console.log('Created LiblouisEasyApi with default build');
+                        } catch (e) {
+                            console.error('Failed with default:', e.message);
+
+                            // Try with explicit version
+                            const builds = LiblouisEasyApi.getAvailableBuilds();
+                            console.log('Available builds:', Object.keys(builds));
+
+                            if (Object.keys(builds).length > 0) {
+                                const version = Object.keys(builds)[0];
+                                translator = new LiblouisEasyApi(version);
+                                console.log('Created LiblouisEasyApi with version:', version);
+                            }
+                        }
+                    }
+
+                    if (translator) {
+                        // Try the simple approach first - enable on-demand table loading
+                        if (translator.enableOnDemandTableLoading) {
+                            try {
+                                console.log('Enabling on-demand table loading...');
+                                translator.enableOnDemandTableLoading('lib/tables/');
+                                console.log('On-demand table loading enabled successfully');
+                                tableData = true; // Mark as ready
+                            } catch (e) {
+                                console.error('Failed to enable on-demand loading:', e);
+
+                                // Fall back to manual loading
+                                // Load all required tables
+                                const tables = {};
+                                const tableFiles = [
+                                    'en-us-g2.ctb',
+                                    'en-us-g1.ctb',
+                                    'chardefs.cti',
+                                    'litdigits6Dots.uti',
+                                    'braille-patterns.cti',
+                                    'loweredDigits6Dots.uti',
+                                    'latinLetterDef8Dots.uti',
+                                    'spaces.ctb',
+                                    'unicode.dis',
+                                    'latinLetterDef6Dots.uti',
+                                    'digits6Dots.uti',
+                                    'digits8Dots.uti',
+                                    'loweredDigits8Dots.uti'
+                                ];
+
+                                console.log('Loading LibLouis tables manually...');
+                                for (const file of tableFiles) {
+                                    const response = await fetch('lib/tables/' + file);
+                                    if (!response.ok) {
+                                        console.error('Failed to load table:', file);
+                                        continue;
+                                    }
+                                    tables[file] = await response.text();
+                                    console.log(
+                                        'Loaded table:',
+                                        file,
+                                        'size:',
+                                        tables[file].length
+                                    );
+                                }
+
+                                tableData = tables['en-us-g2.ctb'];
+
+                                // Try using the filesystem directly
+                                if (translator.getFilesystem) {
+                                    const fs = translator.getFilesystem();
+                                    console.log('Got filesystem interface');
+
+                                    // Create tables directory
+                                    try {
+                                        fs.mkdir('/tables');
+                                    } catch (e) {
+                                        // Directory might exist
+                                    }
+
+                                    // Write all tables to the filesystem
+                                    for (const [name, content] of Object.entries(tables)) {
+                                        try {
+                                            fs.writeFile('/tables/' + name, content, {
+                                                encoding: 'utf8'
+                                            });
+                                            console.log('Wrote to filesystem:', '/tables/' + name);
+                                        } catch (e) {
+                                            console.error('Failed to write:', name, e);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Test translation
+                        try {
+                            const test = translator.translateString('en-us-g2.ctb', 'test');
+                            console.log('Test translation: "test" -> "' + test + '"');
+
+                            // Test a word that should contract in Grade 2
+                            const testAnd = translator.translateString('en-us-g2.ctb', 'and');
+                            const testStorage = translator.translateString(
+                                'en-us-g2.ctb',
+                                'STORAGE'
+                            );
+                            console.log(
+                                'Grade 2 tests: "and" -> "' +
+                                    testAnd +
+                                    '", "STORAGE" -> "' +
+                                    testStorage +
+                                    '"'
+                            );
+
+                            statusDiv.className = 'status success';
+                            statusDiv.textContent =
+                                'LibLouis Grade 2 ready! "and" -> "' +
+                                testAnd +
+                                '" (Length: ' +
+                                testAnd.length +
+                                ')';
+                        } catch (e) {
+                            console.error('Translation test failed:', e);
+                            statusDiv.className = 'status warning';
+                            statusDiv.textContent =
+                                'LibLouis loaded but translation failed, using fallback: ' +
+                                e.message;
+                        }
+                    } else {
+                        throw new Error('No LibLouis interface found');
+                    }
+                } catch (error) {
+                    console.error('LibLouis init error:', error);
+                    statusDiv.className = 'status warning';
+                    statusDiv.textContent = 'Using fallback Grade 2 translation: ' + error.message;
+                }
+            }
+
+            function translateText() {
+                const input = document.getElementById('text-input').value;
+                const outputDiv = document.getElementById('braille-output');
+                const debugDiv = document.getElementById('debug-info');
+
+                let result = '';
+                let method = '';
+
+                try {
+                    // Try LibLouis first
+                    if (translator && translator.translateString && tableData) {
+                        result = translator.translateString('en-us-g2.ctb', input);
+                        method = 'LibLouis Grade 2';
+                    } else if (typeof translateToGrade2Braille === 'function') {
+                        // Use fallback
+                        result = translateToGrade2Braille(input);
+                        method = 'JavaScript Grade 2 (fallback)';
+                    } else {
+                        result = 'No translation available';
+                        method = 'None';
+                    }
+
+                    outputDiv.textContent = result;
+                    debugDiv.innerHTML = `
+                    Method: ${method}<br>
+                    Input length: ${input.length} characters<br>
+                    Output length: ${result.length} characters<br>
+                    Compression: ${Math.round((1 - result.length / input.length) * 100)}%
+                `;
+                } catch (error) {
+                    outputDiv.textContent = 'Error: ' + error.message;
+                    debugDiv.textContent = 'Translation error: ' + error.toString();
+                }
+            }
+
+            function runTests() {
+                const resultsDiv = document.getElementById('test-results');
+
+                const tests = [
+                    { input: 'and', desc: '"and" should contract to single character' },
+                    { input: 'the', desc: '"the" should contract to single character' },
+                    { input: 'for', desc: '"for" should contract to single character' },
+                    { input: 'STORAGE', desc: '"STORAGE" should have contractions' },
+                    { input: 'EMPLOYEES ONLY', desc: 'Multi-word should be contracted' }
+                ];
+
+                let html = '<table style="width:100%; margin-top: 10px;">';
+                html += '<tr><th>Input</th><th>Output</th><th>Length</th><th>Compressed</th></tr>';
+
+                tests.forEach(test => {
+                    let result = '';
+
+                    try {
+                        if (translator && translator.translateString && tableData) {
+                            result = translator.translateString('en-us-g2.ctb', test.input);
+                        } else if (typeof translateToGrade2Braille === 'function') {
+                            result = translateToGrade2Braille(test.input);
+                        }
+
+                        const compressed = result.length < test.input.length;
+                        const percent = Math.round((1 - result.length / test.input.length) * 100);
+
+                        html += `<tr>
+                        <td>${test.input}</td>
+                        <td style="font-family: Braille, monospace; font-size: 24px;">${result}</td>
+                        <td>${test.input.length} → ${result.length}</td>
+                        <td style="color: ${compressed ? 'green' : 'red'}">
+                            ${compressed ? percent + '% smaller' : 'Not compressed'}
+                        </td>
+                    </tr>`;
+                    } catch (error) {
+                        html += `<tr>
+                        <td>${test.input}</td>
+                        <td colspan="3" style="color: red;">Error: ${error.message}</td>
+                    </tr>`;
+                    }
+                });
+
+                html += '</table>';
+                resultsDiv.innerHTML = html;
+            }
+        </script>
+    </body>
+</html>
