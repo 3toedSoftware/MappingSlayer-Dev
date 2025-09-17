@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Test chardefs.cti Only</title>
+        <script src="lib/liblouis/build-no-tables-utf16.js"></script>
+        <script src="lib/liblouis/easy-api.js"></script>
+    </head>
+    <body>
+        <h1>Test Loading Only chardefs.cti</h1>
+        <div
+            id="output"
+            style="
+                white-space: pre-wrap;
+                font-family: monospace;
+                background: #f0f0f0;
+                padding: 20px;
+            "
+        ></div>
+
+        <script>
+            const output = document.getElementById('output');
+
+            function log(msg) {
+                console.log(msg);
+                output.textContent += msg + '\n';
+            }
+
+            async function testChardefsOnly() {
+                log('=== Testing chardefs.cti loading only ===\n');
+
+                // Wait for scripts to load
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                log('Step 1: Check what globals exist');
+                log(`  typeof liblouisBuild: ${typeof liblouisBuild}`);
+                log(`  typeof LiblouisEasyApi: ${typeof LiblouisEasyApi}`);
+
+                if (typeof LiblouisEasyApi === 'undefined') {
+                    log('ERROR: LiblouisEasyApi not found!');
+                    return;
+                }
+
+                try {
+                    log('\nStep 2: Initialize LibLouis');
+                    const lou = new LiblouisEasyApi();
+                    log('  ✓ LibLouis initialized');
+
+                    // Get filesystem
+                    const fs = lou.getFilesystem();
+                    if (!fs) {
+                        log('  ERROR: No filesystem available');
+                        return;
+                    }
+                    log('  ✓ Filesystem available');
+
+                    // Set data path
+                    lou.setDataPath('/');
+                    log('  ✓ Set data path to /');
+
+                    log('\nStep 3: Load ONLY chardefs.cti');
+                    // Create tables directory
+                    try {
+                        fs.mkdir('/tables');
+                    } catch (e) {}
+
+                    // Load chardefs.cti
+                    const response = await fetch('lib/liblouis/tables/chardefs.cti');
+                    const chardefsContent = await response.text();
+                    log(`  Fetched chardefs.cti: ${chardefsContent.length} bytes`);
+
+                    // Show first few lines
+                    const firstLines = chardefsContent.split('\n').slice(0, 5).join('\n');
+                    log(`  First 5 lines:\n${firstLines}`);
+
+                    // Write to filesystem
+                    fs.writeFile('/tables/chardefs.cti', chardefsContent);
+                    log('  ✓ Written to /tables/chardefs.cti');
+
+                    // Verify file exists
+                    try {
+                        const stats = fs.stat('/tables/chardefs.cti');
+                        log(`  ✓ File exists, size: ${stats.size}`);
+                    } catch (e) {
+                        log(`  ERROR: File not found after writing: ${e.message}`);
+                    }
+
+                    log('\nStep 4: Test translating with ONLY chardefs.cti');
+
+                    // Test 1: Try loading just chardefs.cti
+                    log('  Test 1: Load chardefs.cti as table');
+                    try {
+                        const result = lou.translateString('tables/chardefs.cti', 'test');
+                        log(`    Result: "${result}"`);
+                    } catch (e) {
+                        log(`    ERROR: ${e.message}`);
+                    }
+
+                    // Test 2: Check if table can be compiled
+                    log('\n  Test 2: Check table compilation');
+                    try {
+                        const checkResult = lou.checkTable('tables/chardefs.cti');
+                        log(`    checkTable result: ${checkResult}`);
+                    } catch (e) {
+                        log(`    ERROR checking table: ${e.message}`);
+                    }
+
+                    // Test 3: Try compileString for a simple rule
+                    log('\n  Test 3: Test compileString with simple rule');
+                    try {
+                        const compileResult = lou.compileString(
+                            'tables/chardefs.cti',
+                            'letter a 1'
+                        );
+                        log(`    compileString result: ${compileResult}`);
+                    } catch (e) {
+                        log(`    ERROR compiling: ${e.message}`);
+                    }
+
+                    log('\nStep 5: Try minimal table with just letter definitions');
+
+                    // Create a minimal test table
+                    const minimalTable = `# Minimal test table
+letter a 1
+letter b 12
+letter c 14
+letter d 145
+letter e 15
+space \\s 0
+`;
+                    fs.writeFile('/tables/minimal.ctb', minimalTable);
+                    log('  Created minimal.ctb with just a few letter definitions');
+
+                    try {
+                        const result = lou.translateString('tables/minimal.ctb', 'abcd');
+                        log(`  Translation of "abcd": "${result}"`);
+                    } catch (e) {
+                        log(`  ERROR: ${e.message}`);
+                    }
+
+                    log('\nStep 6: Test different file writing methods');
+
+                    // Try writing as UTF-8 explicitly
+                    const encoder = new TextEncoder();
+                    const utf8Bytes = encoder.encode(chardefsContent);
+                    log(`  chardefs.cti as UTF-8: ${utf8Bytes.length} bytes`);
+
+                    // Check if we can write binary data
+                    try {
+                        fs.writeFile('/tables/chardefs-utf8.cti', utf8Bytes);
+                        log('  ✓ Written as UTF-8 bytes');
+                    } catch (e) {
+                        log(`  ERROR writing UTF-8: ${e.message}`);
+                    }
+                } catch (error) {
+                    log(`\nFATAL ERROR: ${error.message}`);
+                    log(`Stack: ${error.stack}`);
+                }
+
+                log('\n=== Test Complete ===');
+            }
+
+            // Run test when page loads
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(testChardefsOnly, 100);
+            });
+        </script>
+    </body>
+</html>

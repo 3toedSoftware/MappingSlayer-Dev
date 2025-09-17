@@ -1,0 +1,1306 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Manual SVG Text Wrapping Demo</title>
+        <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+        <!-- LibLouis for proper Grade 2 Braille translation -->
+        <script src="lib/liblouis/easy-api.js"></script>
+        <script src="lib/liblouis/build-no-tables-utf16.js"></script>
+        <!-- Fallback Grade 2 if LibLouis fails -->
+        <script src="braille-grade2.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+                background: #f0f0f0;
+            }
+
+            .container {
+                display: flex;
+                gap: 20px;
+                align-items: flex-start;
+            }
+
+            .controls {
+                flex: 1;
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .sign-preview {
+                flex: 1;
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            h1 {
+                color: #003875;
+                margin-top: 0;
+            }
+
+            h2 {
+                color: #003875;
+                font-size: 1.2em;
+                margin-top: 0;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 5px;
+                color: #666;
+                font-weight: bold;
+            }
+
+            input[type='text'],
+            textarea,
+            select {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                box-sizing: border-box;
+            }
+
+            textarea {
+                min-height: 100px;
+                resize: vertical;
+            }
+
+            .input-group {
+                margin-bottom: 15px;
+            }
+
+            .dimensions {
+                display: flex;
+                gap: 10px;
+            }
+
+            .dimensions .input-group {
+                flex: 1;
+            }
+
+            input[type='number'] {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            #svg-container {
+                border: 1px solid #ddd;
+                background: #fafafa;
+            }
+
+            .info {
+                background: #e3f2fd;
+                padding: 10px;
+                border-radius: 4px;
+                margin-top: 15px;
+                font-size: 0.9em;
+                color: #1976d2;
+            }
+
+            .presets {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .preset-btn {
+                padding: 8px 12px;
+                background: #003875;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+            }
+
+            .preset-btn:hover {
+                background: #002855;
+            }
+
+            .debug-info {
+                background: #fff3cd;
+                color: #856404;
+                padding: 10px;
+                border-radius: 4px;
+                margin-top: 10px;
+                font-size: 0.85em;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Manual SVG Text Wrapping Demo - Sign Template System</h1>
+
+        <div class="container">
+            <div class="controls">
+                <h2>Sign Text Input</h2>
+
+                <div class="presets">
+                    <button class="preset-btn" onclick="setPreset('STORAGE')">Storage</button>
+                    <button class="preset-btn" onclick="setPreset('EMPLOYEES\nONLY')">
+                        Employees Only
+                    </button>
+                    <button
+                        class="preset-btn"
+                        onclick="setPreset('SURGICAL SERVICES\nCONSULT\nROOM 1')"
+                    >
+                        Consult Room
+                    </button>
+                    <button class="preset-btn" onclick="setPreset('AUTHORIZED\nPERSONNEL\nONLY')">
+                        Authorized
+                    </button>
+                </div>
+
+                <div class="input-group">
+                    <label for="sign-text">Sign Text:</label>
+                    <textarea id="sign-text" placeholder="Enter sign text here...">
+STORAGE</textarea
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="font-family">Font Family:</label>
+                    <select id="font-family">
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="Helvetica, sans-serif">Helvetica</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                        <option value="Verdana, sans-serif">Verdana</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="custom-font">Custom Font (installed on system):</label>
+                    <input type="text" id="custom-font" placeholder="e.g., HCA Brand Font" />
+                    <button class="preset-btn" onclick="useCustomFont()" style="margin-top: 5px">
+                        Use Custom Font
+                    </button>
+                </div>
+
+                <div class="input-group">
+                    <label for="font-upload">Upload Font File (.ttf, .otf, .woff, .woff2):</label>
+                    <input
+                        type="file"
+                        id="font-upload"
+                        accept=".ttf,.otf,.woff,.woff2"
+                        style="margin-bottom: 5px"
+                    />
+                    <div id="uploaded-fonts" style="margin-top: 10px"></div>
+                </div>
+
+                <div class="dimensions">
+                    <div class="input-group">
+                        <label for="cap-height">Cap Height (px):</label>
+                        <input
+                            type="number"
+                            id="cap-height"
+                            value="62.5"
+                            min="10"
+                            max="150"
+                            step="0.5"
+                        />
+                    </div>
+                    <div class="input-group">
+                        <label for="line-height">Line Height:</label>
+                        <input
+                            type="number"
+                            id="line-height"
+                            value="1.2"
+                            min="0.8"
+                            max="2"
+                            step="0.1"
+                        />
+                    </div>
+                </div>
+
+                <div class="info" style="background: #e8f5e9; color: #2e7d32">
+                    <strong>Font Metrics:</strong><br />
+                    <span id="font-metrics">Calculating...</span>
+                </div>
+
+                <div class="dimensions">
+                    <div class="input-group">
+                        <label for="letter-spacing">Letter Spacing (px):</label>
+                        <input
+                            type="number"
+                            id="letter-spacing"
+                            value="0"
+                            min="-5"
+                            max="20"
+                            step="0.5"
+                        />
+                    </div>
+                    <div class="input-group">
+                        <label for="word-spacing">Word Spacing (px):</label>
+                        <input
+                            type="number"
+                            id="word-spacing"
+                            value="0"
+                            min="-10"
+                            max="30"
+                            step="1"
+                        />
+                    </div>
+                </div>
+
+                <div class="dimensions">
+                    <div class="input-group">
+                        <label for="box-width">Text Area Width (px):</label>
+                        <input type="number" id="box-width" value="600" min="100" max="2000" />
+                    </div>
+                    <div class="input-group">
+                        <label for="box-height">Text Area Height (px):</label>
+                        <input type="number" id="box-height" value="400" min="100" max="2000" />
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px">
+                    Sign Dimensions
+                </h2>
+
+                <div class="dimensions">
+                    <div class="input-group">
+                        <label for="sign-width">Sign Width (px):</label>
+                        <input
+                            type="number"
+                            id="sign-width"
+                            value="800"
+                            min="100"
+                            max="2400"
+                            step="1"
+                        />
+                    </div>
+                    <div class="input-group">
+                        <label for="sign-height">Sign Height (px):</label>
+                        <input
+                            type="number"
+                            id="sign-height"
+                            value="800"
+                            min="100"
+                            max="2400"
+                            step="1"
+                        />
+                    </div>
+                </div>
+
+                <div class="dimensions">
+                    <div class="input-group">
+                        <label for="sign-dpi">DPI (for inch conversion):</label>
+                        <input
+                            type="number"
+                            id="sign-dpi"
+                            value="100"
+                            min="72"
+                            max="300"
+                            step="1"
+                        />
+                    </div>
+                    <div class="input-group">
+                        <label for="show-rulers">Show Rulers:</label>
+                        <select id="show-rulers">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px">
+                    Braille Options
+                </h2>
+
+                <div class="input-group">
+                    <label style="display: flex; align-items: center; cursor: pointer">
+                        <input
+                            type="checkbox"
+                            id="enable-braille"
+                            style="width: auto; margin-right: 10px"
+                        />
+                        <span>Add Braille Translation</span>
+                    </label>
+                </div>
+
+                <div class="info" style="background: #f3e5f5; color: #6a1b9a">
+                    <strong>Braille Specifications:</strong><br />
+                    Height: 0.239" (23.9px at 100 DPI)<br />
+                    Gap from text: 0.4" (40px at 100 DPI)<br />
+                    Translation: Grade 2 Contracted Braille (ADA Standard)
+                </div>
+
+                <div class="info">
+                    <strong>Note:</strong> At <span id="dpi-display">100</span> DPI,
+                    <span id="ada-size">62.5</span>px = 0.625 inches (5/8" - standard ADA character
+                    height)<br />
+                    Sign size: <span id="sign-size-display">800x800</span>px (<span
+                        id="sign-inches-display"
+                        >8" x 8"</span
+                    >)<br />
+                    Text is manually wrapped and perfectly centered both horizontally and
+                    vertically.
+                </div>
+            </div>
+
+            <div class="sign-preview">
+                <h2>Sign Preview</h2>
+                <div id="svg-container"></div>
+                <div class="debug-info" id="debug-info">Initializing...</div>
+            </div>
+        </div>
+
+        <script>
+            // Sign dimensions (will be updated dynamically)
+            let SIGN_WIDTH = 800;
+            let SIGN_HEIGHT = 800;
+            let DPI = 100;
+
+            // Custom fonts storage
+            let customFonts = {};
+
+            // Braille translator instance
+            let brailleTranslator = null;
+            let brailleReady = false;
+
+            // Load and inject braille font
+            async function loadBrailleFont() {
+                try {
+                    const response = await fetch('BRAILLE.TTF');
+                    const blob = await response.blob();
+                    const reader = new FileReader();
+
+                    return new Promise((resolve, reject) => {
+                        reader.onload = function (event) {
+                            const base64 = event.target.result;
+
+                            // Inject braille font
+                            const style = document.createElement('style');
+                            style.id = 'braille-font-style';
+                            style.textContent = `
+                            @font-face {
+                                font-family: 'Braille';
+                                src: url(${base64}) format('truetype');
+                                font-weight: normal;
+                                font-style: normal;
+                            }
+                        `;
+                            document.head.appendChild(style);
+                            console.log('Braille font loaded successfully');
+                            resolve();
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+                } catch (error) {
+                    console.error('Error loading braille font:', error);
+                }
+            }
+
+            // Initialize braille translator
+            async function initializeBraille() {
+                try {
+                    // Load braille font first
+                    await loadBrailleFont();
+
+                    // Wait a bit for LibLouis to load
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Try to find LibLouis in various places
+                    let lou = null;
+
+                    // Check if LiblouisEasyApi is available
+                    if (typeof LiblouisEasyApi !== 'undefined') {
+                        console.log('Found LiblouisEasyApi, initializing...');
+                        // Check for liblouisBuild first (this is what build-no-tables-utf16.js creates)
+                        if (typeof liblouisBuild !== 'undefined') {
+                            console.log('Found liblouisBuild, using it for initialization');
+                            lou = new LiblouisEasyApi(liblouisBuild);
+                        } else if (typeof Module !== 'undefined' && Module._lou_version) {
+                            console.log('Found Module with _lou_version');
+                            lou = new LiblouisEasyApi(Module);
+                        } else {
+                            // Try without argument to use default (will auto-detect liblouisBuild)
+                            console.log('Trying LiblouisEasyApi with auto-detection');
+                            lou = new LiblouisEasyApi();
+                        }
+                    } else if (typeof liblouisBuild !== 'undefined' && liblouisBuild.ccall) {
+                        console.log('Found liblouisBuild with ccall, using directly...');
+                        // Try to use liblouisBuild directly
+                        lou = liblouisBuild;
+                    }
+
+                    if (lou) {
+                        // Set up virtual filesystem for LibLouis
+                        try {
+                            // Load all necessary table files including ALL dependencies
+                            const tablesToLoad = [
+                                'unicode.dis', // Required for Unicode braille output
+                                'loweredDigits6Dots.uti', // Required by chardefs.cti
+                                'latinLetterDef8Dots.uti', // Required by chardefs.cti
+                                'latinLetterDef6Dots.uti', // Alternative letter definitions
+                                'chardefs.cti', // Character definitions (loads after its dependencies)
+                                'braille-patterns.cti', // Braille pattern definitions
+                                'litdigits6Dots.uti', // Literal digits for 6-dot braille
+                                'digits6Dots.uti', // Standard digits
+                                'en-us-g1.ctb', // Grade 1 US English (included by g2)
+                                'en-us-g2.ctb' // Grade 2 US English (main table)
+                            ];
+
+                            const tableContents = {};
+
+                            // Load all table files
+                            for (const tableName of tablesToLoad) {
+                                const response = await fetch(`lib/liblouis/tables/${tableName}`);
+                                if (response.ok) {
+                                    tableContents[tableName] = await response.text();
+                                    console.log(
+                                        `Loaded table ${tableName}, size: ${tableContents[tableName].length}`
+                                    );
+                                }
+                            }
+
+                            // Set up the virtual filesystem
+                            const FS = lou.getFilesystem();
+                            if (FS) {
+                                // Create tables directory in virtual filesystem root
+                                try {
+                                    FS.mkdir('/tables');
+                                } catch (e) {
+                                    // Directory might already exist
+                                }
+
+                                // Write all tables to virtual filesystem
+                                for (const [name, content] of Object.entries(tableContents)) {
+                                    FS.writeFile(`/tables/${name}`, content);
+                                    console.log(
+                                        `Wrote ${name} to virtual filesystem at /tables/${name}`
+                                    );
+                                }
+
+                                // Set the data path for LibLouis to root
+                                lou.setDataPath('/');
+                                console.log('LibLouis data path set to /');
+
+                                // Now try to use LibLouis with proper table path references
+                                // Include unicode.dis for proper braille output
+                                const tableList = 'tables/unicode.dis,tables/en-us-g2.ctb';
+
+                                const test1 = lou.translateString(tableList, 'and');
+                                const test2 = lou.translateString(tableList, 'STORAGE');
+
+                                if (test1 && test2) {
+                                    console.log('LibLouis Grade 2 tests SUCCESS:');
+                                    console.log(`  "and" -> "${test1}" (Grade 2 contraction)`);
+                                    console.log(`  "STORAGE" -> "${test2}"`);
+
+                                    // Store the translator and table list for later use
+                                    brailleTranslator = lou;
+                                    window.liblouisTableList = tableList; // Store for use in translation
+                                    brailleReady = true;
+                                    console.log(
+                                        'LibLouis Grade 2 translator initialized successfully!'
+                                    );
+                                } else {
+                                    throw new Error('Translation returned null');
+                                }
+                            } else {
+                                throw new Error('Could not get LibLouis filesystem');
+                            }
+                        } catch (e) {
+                            console.error('Failed to initialize LibLouis properly:', e);
+                            console.log('Will use fallback Grade 2 translation');
+                            brailleReady = true;
+                        }
+                    } else {
+                        console.warn('LibLouis not found, using fallback Grade 2 translation');
+                        brailleReady = true;
+                    }
+                } catch (error) {
+                    console.error('Error initializing LibLouis:', error);
+                    console.log('Will use fallback Grade 2 translation');
+                    brailleReady = true; // Use fallback
+                }
+            }
+
+            // Simple braille character mapping (fallback)
+            const simpleBrailleMap = {
+                A: '⠁',
+                B: '⠃',
+                C: '⠉',
+                D: '⠙',
+                E: '⠑',
+                F: '⠋',
+                G: '⠛',
+                H: '⠓',
+                I: '⠊',
+                J: '⠚',
+                K: '⠅',
+                L: '⠇',
+                M: '⠍',
+                N: '⠝',
+                O: '⠕',
+                P: '⠏',
+                Q: '⠟',
+                R: '⠗',
+                S: '⠎',
+                T: '⠞',
+                U: '⠥',
+                V: '⠧',
+                W: '⠺',
+                X: '⠭',
+                Y: '⠽',
+                Z: '⠵',
+                ' ': ' ',
+                1: '⠼⠁',
+                2: '⠼⠃',
+                3: '⠼⠉',
+                4: '⠼⠙',
+                5: '⠼⠑',
+                6: '⠼⠋',
+                7: '⠼⠛',
+                8: '⠼⠓',
+                9: '⠼⠊',
+                0: '⠼⠚'
+            };
+
+            // Translate text to braille
+            function translateToBraille(text) {
+                // Try LibLouis first for proper Grade 2
+                if (
+                    brailleTranslator &&
+                    brailleTranslator.translateString &&
+                    window.liblouisTableList
+                ) {
+                    try {
+                        const result = brailleTranslator.translateString(
+                            window.liblouisTableList,
+                            text
+                        );
+                        console.log(`LibLouis Grade 2: "${text}" -> "${result}"`);
+                        return result;
+                    } catch (error) {
+                        console.error('LibLouis translation failed:', error);
+                    }
+                }
+
+                // Use JavaScript Grade 2 translation if available
+                if (typeof window.translateToGrade2Braille === 'function') {
+                    const result = window.translateToGrade2Braille(text);
+                    console.log(`Fallback Grade 2: "${text}" -> "${result}"`);
+                    return result;
+                }
+
+                // Last resort: simple mapping
+                const result = text
+                    .toUpperCase()
+                    .split('')
+                    .map(char => simpleBrailleMap[char] || char)
+                    .join('');
+                console.log(`Simple mapping: "${text}" -> "${result}"`);
+                return result;
+            }
+
+            // Load stored fonts from localStorage on startup
+            function loadStoredFonts() {
+                const stored = localStorage.getItem('customFonts');
+                if (stored) {
+                    try {
+                        customFonts = JSON.parse(stored);
+                        // Re-inject all stored fonts
+                        Object.keys(customFonts).forEach(fontName => {
+                            injectFont(fontName, customFonts[fontName]);
+                            addFontToList(fontName);
+                        });
+                    } catch (e) {
+                        console.error('Error loading stored fonts:', e);
+                    }
+                }
+            }
+
+            // Inject font into page
+            function injectFont(fontName, base64Data) {
+                const styleId = 'custom-font-' + fontName.replace(/\s+/g, '-');
+
+                // Remove existing style if present
+                const existing = document.getElementById(styleId);
+                if (existing) {
+                    existing.remove();
+                }
+
+                // Create new style element
+                const style = document.createElement('style');
+                style.id = styleId;
+                style.textContent = `
+                @font-face {
+                    font-family: '${fontName}';
+                    src: url(${base64Data}) format('truetype');
+                    font-weight: normal;
+                    font-style: normal;
+                }
+                @font-face {
+                    font-family: '${fontName}';
+                    src: url(${base64Data}) format('truetype');
+                    font-weight: bold;
+                    font-style: normal;
+                }
+            `;
+                document.head.appendChild(style);
+            }
+
+            // Add font to the dropdown and uploaded fonts list
+            function addFontToList(fontName) {
+                // Add to dropdown if not already there
+                const select = document.getElementById('font-family');
+                const optionId = 'font-option-' + fontName.replace(/\s+/g, '-');
+                if (!document.getElementById(optionId)) {
+                    const option = document.createElement('option');
+                    option.id = optionId;
+                    option.value = `'${fontName}', sans-serif`;
+                    option.textContent = fontName + ' (Custom)';
+                    select.appendChild(option);
+                }
+
+                // Add to uploaded fonts display
+                const uploadedDiv = document.getElementById('uploaded-fonts');
+                const fontId = 'uploaded-' + fontName.replace(/\s+/g, '-');
+                if (!document.getElementById(fontId)) {
+                    const fontItem = document.createElement('div');
+                    fontItem.id = fontId;
+                    fontItem.style.cssText =
+                        'padding: 5px; background: #f0f0f0; margin-bottom: 5px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;';
+                    fontItem.innerHTML = `
+                    <span style="font-family: '${fontName}', sans-serif;">${fontName}</span>
+                    <button onclick="removeFont('${fontName}')" style="background: #dc3545; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">Remove</button>
+                `;
+                    uploadedDiv.appendChild(fontItem);
+                }
+            }
+
+            // Remove font
+            function removeFont(fontName) {
+                // Remove from storage
+                delete customFonts[fontName];
+                localStorage.setItem('customFonts', JSON.stringify(customFonts));
+
+                // Remove from page
+                const styleId = 'custom-font-' + fontName.replace(/\s+/g, '-');
+                const style = document.getElementById(styleId);
+                if (style) style.remove();
+
+                // Remove from dropdown
+                const optionId = 'font-option-' + fontName.replace(/\s+/g, '-');
+                const option = document.getElementById(optionId);
+                if (option) option.remove();
+
+                // Remove from uploaded list
+                const fontId = 'uploaded-' + fontName.replace(/\s+/g, '-');
+                const fontItem = document.getElementById(fontId);
+                if (fontItem) fontItem.remove();
+
+                // If this was the selected font, switch to Arial
+                const select = document.getElementById('font-family');
+                if (select.value === `'${fontName}', sans-serif`) {
+                    select.value = 'Arial, sans-serif';
+                    updateText();
+                }
+            }
+
+            // Use custom system font
+            function useCustomFont() {
+                const fontName = document.getElementById('custom-font').value.trim();
+                if (!fontName) {
+                    alert('Please enter a font name');
+                    return;
+                }
+
+                // Add to dropdown and select it
+                const select = document.getElementById('font-family');
+                const optionId = 'font-option-' + fontName.replace(/\s+/g, '-');
+                if (!document.getElementById(optionId)) {
+                    const option = document.createElement('option');
+                    option.id = optionId;
+                    option.value = `'${fontName}', sans-serif`;
+                    option.textContent = fontName + ' (System)';
+                    select.appendChild(option);
+                }
+
+                select.value = `'${fontName}', sans-serif`;
+                updateText();
+            }
+
+            // Handle font file upload
+            document.addEventListener('DOMContentLoaded', async function () {
+                loadStoredFonts();
+
+                // Initialize braille
+                await initializeBraille();
+
+                document.getElementById('font-upload').addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        const base64 = event.target.result;
+
+                        // Extract font name from filename (remove extension)
+                        let fontName = file.name.replace(/\.(ttf|otf|woff|woff2)$/i, '');
+
+                        // Prompt for custom name
+                        const customName = prompt(
+                            'Font name (or leave blank to use filename):',
+                            fontName
+                        );
+                        if (customName !== null && customName.trim()) {
+                            fontName = customName.trim();
+                        }
+
+                        // Store font
+                        customFonts[fontName] = base64;
+                        localStorage.setItem('customFonts', JSON.stringify(customFonts));
+
+                        // Inject and use font
+                        injectFont(fontName, base64);
+
+                        // Wait a moment for font to load, then add to list
+                        setTimeout(() => {
+                            addFontToList(fontName);
+
+                            // Select the new font
+                            const select = document.getElementById('font-family');
+                            select.value = `'${fontName}', sans-serif`;
+                            updateText();
+                        }, 100);
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Clear the input so the same file can be re-uploaded if needed
+                    e.target.value = '';
+                });
+            });
+
+            // Create SVG container
+            const svgContainer = d3.select('#svg-container');
+            let svg = svgContainer
+                .append('svg')
+                .attr('width', SIGN_WIDTH)
+                .attr('height', SIGN_HEIGHT)
+                .attr('viewBox', `0 0 ${SIGN_WIDTH} ${SIGN_HEIGHT}`);
+
+            // Create all SVG elements that will be redrawn
+            let backgroundRect,
+                logoGroup,
+                textAreaRect,
+                textContainer,
+                brailleContainer,
+                rulerGroup;
+
+            function initializeSVG() {
+                // Clear SVG
+                svg.selectAll('*').remove();
+
+                // Add background (sign plate)
+                backgroundRect = svg
+                    .append('rect')
+                    .attr('class', 'sign-background')
+                    .attr('width', SIGN_WIDTH)
+                    .attr('height', SIGN_HEIGHT)
+                    .attr('fill', '#f5f5f5')
+                    .attr('stroke', '#333')
+                    .attr('stroke-width', 3);
+
+                // Add logo placeholder (orange cross)
+                logoGroup = svg.append('g').attr('transform', `translate(${SIGN_WIDTH - 150}, 50)`);
+
+                logoGroup
+                    .append('rect')
+                    .attr('x', 35)
+                    .attr('y', 0)
+                    .attr('width', 30)
+                    .attr('height', 100)
+                    .attr('fill', '#FF6B35');
+
+                logoGroup
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 35)
+                    .attr('width', 100)
+                    .attr('height', 30)
+                    .attr('fill', '#FF6B35');
+
+                // Text area visualization (dashed border)
+                textAreaRect = svg
+                    .append('rect')
+                    .attr('id', 'text-area')
+                    .attr('fill', 'none')
+                    .attr('stroke', '#003875')
+                    .attr('stroke-width', 1)
+                    .attr('stroke-dasharray', '5,5')
+                    .attr('opacity', 0.3);
+
+                // Create text container
+                textContainer = svg.append('g').attr('id', 'sign-text-container');
+
+                // Create braille container
+                brailleContainer = svg.append('g').attr('id', 'braille-container');
+
+                // Add measurement rulers
+                rulerGroup = svg.append('g').attr('id', 'rulers');
+
+                const showRulers = document.getElementById('show-rulers').value === 'true';
+                rulerGroup.style('display', showRulers ? 'block' : 'none');
+
+                // Horizontal ruler
+                rulerGroup
+                    .append('line')
+                    .attr('x1', 0)
+                    .attr('y1', 30)
+                    .attr('x2', SIGN_WIDTH)
+                    .attr('y2', 30)
+                    .attr('stroke', '#ff0000')
+                    .attr('stroke-width', 2)
+                    .attr('opacity', 0.7);
+
+                rulerGroup
+                    .append('text')
+                    .attr('x', SIGN_WIDTH / 2)
+                    .attr('y', 20)
+                    .attr('text-anchor', 'middle')
+                    .attr('font-size', 14)
+                    .attr('font-weight', 'bold')
+                    .attr('fill', '#ff0000')
+                    .text(
+                        `${(SIGN_WIDTH / DPI).toFixed(2)} inches (${SIGN_WIDTH}px at ${DPI} DPI)`
+                    );
+
+                // Vertical ruler
+                rulerGroup
+                    .append('line')
+                    .attr('x1', 30)
+                    .attr('y1', 0)
+                    .attr('x2', 30)
+                    .attr('y2', SIGN_HEIGHT)
+                    .attr('stroke', '#ff0000')
+                    .attr('stroke-width', 2)
+                    .attr('opacity', 0.7);
+
+                rulerGroup
+                    .append('text')
+                    .attr('x', 40)
+                    .attr('y', SIGN_HEIGHT / 2)
+                    .attr('text-anchor', 'middle')
+                    .attr('font-size', 14)
+                    .attr('font-weight', 'bold')
+                    .attr('fill', '#ff0000')
+                    .attr('transform', `rotate(-90, 40, ${SIGN_HEIGHT / 2})`)
+                    .text(`${(SIGN_HEIGHT / DPI).toFixed(2)} inches (${SIGN_HEIGHT}px)`);
+            }
+
+            // Initialize SVG
+            initializeSVG();
+
+            // Manual text wrapping function
+            function wrapText(
+                text,
+                fontFamily,
+                fontSize,
+                letterSpacing,
+                wordSpacing,
+                maxWidth,
+                maxHeight
+            ) {
+                // Create invisible text element for measuring
+                const measurer = svg
+                    .append('text')
+                    .style('font-family', fontFamily)
+                    .style('font-size', fontSize + 'px')
+                    .style('font-weight', 'bold')
+                    .style('letter-spacing', letterSpacing + 'px')
+                    .style('word-spacing', wordSpacing + 'px')
+                    .style('visibility', 'hidden');
+
+                // Split text by newlines first (manual line breaks)
+                const paragraphs = text.split('\n');
+                const allLines = [];
+
+                // Process each paragraph
+                paragraphs.forEach(paragraph => {
+                    if (paragraph.trim() === '') {
+                        allLines.push(''); // Preserve empty lines
+                        return;
+                    }
+
+                    const words = paragraph.trim().split(/\s+/);
+                    let currentLine = [];
+
+                    words.forEach(word => {
+                        currentLine.push(word);
+                        measurer.text(currentLine.join(' '));
+                        const lineWidth = measurer.node().getComputedTextLength();
+
+                        if (lineWidth > maxWidth && currentLine.length > 1) {
+                            // Line is too long, remove last word and start new line
+                            currentLine.pop();
+                            allLines.push(currentLine.join(' '));
+                            currentLine = [word];
+                        }
+                    });
+
+                    // Add remaining words
+                    if (currentLine.length > 0) {
+                        allLines.push(currentLine.join(' '));
+                    }
+                });
+
+                // Remove measurer
+                measurer.remove();
+
+                return allLines;
+            }
+
+            // Function to update sign dimensions
+            function updateSignDimensions() {
+                SIGN_WIDTH = parseInt(document.getElementById('sign-width').value);
+                SIGN_HEIGHT = parseInt(document.getElementById('sign-height').value);
+                DPI = parseInt(document.getElementById('sign-dpi').value);
+
+                // Calculate inch dimensions for display
+                const signWidthInches = (SIGN_WIDTH / DPI).toFixed(2);
+                const signHeightInches = (SIGN_HEIGHT / DPI).toFixed(2);
+
+                // Update SVG dimensions
+                svg.attr('width', SIGN_WIDTH)
+                    .attr('height', SIGN_HEIGHT)
+                    .attr('viewBox', `0 0 ${SIGN_WIDTH} ${SIGN_HEIGHT}`);
+
+                // Redraw SVG elements
+                initializeSVG();
+
+                // Update display info
+                document.getElementById('dpi-display').textContent = DPI;
+                document.getElementById('ada-size').textContent = (0.625 * DPI).toFixed(1);
+                document.getElementById('sign-size-display').textContent =
+                    `${SIGN_WIDTH}x${SIGN_HEIGHT}`;
+                document.getElementById('sign-inches-display').textContent =
+                    `${signWidthInches}" x ${signHeightInches}"`;
+
+                // Update text
+                updateText();
+            }
+
+            // Function to measure actual cap height
+            function measureCapHeight(fontFamily, fontSize) {
+                // Create a temporary canvas to measure text metrics
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.font = `bold ${fontSize}px ${fontFamily}`;
+
+                // Measure an 'X' to get cap height
+                const metrics = ctx.measureText('X');
+
+                // Get the actual bounds if available (not all browsers support this)
+                let capHeight;
+                if (metrics.actualBoundingBoxAscent) {
+                    capHeight = metrics.actualBoundingBoxAscent;
+                } else {
+                    // Fallback: estimate cap height as 72% of font size (typical ratio)
+                    capHeight = fontSize * 0.72;
+                }
+
+                return capHeight;
+            }
+
+            // Function to calculate font-size needed for desired cap height
+            function calculateFontSizeForCapHeight(fontFamily, targetCapHeight) {
+                // Start with an estimate (cap height is typically 70-75% of font size)
+                let fontSize = targetCapHeight / 0.72;
+                let iterations = 0;
+                const maxIterations = 10;
+
+                // Refine the estimate iteratively
+                while (iterations < maxIterations) {
+                    const measuredCapHeight = measureCapHeight(fontFamily, fontSize);
+                    const error = targetCapHeight - measuredCapHeight;
+
+                    // If we're close enough, return
+                    if (Math.abs(error) < 0.1) {
+                        return fontSize;
+                    }
+
+                    // Adjust font size proportionally
+                    fontSize = fontSize * (targetCapHeight / measuredCapHeight);
+                    iterations++;
+                }
+
+                return fontSize;
+            }
+
+            // Function to measure actual braille dot height
+            function measureBrailleDotHeight(fontSize) {
+                // Create a temporary canvas to measure braille characters
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.font = `${fontSize}px Braille`;
+
+                // Measure a full braille cell (⠿ has all dots filled)
+                const metrics = ctx.measureText('⠿');
+
+                // Get the actual bounds if available
+                let dotHeight;
+                if (metrics.actualBoundingBoxAscent && metrics.actualBoundingBoxDescent) {
+                    dotHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+                } else {
+                    // Fallback: estimate dot height as 62% of font size
+                    dotHeight = fontSize * 0.62;
+                }
+
+                return dotHeight;
+            }
+
+            // Function to calculate font-size needed for desired braille dot height
+            function calculateBrailleFontSize(targetDotHeight) {
+                // Start with an estimate
+                let fontSize = targetDotHeight / 0.62;
+                let iterations = 0;
+                const maxIterations = 10;
+
+                // Refine the estimate iteratively
+                while (iterations < maxIterations) {
+                    const measuredDotHeight = measureBrailleDotHeight(fontSize);
+                    const error = targetDotHeight - measuredDotHeight;
+
+                    // If we're close enough, return
+                    if (Math.abs(error) < 0.1) {
+                        return fontSize;
+                    }
+
+                    // Adjust font size proportionally
+                    fontSize = fontSize * (targetDotHeight / measuredDotHeight);
+                    iterations++;
+                }
+
+                return fontSize;
+            }
+
+            // Function to update text
+            function updateText() {
+                const text = document.getElementById('sign-text').value;
+                const fontFamily = document.getElementById('font-family').value;
+                const targetCapHeight = parseFloat(document.getElementById('cap-height').value);
+                const lineHeight = parseFloat(document.getElementById('line-height').value);
+                const letterSpacing = parseFloat(document.getElementById('letter-spacing').value);
+                const wordSpacing = parseFloat(document.getElementById('word-spacing').value);
+                const boxWidth = parseInt(document.getElementById('box-width').value);
+                const boxHeight = parseInt(document.getElementById('box-height').value);
+
+                // Calculate the font-size needed for the target cap height
+                const fontSize = calculateFontSizeForCapHeight(fontFamily, targetCapHeight);
+
+                // Verify the actual cap height achieved
+                const actualCapHeight = measureCapHeight(fontFamily, fontSize);
+                const capHeightInches = (actualCapHeight / DPI).toFixed(3);
+                const adaCompliant = actualCapHeight >= 0.625 * DPI;
+
+                // Update font metrics display
+                document.getElementById('font-metrics').innerHTML = `
+                Calculated Font Size: ${fontSize.toFixed(1)}px (em square)<br>
+                Actual Cap Height: ${actualCapHeight.toFixed(1)}px (${capHeightInches}" at ${DPI} DPI)<br>
+                ADA Compliance: ${adaCompliant ? '✓ Yes' : '✗ No'} (needs ${(0.625 * DPI).toFixed(1)}px cap height)
+            `;
+
+                // Calculate text area position (centered on sign)
+                const textX = (SIGN_WIDTH - boxWidth) / 2;
+                const textY = (SIGN_HEIGHT - boxHeight) / 2;
+
+                // Update text area rectangle
+                textAreaRect
+                    .attr('x', textX)
+                    .attr('y', textY)
+                    .attr('width', boxWidth)
+                    .attr('height', boxHeight);
+
+                // Clear previous text and braille
+                textContainer.selectAll('*').remove();
+                brailleContainer.selectAll('*').remove();
+
+                // Wrap text
+                const lines = wrapText(
+                    text,
+                    fontFamily,
+                    fontSize,
+                    letterSpacing,
+                    wordSpacing,
+                    boxWidth,
+                    boxHeight
+                );
+
+                // Calculate vertical centering
+                const lineHeightPx = fontSize * lineHeight;
+                const totalTextHeight = lines.length * lineHeightPx;
+                const verticalPadding = (boxHeight - totalTextHeight) / 2;
+                const startY = textY + verticalPadding + fontSize; // Add fontSize for baseline adjustment
+
+                // Render each line
+                let lastTextY = startY;
+                lines.forEach((line, i) => {
+                    const y = startY + i * lineHeightPx;
+                    textContainer
+                        .append('text')
+                        .attr('x', textX + boxWidth / 2)
+                        .attr('y', y)
+                        .attr('text-anchor', 'middle')
+                        .attr('font-family', fontFamily)
+                        .attr('font-size', fontSize)
+                        .attr('font-weight', 'bold')
+                        .attr('fill', '#003875')
+                        .style('letter-spacing', letterSpacing + 'px')
+                        .style('word-spacing', wordSpacing + 'px')
+                        .text(line);
+                    lastTextY = y;
+                });
+
+                // Add braille if enabled
+                const brailleEnabled = document.getElementById('enable-braille').checked;
+                if (brailleEnabled && brailleReady) {
+                    // Calculate braille position
+                    // 0.4" (40px at 100 DPI) gap from bottom of text
+                    // Braille actual dot height should be 0.239" (23.9px at 100 DPI)
+                    const brailleGap = 0.4 * DPI; // 40px at 100 DPI
+                    const brailleTargetHeight = 0.239 * DPI; // 23.9px at 100 DPI - this is the actual dot height we want
+
+                    // Calculate font-size needed to achieve exact braille dot height
+                    const brailleFontSize = calculateBrailleFontSize(brailleTargetHeight);
+
+                    // Verify actual height achieved
+                    const actualBrailleHeight = measureBrailleDotHeight(brailleFontSize);
+                    console.log(
+                        `Braille: target ${brailleTargetHeight.toFixed(1)}px, actual ${actualBrailleHeight.toFixed(1)}px, font-size ${brailleFontSize.toFixed(1)}px`
+                    );
+
+                    const brailleY = lastTextY + brailleGap + brailleTargetHeight; // Top of braille + height for baseline
+
+                    // Translate text to braille - remove newlines so it flows continuously
+                    const textWithoutBreaks = text.replace(/\n/g, ' ');
+                    const brailleText = translateToBraille(textWithoutBreaks);
+
+                    // Wrap braille text to fit within sign width
+                    const brailleMeasurer = document.createElement('div');
+                    brailleMeasurer.style.position = 'absolute';
+                    brailleMeasurer.style.visibility = 'hidden';
+                    brailleMeasurer.style.fontFamily = 'Braille, monospace';
+                    brailleMeasurer.style.fontSize = brailleFontSize + 'px';
+                    brailleMeasurer.style.whiteSpace = 'nowrap';
+                    document.body.appendChild(brailleMeasurer);
+
+                    // Simple word wrapping for braille
+                    const brailleWords = brailleText.split(' ');
+                    const brailleLines = [];
+                    let currentBrailleLine = [];
+
+                    brailleWords.forEach(word => {
+                        currentBrailleLine.push(word);
+                        brailleMeasurer.textContent = currentBrailleLine.join(' ');
+                        const lineWidth = brailleMeasurer.offsetWidth;
+
+                        if (lineWidth > boxWidth && currentBrailleLine.length > 1) {
+                            currentBrailleLine.pop();
+                            brailleLines.push(currentBrailleLine.join(' '));
+                            currentBrailleLine = [word];
+                        }
+                    });
+
+                    if (currentBrailleLine.length > 0) {
+                        brailleLines.push(currentBrailleLine.join(' '));
+                    }
+
+                    brailleMeasurer.remove();
+
+                    // Render braille lines
+                    brailleLines.forEach((line, i) => {
+                        brailleContainer
+                            .append('text')
+                            .attr('x', textX + boxWidth / 2)
+                            .attr('y', brailleY + i * brailleTargetHeight * 1.5) // 1.5 line height for braille spacing
+                            .attr('text-anchor', 'middle')
+                            .attr('font-family', 'Braille, monospace')
+                            .attr('font-size', brailleFontSize)
+                            .attr('fill', '#003875')
+                            .text(line);
+                    });
+
+                    // Add visual indicator for braille area (dotted outline)
+                    const brailleTotalHeight = Math.max(
+                        brailleLines.length * brailleTargetHeight * 1.5,
+                        brailleTargetHeight * 1.5
+                    );
+                    brailleContainer
+                        .append('rect')
+                        .attr('x', textX)
+                        .attr('y', brailleY - brailleTargetHeight)
+                        .attr('width', boxWidth)
+                        .attr('height', brailleTotalHeight + 5)
+                        .attr('fill', 'none')
+                        .attr('stroke', '#6a1b9a')
+                        .attr('stroke-width', 1)
+                        .attr('stroke-dasharray', '3,3')
+                        .attr('opacity', 0.3);
+                }
+
+                // Update debug info
+                const debugInfo = document.getElementById('debug-info');
+                debugInfo.innerHTML = `
+                Lines: ${lines.length}<br>
+                Font Size: ${fontSize}px (${(fontSize / 100).toFixed(3)}" at 100 DPI)<br>
+                Line Height: ${lineHeight} (${lineHeightPx.toFixed(1)}px)<br>
+                Total Text Height: ${totalTextHeight.toFixed(1)}px<br>
+                Vertical Padding: ${verticalPadding.toFixed(1)}px<br>
+                Text Area: ${boxWidth}x${boxHeight}px (${(boxWidth / 100).toFixed(2)}" x ${(boxHeight / 100).toFixed(2)}")
+            `;
+            }
+
+            // Function to set preset text
+            function setPreset(text) {
+                document.getElementById('sign-text').value = text;
+                updateText();
+            }
+
+            // Add event listeners for text and spacing
+            document.getElementById('sign-text').addEventListener('input', updateText);
+            document.getElementById('font-family').addEventListener('change', updateText);
+            document.getElementById('cap-height').addEventListener('input', updateText);
+            document.getElementById('line-height').addEventListener('input', updateText);
+            document.getElementById('letter-spacing').addEventListener('input', updateText);
+            document.getElementById('word-spacing').addEventListener('input', updateText);
+            document.getElementById('box-width').addEventListener('input', updateText);
+            document.getElementById('box-height').addEventListener('input', updateText);
+
+            // Add event listeners for sign dimensions
+            document.getElementById('sign-width').addEventListener('input', updateSignDimensions);
+            document.getElementById('sign-height').addEventListener('input', updateSignDimensions);
+            document.getElementById('sign-dpi').addEventListener('input', updateSignDimensions);
+            document.getElementById('show-rulers').addEventListener('change', () => {
+                const showRulers = document.getElementById('show-rulers').value === 'true';
+                if (rulerGroup) {
+                    rulerGroup.style('display', showRulers ? 'block' : 'none');
+                }
+            });
+
+            // Add event listener for braille checkbox
+            document.getElementById('enable-braille').addEventListener('change', updateText);
+
+            // Initial render
+            updateSignDimensions();
+        </script>
+    </body>
+</html>

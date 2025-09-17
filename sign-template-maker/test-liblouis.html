@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>LibLouis Debug Test</title>
+        <script src="lib/liblouis/build-no-tables-utf16.js"></script>
+        <script src="lib/liblouis/easy-api.js"></script>
+    </head>
+    <body>
+        <h1>LibLouis Initialization Debug</h1>
+        <div id="output" style="white-space: pre-wrap; font-family: monospace"></div>
+
+        <script>
+            const output = document.getElementById('output');
+
+            function log(msg) {
+                console.log(msg);
+                output.textContent += msg + '\n';
+            }
+
+            async function testLibLouis() {
+                log('Starting LibLouis test...\n');
+
+                // Check what globals are available
+                log('Checking globals:');
+                log(`  typeof liblouisBuild: ${typeof liblouisBuild}`);
+                log(`  typeof Module: ${typeof Module}`);
+                log(`  typeof LiblouisEasyApi: ${typeof LiblouisEasyApi}`);
+                log(`  typeof liblouis_emscripten: ${typeof liblouis_emscripten}`);
+
+                // Wait for everything to load
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                log('\nAfter 1 second wait:');
+                log(`  typeof liblouisBuild: ${typeof liblouisBuild}`);
+                log(`  typeof Module: ${typeof Module}`);
+
+                if (typeof liblouisBuild !== 'undefined') {
+                    log('\nliblouisBuild properties:');
+                    log(`  Has ccall: ${typeof liblouisBuild.ccall}`);
+                    log(`  Has _lou_version: ${typeof liblouisBuild._lou_version}`);
+                    log(`  Has FS: ${typeof liblouisBuild.FS}`);
+
+                    // Try to get version directly
+                    try {
+                        if (liblouisBuild.ccall) {
+                            const version = liblouisBuild.ccall('lou_version', 'string', [], []);
+                            log(`  LibLouis version (direct): ${version}`);
+                        }
+                    } catch (e) {
+                        log(`  Error getting version directly: ${e.message}`);
+                    }
+                }
+
+                // Try to initialize LiblouisEasyApi
+                if (typeof LiblouisEasyApi !== 'undefined') {
+                    log('\nTrying to initialize LiblouisEasyApi...');
+
+                    try {
+                        // Try with liblouisBuild
+                        if (typeof liblouisBuild !== 'undefined') {
+                            log('  Using liblouisBuild...');
+                            const lou = new LiblouisEasyApi(liblouisBuild);
+                            log('  ✓ Created with liblouisBuild');
+
+                            // Try to get version
+                            const version = lou.version();
+                            log(`  LibLouis version: ${version}`);
+
+                            // Try to set data path
+                            lou.setDataPath('/');
+                            log('  ✓ Set data path to /');
+
+                            // Try to get filesystem
+                            const fs = lou.getFilesystem();
+                            log(`  Has filesystem: ${!!fs}`);
+
+                            if (fs) {
+                                // Load tables
+                                log('\n  Loading ALL tables with dependencies...');
+                                const tables = [
+                                    'unicode.dis',
+                                    'loweredDigits6Dots.uti',
+                                    'latinLetterDef8Dots.uti',
+                                    'latinLetterDef6Dots.uti',
+                                    'chardefs.cti',
+                                    'braille-patterns.cti',
+                                    'litdigits6Dots.uti',
+                                    'digits6Dots.uti',
+                                    'en-us-g1.ctb',
+                                    'en-us-g2.ctb'
+                                ];
+
+                                // Create directory
+                                try {
+                                    fs.mkdir('/tables');
+                                } catch (e) {}
+
+                                for (const table of tables) {
+                                    try {
+                                        const response = await fetch(
+                                            `lib/liblouis/tables/${table}`
+                                        );
+                                        const content = await response.text();
+                                        fs.writeFile(`/tables/${table}`, content);
+                                        log(`    ✓ Loaded ${table} (${content.length} bytes)`);
+                                    } catch (e) {
+                                        log(`    ✗ Failed to load ${table}: ${e.message}`);
+                                    }
+                                }
+
+                                // Test translation
+                                log('\n  Testing translation...');
+                                const tableList = 'tables/unicode.dis,tables/en-us-g2.ctb';
+
+                                try {
+                                    const result1 = lou.translateString(tableList, 'and');
+                                    log(`    "and" -> "${result1}" (expected contracted form)`);
+
+                                    const result2 = lou.translateString(tableList, 'STORAGE');
+                                    log(`    "STORAGE" -> "${result2}"`);
+
+                                    log('\n✓ LibLouis initialized successfully!');
+                                } catch (e) {
+                                    log(`    ✗ Translation failed: ${e.message}`);
+
+                                    // Try without unicode.dis
+                                    log('\n  Trying with just en-us-g2.ctb...');
+                                    try {
+                                        const result = lou.translateString(
+                                            'tables/en-us-g2.ctb',
+                                            'and'
+                                        );
+                                        log(`    "and" -> "${result}"`);
+                                    } catch (e2) {
+                                        log(`    ✗ Still failed: ${e2.message}`);
+                                    }
+                                }
+                            }
+                        } else {
+                            // Try without argument
+                            log('  Using auto-detection...');
+                            const lou = new LiblouisEasyApi();
+                            log('  ✓ Created with auto-detection');
+                        }
+                    } catch (e) {
+                        log(`  ✗ Failed to initialize: ${e.message}`);
+                        log(`  Error stack: ${e.stack}`);
+                    }
+                }
+            }
+
+            // Run test when page loads
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(testLibLouis, 100);
+            });
+        </script>
+    </body>
+</html>

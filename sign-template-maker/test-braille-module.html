@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Braille Module Test</title>
+        <style>
+            @font-face {
+                font-family: 'Braille';
+                src: url('BRAILLE.TTF') format('truetype');
+            }
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 20px;
+            }
+            .test-box {
+                margin: 20px 0;
+                padding: 20px;
+                background: #f5f5f5;
+                border-radius: 8px;
+            }
+            .braille-output {
+                font-family: 'Braille', monospace;
+                font-size: 36px;
+                line-height: 1.5;
+                background: white;
+                padding: 15px;
+                margin: 10px 0;
+                border: 2px solid #003875;
+                border-radius: 4px;
+            }
+            input,
+            button {
+                padding: 10px;
+                font-size: 16px;
+                margin: 5px;
+            }
+            input {
+                width: 300px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Direct LibLouis Module Test</h1>
+
+        <div class="test-box">
+            <h2>Status</h2>
+            <div id="status">Loading LibLouis module...</div>
+        </div>
+
+        <div class="test-box">
+            <h2>Manual Test</h2>
+            <input
+                type="text"
+                id="text-input"
+                placeholder="Enter text to translate"
+                value="STORAGE"
+            />
+            <button onclick="translateText()">Translate</button>
+
+            <h3>Output:</h3>
+            <div id="braille-output" class="braille-output"></div>
+        </div>
+
+        <!-- Load LibLouis directly -->
+        <script src="lib/build-no-tables-utf16.js"></script>
+        <script>
+            let lou = null;
+            let tableData = '';
+
+            // Wait for Module to be ready
+            function waitForModule() {
+                if (typeof Module !== 'undefined' && Module.ccall) {
+                    console.log('Module is ready');
+                    initLibLouis();
+                } else {
+                    console.log('Waiting for Module...');
+                    setTimeout(waitForModule, 100);
+                }
+            }
+
+            async function initLibLouis() {
+                const statusDiv = document.getElementById('status');
+
+                try {
+                    // Load the braille table
+                    const response = await fetch('lib/liblouis/tables/en-us-g2.ctb');
+                    tableData = await response.text();
+                    console.log('Loaded table, length:', tableData.length);
+
+                    // Test if Module has the LibLouis functions
+                    if (Module.ccall) {
+                        console.log('Module has ccall');
+
+                        // Try to get version
+                        const versionPtr = Module.ccall('lou_version', 'number', [], []);
+                        if (versionPtr) {
+                            const version = Module.UTF8ToString(versionPtr);
+                            console.log('LibLouis version:', version);
+                            statusDiv.textContent = 'LibLouis ready! Version: ' + version;
+                        } else {
+                            statusDiv.textContent = 'LibLouis functions available';
+                        }
+
+                        lou = Module;
+                    } else {
+                        statusDiv.textContent = 'Module loaded but no ccall';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    statusDiv.textContent = 'Error: ' + error.message;
+                }
+            }
+
+            function translateText() {
+                const input = document.getElementById('text-input').value;
+                const outputDiv = document.getElementById('braille-output');
+
+                if (!lou) {
+                    outputDiv.textContent = 'LibLouis not ready';
+                    return;
+                }
+
+                try {
+                    // Try using Module's string functions if available
+                    if (lou.translateString) {
+                        const result = lou.translateString('en-us-g2.ctb', input);
+                        outputDiv.textContent = result;
+                    } else if (lou.ccall) {
+                        // Try direct ccall
+                        const inputPtr = lou.allocateUTF8(input);
+                        const outputPtr = lou._malloc(input.length * 4);
+
+                        const result = lou.ccall(
+                            'lou_translateString',
+                            'number',
+                            ['string', 'number', 'number', 'number', 'number', 'number'],
+                            ['en-us-g2.ctb', inputPtr, input.length, outputPtr, input.length * 4, 0]
+                        );
+
+                        if (result) {
+                            const braille = lou.UTF8ToString(outputPtr);
+                            outputDiv.textContent = braille;
+                        } else {
+                            outputDiv.textContent = 'Translation failed';
+                        }
+
+                        lou._free(inputPtr);
+                        lou._free(outputPtr);
+                    } else {
+                        outputDiv.textContent = 'No translation method available';
+                    }
+                } catch (error) {
+                    outputDiv.textContent = 'Error: ' + error.message;
+                    console.error('Translation error:', error);
+                }
+            }
+
+            // Start initialization
+            waitForModule();
+        </script>
+    </body>
+</html>

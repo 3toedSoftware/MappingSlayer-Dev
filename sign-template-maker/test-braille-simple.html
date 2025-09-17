@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Braille Translation Test</title>
+        <script src="lib/easy-api.js"></script>
+        <script src="lib/build-no-tables-utf16.js"></script>
+        <style>
+            @font-face {
+                font-family: 'Braille';
+                src: url('BRAILLE.TTF') format('truetype');
+            }
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 20px;
+            }
+            .test-box {
+                margin: 20px 0;
+                padding: 20px;
+                background: #f5f5f5;
+                border-radius: 8px;
+            }
+            .braille-output {
+                font-family: 'Braille', monospace;
+                font-size: 36px;
+                line-height: 1.5;
+                background: white;
+                padding: 15px;
+                margin: 10px 0;
+                border: 2px solid #003875;
+                border-radius: 4px;
+            }
+            input,
+            button {
+                padding: 10px;
+                font-size: 16px;
+                margin: 5px;
+            }
+            input {
+                width: 300px;
+            }
+            .status {
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 4px;
+            }
+            .status.success {
+                background: #d4edda;
+                color: #155724;
+            }
+            .status.error {
+                background: #f8d7da;
+                color: #721c24;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>LibLouis Braille Translation Test</h1>
+
+        <div class="test-box">
+            <h2>Status</h2>
+            <div id="status" class="status">Initializing LibLouis...</div>
+        </div>
+
+        <div class="test-box">
+            <h2>Manual Test</h2>
+            <input
+                type="text"
+                id="text-input"
+                placeholder="Enter text to translate"
+                value="STORAGE"
+            />
+            <button onclick="translateText()">Translate</button>
+
+            <h3>Grade 2 Braille Output:</h3>
+            <div id="braille-output" class="braille-output"></div>
+
+            <h3>Character Count:</h3>
+            <div id="char-count"></div>
+        </div>
+
+        <div class="test-box">
+            <h2>Automatic Tests</h2>
+            <div id="test-results"></div>
+        </div>
+
+        <script>
+            let liblouisReady = false;
+            let lou = null;
+
+            // Wait for Module to be ready
+            function waitForModule() {
+                return new Promise(resolve => {
+                    const checkModule = setInterval(() => {
+                        if (typeof Module !== 'undefined' && Module.ccall) {
+                            clearInterval(checkModule);
+                            console.log('Module is ready with ccall');
+                            resolve();
+                        } else if (typeof Module !== 'undefined') {
+                            console.log('Module exists but no ccall yet...');
+                        }
+                    }, 100);
+                });
+            }
+
+            // Initialize LibLouis
+            async function initLibLouis() {
+                const statusDiv = document.getElementById('status');
+
+                try {
+                    console.log('Starting LibLouis initialization...');
+
+                    // Wait for Module to be fully loaded
+                    await waitForModule();
+
+                    console.log('Module loaded, checking available interfaces...');
+                    console.log('Module.ccall:', typeof Module.ccall);
+                    console.log('Module._lou_translateString:', typeof Module._lou_translateString);
+                    console.log('LiblouisEasyApi:', typeof LiblouisEasyApi);
+
+                    // Try different ways to access LibLouis
+                    let liblouisLib = null;
+
+                    // LiblouisEasyApi needs the Module object, not a path
+                    if (typeof LiblouisEasyApi !== 'undefined' && typeof Module !== 'undefined') {
+                        console.log('Using LiblouisEasyApi with Module');
+                        liblouisLib = new LiblouisEasyApi(Module);
+                    } else if (typeof Module !== 'undefined' && Module.ccall) {
+                        console.log('Using Module directly');
+                        // Create wrapper functions
+                        liblouisLib = {
+                            translateString: function (table, text) {
+                                if (!Module.ccall) return text;
+
+                                const inputPtr = Module.allocateUTF8(text);
+                                const outputLen = text.length * 4;
+                                const outputPtr = Module._malloc(outputLen);
+
+                                try {
+                                    const result = Module.ccall(
+                                        'lou_translateString',
+                                        'number',
+                                        [
+                                            'string',
+                                            'number',
+                                            'number',
+                                            'number',
+                                            'number',
+                                            'number'
+                                        ],
+                                        [table, inputPtr, text.length, outputPtr, outputLen, null]
+                                    );
+
+                                    if (result) {
+                                        return Module.UTF8ToString(outputPtr);
+                                    }
+                                } catch (e) {
+                                    console.error('Translation error:', e);
+                                } finally {
+                                    Module._free(inputPtr);
+                                    Module._free(outputPtr);
+                                }
+                                return text;
+                            }
+                        };
+                    }
+
+                    if (!liblouisLib) {
+                        throw new Error('Could not initialize LibLouis');
+                    }
+
+                    lou = liblouisLib;
+                    console.log('LibLouis interface ready');
+
+                    // Load the Grade 2 table
+                    const tableResponse = await fetch('lib/liblouis/tables/en-us-g2.ctb');
+                    if (!tableResponse.ok) {
+                        throw new Error('Failed to load braille table: ' + tableResponse.status);
+                    }
+
+                    const tableData = await tableResponse.text();
+                    console.log('Loaded table, length:', tableData.length);
+
+                    // Register table resolver
+                    lou.registerTableResolver(tableName => {
+                        console.log('Table requested:', tableName);
+                        return tableData;
+                    });
+
+                    liblouisReady = true;
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = 'LibLouis Grade 2 translator ready!';
+
+                    console.log('LibLouis initialization complete');
+
+                    // Run automatic tests
+                    runTests();
+                } catch (error) {
+                    console.error('LibLouis initialization failed:', error);
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = 'Error: ' + error.message;
+                }
+            }
+
+            // Translate text function
+            function translateText() {
+                const input = document.getElementById('text-input').value;
+                const outputDiv = document.getElementById('braille-output');
+                const countDiv = document.getElementById('char-count');
+
+                if (!liblouisReady) {
+                    outputDiv.textContent = 'LibLouis not ready';
+                    return;
+                }
+
+                try {
+                    const braille = lou.translateString('en-us-g2.ctb', input);
+                    outputDiv.textContent = braille;
+                    countDiv.innerHTML = `
+                    Input: ${input.length} characters<br>
+                    Braille: ${braille.length} characters<br>
+                    Compression: ${Math.round((1 - braille.length / input.length) * 100)}%
+                `;
+                } catch (error) {
+                    outputDiv.textContent = 'Translation error: ' + error.message;
+                    console.error('Translation error:', error);
+                }
+            }
+
+            // Run automatic tests
+            function runTests() {
+                const tests = [
+                    { input: 'and', expected: '⠯', name: 'Word "and" -> single character' },
+                    { input: 'the', expected: '⠮', name: 'Word "the" -> single character' },
+                    { input: 'for', expected: '⠿', name: 'Word "for" -> single character' },
+                    { input: 'STORAGE', expectedLength: 5, name: 'STORAGE should be contracted' },
+                    {
+                        input: 'EMPLOYEES ONLY',
+                        expectedShorter: true,
+                        name: 'Should be shorter than letter count'
+                    }
+                ];
+
+                const resultsDiv = document.getElementById('test-results');
+                let html =
+                    '<table style="width:100%"><tr><th>Test</th><th>Input</th><th>Output</th><th>Result</th></tr>';
+
+                tests.forEach(test => {
+                    try {
+                        const result = lou.translateString('en-us-g2.ctb', test.input);
+                        let passed = false;
+
+                        if (test.expected) {
+                            passed = result === test.expected;
+                        } else if (test.expectedLength) {
+                            passed = result.length === test.expectedLength;
+                        } else if (test.expectedShorter) {
+                            passed = result.length < test.input.length;
+                        }
+
+                        html += `<tr>
+                        <td>${test.name}</td>
+                        <td>${test.input}</td>
+                        <td style="font-family: Braille, monospace; font-size: 24px">${result}</td>
+                        <td style="color: ${passed ? 'green' : 'red'}">${passed ? '✓' : '✗'}</td>
+                    </tr>`;
+                    } catch (error) {
+                        html += `<tr>
+                        <td>${test.name}</td>
+                        <td>${test.input}</td>
+                        <td>Error: ${error.message}</td>
+                        <td style="color: red">✗</td>
+                    </tr>`;
+                    }
+                });
+
+                html += '</table>';
+                resultsDiv.innerHTML = html;
+            }
+
+            // Initialize on load
+            window.addEventListener('DOMContentLoaded', initLibLouis);
+        </script>
+    </body>
+</html>
