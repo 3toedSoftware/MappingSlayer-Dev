@@ -576,6 +576,10 @@ STORAGE</textarea
 
             // Translate text to braille
             function translateToBraille(text) {
+                // IMPORTANT: Convert to lowercase for ADA compliance
+                // ADA signage is visually all caps, but braille should be lowercase
+                const lowercaseText = text.toLowerCase();
+
                 // Try LibLouis first for proper Grade 2
                 if (
                     brailleTranslator &&
@@ -585,9 +589,9 @@ STORAGE</textarea
                     try {
                         const result = brailleTranslator.translateString(
                             window.liblouisTableList,
-                            text
+                            lowercaseText
                         );
-                        console.log(`LibLouis Grade 2: "${text}" -> "${result}"`);
+                        console.log(`LibLouis Grade 2: "${lowercaseText}" -> "${result}"`);
                         return result;
                     } catch (error) {
                         console.error('LibLouis translation failed:', error);
@@ -596,18 +600,18 @@ STORAGE</textarea
 
                 // Use JavaScript Grade 2 translation if available
                 if (typeof window.translateToGrade2Braille === 'function') {
-                    const result = window.translateToGrade2Braille(text);
-                    console.log(`Fallback Grade 2: "${text}" -> "${result}"`);
+                    const result = window.translateToGrade2Braille(lowercaseText);
+                    console.log(`Fallback Grade 2: "${lowercaseText}" -> "${result}"`);
                     return result;
                 }
 
-                // Last resort: simple mapping
-                const result = text
+                // Last resort: simple mapping (already uses uppercase internally for mapping)
+                const result = lowercaseText
                     .toUpperCase()
                     .split('')
                     .map(char => simpleBrailleMap[char] || char)
                     .join('');
-                console.log(`Simple mapping: "${text}" -> "${result}"`);
+                console.log(`Simple mapping: "${lowercaseText}" -> "${result}"`);
                 return result;
             }
 
