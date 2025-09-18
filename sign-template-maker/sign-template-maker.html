@@ -217,21 +217,7 @@ STORAGE</textarea
                     </div>
 
                     <div class="input-group">
-                        <label for="custom-font">Custom Font (installed on system):</label>
-                        <input type="text" id="custom-font" placeholder="e.g., HCA Brand Font" />
-                        <button
-                            class="preset-btn"
-                            onclick="useCustomFont()"
-                            style="margin-top: 5px"
-                        >
-                            Use Custom Font
-                        </button>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="font-upload"
-                            >Upload Font File (.ttf, .otf, .woff, .woff2):</label
-                        >
+                        <label for="font-upload">Upload Font File:</label>
                         <input
                             type="file"
                             id="font-upload"
@@ -370,23 +356,28 @@ STORAGE</textarea
                         </label>
                     </div>
 
-                    <div class="info" style="background: #f3e5f5; color: #6a1b9a">
-                        <strong>Braille Specifications:</strong><br />
-                        Height: 0.239" (23.9px at 100 DPI)<br />
-                        Gap from text: 0.4" (40px at 100 DPI)<br />
-                        Translation: Grade 2 Contracted Braille (ADA Standard)
+                    <div class="input-group">
+                        <label for="braille-height">Braille Height (px):</label>
+                        <input
+                            type="number"
+                            id="braille-height"
+                            value="23.9"
+                            min="10"
+                            max="50"
+                            step="0.1"
+                        />
                     </div>
 
-                    <div class="info">
-                        <strong>Note:</strong> At <span id="dpi-display">100</span> DPI,
-                        <span id="ada-size">62.5</span>px = 0.625 inches (5/8" - standard ADA
-                        character height)<br />
-                        Sign size: <span id="sign-size-display">800x800</span>px (<span
-                            id="sign-inches-display"
-                            >8" x 8"</span
-                        >)<br />
-                        Text is manually wrapped and perfectly centered both horizontally and
-                        vertically.
+                    <div class="input-group">
+                        <label for="braille-gap">Gap from Text (px):</label>
+                        <input
+                            type="number"
+                            id="braille-gap"
+                            value="40"
+                            min="10"
+                            max="100"
+                            step="1"
+                        />
                     </div>
                 </div>
             </div>
@@ -1215,11 +1206,12 @@ STORAGE</textarea
                 // Add braille if enabled
                 const brailleEnabled = document.getElementById('enable-braille').checked;
                 if (brailleEnabled && brailleReady) {
-                    // Calculate braille position
-                    // 0.4" (40px at 100 DPI) gap from bottom of text
-                    // Braille actual dot height should be 0.239" (23.9px at 100 DPI)
-                    const brailleGap = 0.4 * DPI; // 40px at 100 DPI
-                    const brailleTargetHeight = 0.239 * DPI; // 23.9px at 100 DPI - this is the actual dot height we want
+                    // Calculate braille position using input values
+                    // Get braille height and gap from inputs
+                    const brailleGap =
+                        parseFloat(document.getElementById('braille-gap').value) || 40;
+                    const brailleTargetHeight =
+                        parseFloat(document.getElementById('braille-height').value) || 23.9;
 
                     // Calculate font-size needed to achieve exact braille dot height
                     const brailleFontSize = calculateBrailleFontSize(brailleTargetHeight);
@@ -1359,6 +1351,10 @@ STORAGE</textarea
 
             // Add event listener for braille checkbox
             document.getElementById('enable-braille').addEventListener('change', updateText);
+
+            // Add event listeners for braille height and gap inputs
+            document.getElementById('braille-height').addEventListener('input', updateText);
+            document.getElementById('braille-gap').addEventListener('input', updateText);
 
             // Initial render
             updateSignDimensions();
