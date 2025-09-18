@@ -1259,34 +1259,42 @@ STORAGE</textarea
                         .text('MSG' + msgId)
                         .style('pointer-events', 'none');
 
-                    // Make the label draggable only for the current message
-                    if (parseInt(msgId) === currentMessageId) {
-                        msgLabelGroup.style('cursor', 'move').call(
-                            d3
-                                .drag()
-                                .on('start', function (event) {
-                                    textAreaRect.attr('stroke-width', 3);
-                                })
-                                .on('drag', function (event) {
-                                    const newX = Math.max(
-                                        0,
-                                        Math.min(SIGN_WIDTH - boxWidth, event.x)
-                                    );
-                                    const newY = Math.max(
-                                        0,
-                                        Math.min(SIGN_HEIGHT - boxHeight, event.y)
-                                    );
-                                    messageData[msgId].boxX = Math.round(newX);
-                                    messageData[msgId].boxY = Math.round(newY);
+                    // Make all message labels draggable
+                    msgLabelGroup.style('cursor', 'move').call(
+                        d3
+                            .drag()
+                            .on('start', function (event) {
+                                textAreaRect.attr('stroke-width', 3);
+                                // Switch to this message's tab if not already selected
+                                if (parseInt(msgId) !== currentMessageId) {
+                                    // Find and click the corresponding tab button
+                                    const tabButtons = document.querySelectorAll('.tab-button');
+                                    tabButtons.forEach(button => {
+                                        if (button.textContent === 'MSG' + msgId) {
+                                            button.click();
+                                        }
+                                    });
+                                }
+                            })
+                            .on('drag', function (event) {
+                                const newX = Math.max(0, Math.min(SIGN_WIDTH - boxWidth, event.x));
+                                const newY = Math.max(
+                                    0,
+                                    Math.min(SIGN_HEIGHT - boxHeight, event.y)
+                                );
+                                messageData[msgId].boxX = Math.round(newX);
+                                messageData[msgId].boxY = Math.round(newY);
+                                // Only update input fields if this is the current message
+                                if (parseInt(msgId) === currentMessageId) {
                                     document.getElementById('box-x').value = Math.round(newX);
                                     document.getElementById('box-y').value = Math.round(newY);
-                                    renderAllMessages();
-                                })
-                                .on('end', function (event) {
-                                    textAreaRect.attr('stroke-width', 2);
-                                })
-                        );
-                    }
+                                }
+                                renderAllMessages();
+                            })
+                            .on('end', function (event) {
+                                textAreaRect.attr('stroke-width', 2);
+                            })
+                    );
 
                     // Wrap text for this message
                     const lines = wrapText(
@@ -1459,7 +1467,7 @@ STORAGE</textarea
             }
 
             // Function to switch tabs
-            function switchTab(tabName) {
+            function switchTab(tabName, buttonElement) {
                 // Save current message data before switching
                 if (currentMessageId && tabName !== 'dimensions') {
                     saveCurrentMessageData();
@@ -1479,7 +1487,11 @@ STORAGE</textarea
                 document.getElementById(tabName + '-tab').classList.add('active');
 
                 // Add active class to clicked button
-                event.target.classList.add('active');
+                // If buttonElement is provided, use it; otherwise try event.target
+                const activeButton = buttonElement || event.target;
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                }
 
                 // If switching to a message tab, load its data
                 if (tabName.startsWith('msg-')) {
@@ -1536,7 +1548,9 @@ STORAGE</textarea
                 const newTabButton = document.createElement('button');
                 newTabButton.className = 'tab-button';
                 newTabButton.textContent = 'MSG' + newMsgId;
-                newTabButton.onclick = () => switchTab('msg-' + newMsgId);
+                newTabButton.onclick = function () {
+                    switchTab('msg-' + newMsgId, this);
+                };
 
                 // Insert before the + button
                 tabsContainer.insertBefore(newTabButton, addButton);
@@ -1547,7 +1561,7 @@ STORAGE</textarea
                 dimensionsTab.parentNode.insertBefore(newTabContent, dimensionsTab);
 
                 // Switch to the new tab
-                switchTab('msg-' + newMsgId);
+                switchTab('msg-' + newMsgId, newTabButton);
             }
 
             // Function to create message tab content
