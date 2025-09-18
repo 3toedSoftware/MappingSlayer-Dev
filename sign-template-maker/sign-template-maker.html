@@ -910,46 +910,16 @@ STORAGE</textarea
                     .attr('stroke', '#003875')
                     .attr('stroke-width', 1)
                     .attr('stroke-dasharray', '5,5')
-                    .attr('opacity', 0.3)
-                    .style('cursor', 'move')
-                    .call(
-                        d3
-                            .drag()
-                            .on('start', function (event) {
-                                d3.select(this).attr('stroke-width', 2);
-                            })
-                            .on('drag', function (event) {
-                                const newX = Math.max(
-                                    0,
-                                    Math.min(
-                                        SIGN_WIDTH - parseInt(this.getAttribute('width')),
-                                        event.x
-                                    )
-                                );
-                                const newY = Math.max(
-                                    0,
-                                    Math.min(
-                                        SIGN_HEIGHT - parseInt(this.getAttribute('height')),
-                                        event.y
-                                    )
-                                );
-                                document.getElementById('box-x').value = Math.round(newX);
-                                document.getElementById('box-y').value = Math.round(newY);
-                                updateText();
-                            })
-                            .on('end', function (event) {
-                                d3.select(this).attr('stroke-width', 1);
-                            })
-                    );
+                    .attr('opacity', 0.3);
+
+                // Create label container for MSG1 label
+                textAreaLabelGroup = svg.append('g').attr('id', 'text-area-label');
 
                 // Create text container
                 textContainer = svg.append('g').attr('id', 'sign-text-container');
 
                 // Create braille container
                 brailleContainer = svg.append('g').attr('id', 'braille-container');
-
-                // Create label container for MSG1 label
-                textAreaLabelGroup = svg.append('g').attr('id', 'text-area-label');
 
                 // Add measurement rulers
                 rulerGroup = svg.append('g').attr('id', 'rulers');
@@ -1244,7 +1214,27 @@ STORAGE</textarea
                     .attr('font-size', '12px')
                     .attr('font-weight', 'bold')
                     .attr('fill', 'white')
-                    .text('MSG1');
+                    .text('MSG1')
+                    .style('pointer-events', 'none'); // Text doesn't block mouse events
+
+                // Make the MSG1 label draggable
+                textAreaLabelGroup.style('cursor', 'move').call(
+                    d3
+                        .drag()
+                        .on('start', function (event) {
+                            textAreaRect.attr('stroke-width', 2);
+                        })
+                        .on('drag', function (event) {
+                            const newX = Math.max(0, Math.min(SIGN_WIDTH - boxWidth, event.x));
+                            const newY = Math.max(0, Math.min(SIGN_HEIGHT - boxHeight, event.y));
+                            document.getElementById('box-x').value = Math.round(newX);
+                            document.getElementById('box-y').value = Math.round(newY);
+                            updateText();
+                        })
+                        .on('end', function (event) {
+                            textAreaRect.attr('stroke-width', 1);
+                        })
+                );
 
                 // Clear previous text and braille
                 textContainer.selectAll('*').remove();
