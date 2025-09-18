@@ -147,10 +147,11 @@
                 margin-bottom: 20px;
                 border-bottom: 2px solid #ddd;
                 overflow-x: auto;
+                max-width: 100%;
             }
 
             .tab-button {
-                padding: 10px 20px;
+                padding: 10px 12px;
                 background: #f0f0f0;
                 border: none;
                 border-radius: 8px 8px 0 0;
@@ -159,12 +160,11 @@
                 color: #666;
                 transition: all 0.3s ease;
                 white-space: nowrap;
-                flex-shrink: 1;
-                min-width: 60px;
-            }
-
-            .tab-button:not(.add-tab):not(:last-child) {
-                flex: 0 1 auto;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex: 1 1 auto;
+                min-width: 40px;
+                max-width: 100px;
             }
 
             .tab-button:hover {
@@ -190,12 +190,15 @@
                 font-size: 18px;
                 padding: 10px 15px;
                 min-width: 40px;
-                flex-shrink: 0;
+                max-width: 40px;
+                flex: 0 0 auto;
             }
 
             /* Keep SIGN DIMS button from shrinking */
             .tab-button[onclick*='dimensions'] {
-                flex-shrink: 0;
+                flex: 0 0 auto;
+                min-width: auto;
+                max-width: none;
             }
 
             .tab-button.add-tab:hover {
