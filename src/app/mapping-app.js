@@ -328,6 +328,7 @@ class MappingSlayerApp extends SlayerAppBase {
                     <div class="ms-gallery-header">
                         <span class="ms-gallery-title">Gallery</span>
                         <div class="ms-gallery-controls">
+                            <button class="ms-gallery-btn ms-gallery-label-toggle-btn" id="gallery-label-toggle-btn" title="Toggle location number labels">#</button>
                             <button class="ms-gallery-btn ms-gallery-add-btn" id="gallery-add-btn" title="Add photo to gallery">+</button>
                             <button class="ms-gallery-btn ms-gallery-close-btn" id="gallery-close-btn" title="Delete selected photo">−</button>
                         </div>

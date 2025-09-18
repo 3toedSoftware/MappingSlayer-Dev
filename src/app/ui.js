@@ -6003,6 +6003,7 @@ function resetKeyboardShortcutsFlag() {
 // Gallery Modal Functions
 let currentGalleryDot = null;
 let galleryResizeHandler = null;
+let showGalleryLabels = localStorage.getItem('showGalleryLabels') === 'true';
 
 function updateGalleryPosition() {
     const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
@@ -6089,7 +6090,12 @@ function populateGallery(dot) {
     // Display the photo if it exists, otherwise show placeholder
     if (mainImage) {
         if (dot.photo) {
-            mainImage.innerHTML = `<img src="${dot.photo}" alt="Location photo">`;
+            let html = `<img src="${dot.photo}" alt="Location photo">`;
+            // Add location label if toggle is active
+            if (showGalleryLabels) {
+                html += `<div class="ms-gallery-location-label">${dot.locationNumber}</div>`;
+            }
+            mainImage.innerHTML = html;
         } else {
             mainImage.innerHTML = '<span class="ms-gallery-placeholder">NO PHOTO</span>';
         }
@@ -6156,6 +6162,38 @@ function setupGalleryEventListeners() {
     if (addBtn) {
         addBtn.addEventListener('click', () => {
             showPhotoOptions();
+        });
+    }
+
+    // Toggle label button
+    const labelToggleBtn = document.getElementById('gallery-label-toggle-btn');
+    if (labelToggleBtn) {
+        // Set initial state
+        if (showGalleryLabels) {
+            labelToggleBtn.classList.add('active');
+        }
+
+        labelToggleBtn.addEventListener('click', () => {
+            showGalleryLabels = !showGalleryLabels;
+            localStorage.setItem('showGalleryLabels', showGalleryLabels);
+
+            // Update button state
+            if (showGalleryLabels) {
+                labelToggleBtn.classList.add('active');
+            } else {
+                labelToggleBtn.classList.remove('active');
+            }
+
+            // Refresh gallery display if there's a current dot
+            if (currentGalleryDot) {
+                const dots = getCurrentPageDots();
+                if (dots) {
+                    const dot = dots.get(currentGalleryDot.internalId);
+                    if (dot) {
+                        populateGallery(dot);
+                    }
+                }
+            }
         });
     }
 }

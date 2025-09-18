@@ -1455,6 +1455,31 @@ body {
     border-color: #c82333;
 }
 
+.ms-gallery-label-toggle-btn {
+    background: #444;
+    color: #999;
+    border: 1px solid #555;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.ms-gallery-label-toggle-btn:hover {
+    background: #555;
+    color: #bbb;
+    border-color: #666;
+}
+
+.ms-gallery-label-toggle-btn.active {
+    background: #f07727;
+    color: white;
+    border-color: #f07727;
+}
+
+.ms-gallery-label-toggle-btn.active:hover {
+    background: #ff8833;
+    border-color: #ff8833;
+}
+
 .ms-gallery-body {
     flex: 1;
     display: flex;
@@ -1488,6 +1513,20 @@ body {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+}
+
+.ms-gallery-location-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 10;
 }
 
 .ms-gallery-delete-btn {
