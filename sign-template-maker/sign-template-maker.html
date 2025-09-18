@@ -223,7 +223,7 @@
                     <div class="input-group">
                         <label for="sign-text">Sign Text:</label>
                         <textarea id="sign-text" placeholder="Enter sign text here...">
-STORAGE</textarea
+MSG1</textarea
                         >
                     </div>
 
@@ -318,7 +318,7 @@ STORAGE</textarea
                         </div>
                         <div class="input-group">
                             <label for="box-height">Text Area Height (px):</label>
-                            <input type="number" id="box-height" value="400" min="100" max="2000" />
+                            <input type="number" id="box-height" value="100" min="100" max="2000" />
                         </div>
                     </div>
 
@@ -445,11 +445,11 @@ STORAGE</textarea
             let messageCount = 1;
             let messageData = {
                 1: {
-                    text: 'STORAGE',
+                    text: 'MSG1',
                     boxX: 50,
                     boxY: 300,
                     boxWidth: 700,
-                    boxHeight: 200,
+                    boxHeight: 100,
                     brailleEnabled: true,
                     brailleHeight: 23.9,
                     brailleGap: 40
@@ -1590,7 +1590,7 @@ STORAGE</textarea
                     boxX: 50,
                     boxY: 300 + (newMsgId - 1) * 50, // Offset each message slightly
                     boxWidth: 700,
-                    boxHeight: 200,
+                    boxHeight: 100,
                     brailleEnabled: true,
                     brailleHeight: 23.9,
                     brailleGap: 40
