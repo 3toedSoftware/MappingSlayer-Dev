@@ -279,6 +279,17 @@ STORAGE</textarea
 
                     <div class="dimensions">
                         <div class="input-group">
+                            <label for="box-x">Text Area X (px):</label>
+                            <input type="number" id="box-x" value="100" min="0" max="2000" />
+                        </div>
+                        <div class="input-group">
+                            <label for="box-y">Text Area Y (px):</label>
+                            <input type="number" id="box-y" value="200" min="0" max="2000" />
+                        </div>
+                    </div>
+
+                    <div class="dimensions">
+                        <div class="input-group">
                             <label for="box-width">Text Area Width (px):</label>
                             <input type="number" id="box-width" value="600" min="100" max="2000" />
                         </div>
@@ -896,7 +907,37 @@ STORAGE</textarea
                     .attr('stroke', '#003875')
                     .attr('stroke-width', 1)
                     .attr('stroke-dasharray', '5,5')
-                    .attr('opacity', 0.3);
+                    .attr('opacity', 0.3)
+                    .style('cursor', 'move')
+                    .call(
+                        d3
+                            .drag()
+                            .on('start', function (event) {
+                                d3.select(this).attr('stroke-width', 2);
+                            })
+                            .on('drag', function (event) {
+                                const newX = Math.max(
+                                    0,
+                                    Math.min(
+                                        SIGN_WIDTH - parseInt(this.getAttribute('width')),
+                                        event.x
+                                    )
+                                );
+                                const newY = Math.max(
+                                    0,
+                                    Math.min(
+                                        SIGN_HEIGHT - parseInt(this.getAttribute('height')),
+                                        event.y
+                                    )
+                                );
+                                document.getElementById('box-x').value = Math.round(newX);
+                                document.getElementById('box-y').value = Math.round(newY);
+                                updateText();
+                            })
+                            .on('end', function (event) {
+                                d3.select(this).attr('stroke-width', 1);
+                            })
+                    );
 
                 // Create text container
                 textContainer = svg.append('g').attr('id', 'sign-text-container');
@@ -1163,9 +1204,9 @@ STORAGE</textarea
 
                 // Font metrics calculations (removed display since we removed the div)
 
-                // Calculate text area position (centered on sign)
-                const textX = (SIGN_WIDTH - boxWidth) / 2;
-                const textY = (SIGN_HEIGHT - boxHeight) / 2;
+                // Get text area position from inputs
+                const textX = parseInt(document.getElementById('box-x').value) || 100;
+                const textY = parseInt(document.getElementById('box-y').value) || 200;
 
                 // Update text area rectangle
                 textAreaRect
@@ -1373,6 +1414,8 @@ STORAGE</textarea
             document.getElementById('line-height').addEventListener('input', updateText);
             document.getElementById('letter-spacing').addEventListener('input', updateText);
             document.getElementById('word-spacing').addEventListener('input', updateText);
+            document.getElementById('box-x').addEventListener('input', updateText);
+            document.getElementById('box-y').addEventListener('input', updateText);
             document.getElementById('box-width').addEventListener('input', updateText);
             document.getElementById('box-height').addEventListener('input', updateText);
             document.getElementById('text-h-align').addEventListener('change', updateText);
