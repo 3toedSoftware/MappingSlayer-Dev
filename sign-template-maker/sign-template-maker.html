@@ -252,11 +252,6 @@ STORAGE</textarea
                         </div>
                     </div>
 
-                    <div class="info" style="background: #e8f5e9; color: #2e7d32">
-                        <strong>Font Metrics:</strong><br />
-                        <span id="font-metrics">Calculating...</span>
-                    </div>
-
                     <div class="dimensions">
                         <div class="input-group">
                             <label for="letter-spacing">Letter Spacing (px):</label>
@@ -1020,13 +1015,13 @@ STORAGE</textarea
                 // Redraw SVG elements
                 initializeSVG();
 
-                // Update display info
-                document.getElementById('dpi-display').textContent = DPI;
-                document.getElementById('ada-size').textContent = (0.625 * DPI).toFixed(1);
-                document.getElementById('sign-size-display').textContent =
-                    `${SIGN_WIDTH}x${SIGN_HEIGHT}`;
-                document.getElementById('sign-inches-display').textContent =
-                    `${signWidthInches}" x ${signHeightInches}"`;
+                // Update display info (removed since we removed the info divs)
+                // document.getElementById('dpi-display').textContent = DPI;
+                // document.getElementById('ada-size').textContent = (0.625 * DPI).toFixed(1);
+                // document.getElementById('sign-size-display').textContent =
+                //     `${SIGN_WIDTH}x${SIGN_HEIGHT}`;
+                // document.getElementById('sign-inches-display').textContent =
+                //     `${signWidthInches}" x ${signHeightInches}"`;
 
                 // Update text
                 updateText();
@@ -1145,12 +1140,7 @@ STORAGE</textarea
                 const capHeightInches = (actualCapHeight / DPI).toFixed(3);
                 const adaCompliant = actualCapHeight >= 0.625 * DPI;
 
-                // Update font metrics display
-                document.getElementById('font-metrics').innerHTML = `
-                Calculated Font Size: ${fontSize.toFixed(1)}px (em square)<br>
-                Actual Cap Height: ${actualCapHeight.toFixed(1)}px (${capHeightInches}" at ${DPI} DPI)<br>
-                ADA Compliance: ${adaCompliant ? '✓ Yes' : '✗ No'} (needs ${(0.625 * DPI).toFixed(1)}px cap height)
-            `;
+                // Font metrics calculations (removed display since we removed the div)
 
                 // Calculate text area position (centered on sign)
                 const textX = (SIGN_WIDTH - boxWidth) / 2;
