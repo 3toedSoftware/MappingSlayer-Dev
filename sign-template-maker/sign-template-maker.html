@@ -1239,13 +1239,16 @@ STORAGE</textarea
                 const totalTextHeight = lines.length * lineHeightPx;
 
                 let startY;
+                let verticalPadding = 0; // Initialize for debug info
                 if (vAlign === 'top') {
                     startY = textY + fontSize; // Top aligned
+                    verticalPadding = 0;
                 } else if (vAlign === 'bottom') {
                     startY = textY + boxHeight - totalTextHeight + fontSize;
+                    verticalPadding = boxHeight - totalTextHeight;
                 } else {
                     // middle
-                    const verticalPadding = (boxHeight - totalTextHeight) / 2;
+                    verticalPadding = (boxHeight - totalTextHeight) / 2;
                     startY = textY + verticalPadding + fontSize;
                 }
 
