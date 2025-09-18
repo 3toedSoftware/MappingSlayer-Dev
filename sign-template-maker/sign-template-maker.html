@@ -175,6 +175,33 @@
             .tab-content.active {
                 display: block;
             }
+
+            .tab-button.add-tab {
+                background: #4caf50;
+                color: white;
+                font-size: 18px;
+                padding: 10px 15px;
+                min-width: 40px;
+            }
+
+            .tab-button.add-tab:hover {
+                background: #45a049;
+            }
+
+            .delete-tab-btn {
+                background: #dc3545;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-top: 20px;
+                width: 100%;
+            }
+
+            .delete-tab-btn:hover {
+                background: #c82333;
+            }
         </style>
     </head>
     <body>
@@ -183,17 +210,16 @@
         <div class="container">
             <div class="controls">
                 <!-- Tab navigation -->
-                <div class="tabs">
-                    <button class="tab-button active" onclick="switchTab('text-input')">
-                        MSG1
-                    </button>
+                <div class="tabs" id="tabs-container">
+                    <button class="tab-button active" onclick="switchTab('msg-1')">MSG1</button>
+                    <button class="tab-button add-tab" onclick="addNewTab()">+</button>
                     <button class="tab-button" onclick="switchTab('dimensions')">
                         Sign Dimensions
                     </button>
                 </div>
 
-                <!-- Tab 1: Sign Text Input -->
-                <div id="text-input-tab" class="tab-content active">
+                <!-- Tab 1: MSG1 -->
+                <div id="msg-1-tab" class="tab-content active" data-msg-id="1">
                     <div class="input-group">
                         <label for="sign-text">Sign Text:</label>
                         <textarea id="sign-text" placeholder="Enter sign text here...">
@@ -415,6 +441,19 @@ STORAGE</textarea
         </div>
 
         <script>
+            // Message data structure to track all message areas
+            let messageCount = 1;
+            let messageData = {
+                1: {
+                    text: 'STORAGE',
+                    boxX: 50,
+                    boxY: 300,
+                    boxWidth: 700,
+                    boxHeight: 200
+                }
+            };
+            let currentMessageId = 1;
+
             // Sign dimensions (will be updated dynamically)
             let SIGN_WIDTH = 800;
             let SIGN_HEIGHT = 800;
@@ -427,8 +466,7 @@ STORAGE</textarea
             let brailleTranslator = null;
             let brailleReady = false;
 
-            // SVG element references
-            let textAreaLabelGroup;
+            // SVG element references will be created dynamically
 
             // Load and inject braille font
             async function loadBrailleFont() {
@@ -860,12 +898,7 @@ STORAGE</textarea
                 .attr('viewBox', `0 0 ${SIGN_WIDTH} ${SIGN_HEIGHT}`);
 
             // Create all SVG elements that will be redrawn
-            let backgroundRect,
-                logoGroup,
-                textAreaRect,
-                textContainer,
-                brailleContainer,
-                rulerGroup;
+            let backgroundRect, logoGroup, textContainer, brailleContainer, rulerGroup;
 
             function initializeSVG() {
                 // Clear SVG
@@ -900,18 +933,7 @@ STORAGE</textarea
                     .attr('height', 30)
                     .attr('fill', '#FF6B35');
 
-                // Text area visualization (dashed border)
-                textAreaRect = svg
-                    .append('rect')
-                    .attr('id', 'text-area')
-                    .attr('fill', 'none')
-                    .attr('stroke', '#003875')
-                    .attr('stroke-width', 1)
-                    .attr('stroke-dasharray', '5,5')
-                    .attr('opacity', 0.3);
-
-                // Create label container for MSG1 label
-                textAreaLabelGroup = svg.append('g').attr('id', 'text-area-label');
+                // We'll create text area rectangles and labels dynamically in renderAllMessages()
 
                 // Create text container
                 textContainer = svg.append('g').attr('id', 'sign-text-container');
@@ -1159,249 +1181,275 @@ STORAGE</textarea
 
             // Function to update text
             function updateText() {
-                const text = document.getElementById('sign-text').value;
+                // Save current message data
+                saveCurrentMessageData();
+
+                // Render all messages
+                renderAllMessages();
+            }
+
+            // Function to render all message areas
+            function renderAllMessages() {
                 const fontFamily = document.getElementById('font-family').value;
                 const targetCapHeight = parseFloat(document.getElementById('cap-height').value);
                 const lineHeight = parseFloat(document.getElementById('line-height').value);
                 const letterSpacing = parseFloat(document.getElementById('letter-spacing').value);
                 const wordSpacing = parseFloat(document.getElementById('word-spacing').value);
-                const boxWidth = parseInt(document.getElementById('box-width').value);
-                const boxHeight = parseInt(document.getElementById('box-height').value);
 
                 // Calculate the font-size needed for the target cap height
                 const fontSize = calculateFontSizeForCapHeight(fontFamily, targetCapHeight);
 
-                // Verify the actual cap height achieved
-                const actualCapHeight = measureCapHeight(fontFamily, fontSize);
-                const capHeightInches = (actualCapHeight / DPI).toFixed(3);
-                const adaCompliant = actualCapHeight >= 0.625 * DPI;
-
-                // Font metrics calculations (removed display since we removed the div)
-
-                // Get text area position from inputs
-                const textX = parseInt(document.getElementById('box-x').value) || 100;
-                const textY = parseInt(document.getElementById('box-y').value) || 200;
-
-                // Update text area rectangle
-                textAreaRect
-                    .attr('x', textX)
-                    .attr('y', textY)
-                    .attr('width', boxWidth)
-                    .attr('height', boxHeight);
-
-                // Update MSG1 label
-                textAreaLabelGroup.selectAll('*').remove();
-
-                // Add background rect for label
-                textAreaLabelGroup
-                    .append('rect')
-                    .attr('x', textX)
-                    .attr('y', textY)
-                    .attr('width', 45)
-                    .attr('height', 20)
-                    .attr('fill', '#003875')
-                    .attr('opacity', 0.9);
-
-                // Add MSG1 text
-                textAreaLabelGroup
-                    .append('text')
-                    .attr('x', textX + 22.5)
-                    .attr('y', textY + 14)
-                    .attr('text-anchor', 'middle')
-                    .attr('font-family', 'Arial, sans-serif')
-                    .attr('font-size', '12px')
-                    .attr('font-weight', 'bold')
-                    .attr('fill', 'white')
-                    .text('MSG1')
-                    .style('pointer-events', 'none'); // Text doesn't block mouse events
-
-                // Make the MSG1 label draggable
-                textAreaLabelGroup.style('cursor', 'move').call(
-                    d3
-                        .drag()
-                        .on('start', function (event) {
-                            textAreaRect.attr('stroke-width', 2);
-                        })
-                        .on('drag', function (event) {
-                            const newX = Math.max(0, Math.min(SIGN_WIDTH - boxWidth, event.x));
-                            const newY = Math.max(0, Math.min(SIGN_HEIGHT - boxHeight, event.y));
-                            document.getElementById('box-x').value = Math.round(newX);
-                            document.getElementById('box-y').value = Math.round(newY);
-                            updateText();
-                        })
-                        .on('end', function (event) {
-                            textAreaRect.attr('stroke-width', 1);
-                        })
-                );
-
-                // Clear previous text and braille
+                // Clear all containers
                 textContainer.selectAll('*').remove();
                 brailleContainer.selectAll('*').remove();
-
-                // Wrap text
-                const lines = wrapText(
-                    text,
-                    fontFamily,
-                    fontSize,
-                    letterSpacing,
-                    wordSpacing,
-                    boxWidth,
-                    boxHeight
-                );
 
                 // Get alignment settings
                 const hAlign = document.getElementById('text-h-align').value;
                 const vAlign = document.getElementById('text-v-align').value;
-
-                // Calculate vertical position based on alignment
-                const lineHeightPx = fontSize * lineHeight;
-                const totalTextHeight = lines.length * lineHeightPx;
-
-                let startY;
-                let verticalPadding = 0; // Initialize for debug info
-                if (vAlign === 'top') {
-                    startY = textY + fontSize; // Top aligned
-                    verticalPadding = 0;
-                } else if (vAlign === 'bottom') {
-                    startY = textY + boxHeight - totalTextHeight + fontSize;
-                    verticalPadding = boxHeight - totalTextHeight;
-                } else {
-                    // middle
-                    verticalPadding = (boxHeight - totalTextHeight) / 2;
-                    startY = textY + verticalPadding + fontSize;
-                }
-
-                // Calculate horizontal position based on alignment
-                let textAnchor, xPos;
-                if (hAlign === 'left') {
-                    textAnchor = 'start';
-                    xPos = textX;
-                } else if (hAlign === 'right') {
-                    textAnchor = 'end';
-                    xPos = textX + boxWidth;
-                } else {
-                    // center
-                    textAnchor = 'middle';
-                    xPos = textX + boxWidth / 2;
-                }
-
-                // Render each line
-                let lastTextY = startY;
-                lines.forEach((line, i) => {
-                    const y = startY + i * lineHeightPx;
-                    textContainer
-                        .append('text')
-                        .attr('x', xPos)
-                        .attr('y', y)
-                        .attr('text-anchor', textAnchor)
-                        .attr('font-family', fontFamily)
-                        .attr('font-size', fontSize)
-                        .attr('font-weight', 'bold')
-                        .attr('fill', '#003875')
-                        .style('letter-spacing', letterSpacing + 'px')
-                        .style('word-spacing', wordSpacing + 'px')
-                        .text(line);
-                    lastTextY = y;
-                });
-
-                // Add braille if enabled
                 const brailleEnabled = document.getElementById('enable-braille').checked;
-                if (brailleEnabled && brailleReady) {
-                    // Calculate braille position using input values
-                    // Get braille height and gap from inputs
-                    const brailleGap =
-                        parseFloat(document.getElementById('braille-gap').value) || 40;
-                    const brailleTargetHeight =
-                        parseFloat(document.getElementById('braille-height').value) || 23.9;
 
-                    // Calculate font-size needed to achieve exact braille dot height
-                    const brailleFontSize = calculateBrailleFontSize(brailleTargetHeight);
+                // Loop through all message areas
+                Object.keys(messageData).forEach(msgId => {
+                    const msgData = messageData[msgId];
+                    const text = msgData.text;
+                    const boxWidth = msgData.boxWidth;
+                    const boxHeight = msgData.boxHeight;
+                    const textX = msgData.boxX;
+                    const textY = msgData.boxY;
 
-                    // Verify actual height achieved
-                    const actualBrailleHeight = measureBrailleDotHeight(brailleFontSize);
-                    console.log(
-                        `Braille: target ${brailleTargetHeight.toFixed(1)}px, actual ${actualBrailleHeight.toFixed(1)}px, font-size ${brailleFontSize.toFixed(1)}px`
-                    );
+                    // Draw text area rectangle
+                    const textAreaRect = textContainer
+                        .append('rect')
+                        .attr('class', 'text-area-rect')
+                        .attr('x', textX)
+                        .attr('y', textY)
+                        .attr('width', boxWidth)
+                        .attr('height', boxHeight)
+                        .attr('fill', 'none')
+                        .attr('stroke', '#003875')
+                        .attr('stroke-width', 2)
+                        .attr('stroke-dasharray', '5,5')
+                        .attr('opacity', 0.3);
 
-                    const brailleY = lastTextY + brailleGap + brailleTargetHeight; // Top of braille + height for baseline
+                    // Create label group for this message
+                    const msgLabelGroup = textContainer
+                        .append('g')
+                        .attr('class', 'text-area-label-group');
 
-                    // Translate text to braille - remove newlines so it flows continuously
-                    const textWithoutBreaks = text.replace(/\n/g, ' ');
-                    const brailleText = translateToBraille(textWithoutBreaks);
-
-                    // Wrap braille text to fit within sign width
-                    const brailleMeasurer = document.createElement('div');
-                    brailleMeasurer.style.position = 'absolute';
-                    brailleMeasurer.style.visibility = 'hidden';
-                    brailleMeasurer.style.fontFamily = 'Braille, monospace';
-                    brailleMeasurer.style.fontSize = brailleFontSize + 'px';
-                    brailleMeasurer.style.whiteSpace = 'nowrap';
-                    document.body.appendChild(brailleMeasurer);
-
-                    // Simple word wrapping for braille
-                    const brailleWords = brailleText.split(' ');
-                    const brailleLines = [];
-                    let currentBrailleLine = [];
-
-                    brailleWords.forEach(word => {
-                        currentBrailleLine.push(word);
-                        brailleMeasurer.textContent = currentBrailleLine.join(' ');
-                        const lineWidth = brailleMeasurer.offsetWidth;
-
-                        if (lineWidth > boxWidth && currentBrailleLine.length > 1) {
-                            currentBrailleLine.pop();
-                            brailleLines.push(currentBrailleLine.join(' '));
-                            currentBrailleLine = [word];
-                        }
-                    });
-
-                    if (currentBrailleLine.length > 0) {
-                        brailleLines.push(currentBrailleLine.join(' '));
-                    }
-
-                    brailleMeasurer.remove();
-
-                    // Render braille lines
-                    brailleLines.forEach((line, i) => {
-                        brailleContainer
-                            .append('text')
-                            .attr('x', xPos) // Use same horizontal position as main text
-                            .attr('y', brailleY + i * brailleTargetHeight * 1.5) // 1.5 line height for braille spacing
-                            .attr('text-anchor', textAnchor) // Use same text anchor as main text
-                            .attr('font-family', 'Braille, monospace')
-                            .attr('font-size', brailleFontSize)
-                            .attr('fill', '#003875')
-                            .text(line);
-                    });
-
-                    // Add visual indicator for braille area (dotted outline)
-                    const brailleTotalHeight = Math.max(
-                        brailleLines.length * brailleTargetHeight * 1.5,
-                        brailleTargetHeight * 1.5
-                    );
-                    brailleContainer
+                    // Add background rect for label
+                    msgLabelGroup
                         .append('rect')
                         .attr('x', textX)
-                        .attr('y', brailleY - brailleTargetHeight)
-                        .attr('width', boxWidth)
-                        .attr('height', brailleTotalHeight + 5)
-                        .attr('fill', 'none')
-                        .attr('stroke', '#6a1b9a')
-                        .attr('stroke-width', 1)
-                        .attr('stroke-dasharray', '3,3')
-                        .attr('opacity', 0.3);
-                }
+                        .attr('y', textY)
+                        .attr('width', 45)
+                        .attr('height', 20)
+                        .attr('fill', '#003875')
+                        .attr('opacity', 0.9);
 
-                // Update debug info
-                const debugInfo = document.getElementById('debug-info');
-                debugInfo.innerHTML = `
-                Lines: ${lines.length}<br>
-                Font Size: ${fontSize}px (${(fontSize / 100).toFixed(3)}" at 100 DPI)<br>
-                Line Height: ${lineHeight} (${lineHeightPx.toFixed(1)}px)<br>
-                Total Text Height: ${totalTextHeight.toFixed(1)}px<br>
-                Vertical Padding: ${verticalPadding.toFixed(1)}px<br>
-                Text Area: ${boxWidth}x${boxHeight}px (${(boxWidth / 100).toFixed(2)}" x ${(boxHeight / 100).toFixed(2)}")
-            `;
+                    // Add MSG label text
+                    msgLabelGroup
+                        .append('text')
+                        .attr('x', textX + 22.5)
+                        .attr('y', textY + 14)
+                        .attr('text-anchor', 'middle')
+                        .attr('font-family', 'Arial, sans-serif')
+                        .attr('font-size', '12px')
+                        .attr('font-weight', 'bold')
+                        .attr('fill', 'white')
+                        .text('MSG' + msgId)
+                        .style('pointer-events', 'none');
+
+                    // Make the label draggable only for the current message
+                    if (parseInt(msgId) === currentMessageId) {
+                        msgLabelGroup.style('cursor', 'move').call(
+                            d3
+                                .drag()
+                                .on('start', function (event) {
+                                    textAreaRect.attr('stroke-width', 3);
+                                })
+                                .on('drag', function (event) {
+                                    const newX = Math.max(
+                                        0,
+                                        Math.min(SIGN_WIDTH - boxWidth, event.x)
+                                    );
+                                    const newY = Math.max(
+                                        0,
+                                        Math.min(SIGN_HEIGHT - boxHeight, event.y)
+                                    );
+                                    messageData[msgId].boxX = Math.round(newX);
+                                    messageData[msgId].boxY = Math.round(newY);
+                                    document.getElementById('box-x').value = Math.round(newX);
+                                    document.getElementById('box-y').value = Math.round(newY);
+                                    renderAllMessages();
+                                })
+                                .on('end', function (event) {
+                                    textAreaRect.attr('stroke-width', 2);
+                                })
+                        );
+                    }
+
+                    // Wrap text for this message
+                    const lines = wrapText(
+                        text,
+                        fontFamily,
+                        fontSize,
+                        letterSpacing,
+                        wordSpacing,
+                        boxWidth,
+                        boxHeight
+                    );
+
+                    // Calculate vertical position based on alignment
+                    const lineHeightPx = fontSize * lineHeight;
+                    const totalTextHeight = lines.length * lineHeightPx;
+
+                    let startY;
+                    let verticalPadding = 0; // Initialize for debug info
+                    if (vAlign === 'top') {
+                        startY = textY + fontSize; // Top aligned
+                        verticalPadding = 0;
+                    } else if (vAlign === 'bottom') {
+                        startY = textY + boxHeight - totalTextHeight + fontSize;
+                        verticalPadding = boxHeight - totalTextHeight;
+                    } else {
+                        // middle
+                        verticalPadding = (boxHeight - totalTextHeight) / 2;
+                        startY = textY + verticalPadding + fontSize;
+                    }
+
+                    // Calculate horizontal position based on alignment
+                    let textAnchor, xPos;
+                    if (hAlign === 'left') {
+                        textAnchor = 'start';
+                        xPos = textX;
+                    } else if (hAlign === 'right') {
+                        textAnchor = 'end';
+                        xPos = textX + boxWidth;
+                    } else {
+                        // center
+                        textAnchor = 'middle';
+                        xPos = textX + boxWidth / 2;
+                    }
+
+                    // Render each line
+                    let lastTextY = startY;
+                    lines.forEach((line, i) => {
+                        const y = startY + i * lineHeightPx;
+                        textContainer
+                            .append('text')
+                            .attr('x', xPos)
+                            .attr('y', y)
+                            .attr('text-anchor', textAnchor)
+                            .attr('font-family', fontFamily)
+                            .attr('font-size', fontSize)
+                            .attr('font-weight', 'bold')
+                            .attr('fill', '#003875')
+                            .style('letter-spacing', letterSpacing + 'px')
+                            .style('word-spacing', wordSpacing + 'px')
+                            .text(line);
+                        lastTextY = y;
+                    });
+
+                    // Add braille if enabled
+                    if (brailleEnabled && brailleReady) {
+                        // Calculate braille position using input values
+                        // Get braille height and gap from inputs
+                        const brailleGap =
+                            parseFloat(document.getElementById('braille-gap').value) || 40;
+                        const brailleTargetHeight =
+                            parseFloat(document.getElementById('braille-height').value) || 23.9;
+
+                        // Calculate font-size needed to achieve exact braille dot height
+                        const brailleFontSize = calculateBrailleFontSize(brailleTargetHeight);
+
+                        // Verify actual height achieved
+                        const actualBrailleHeight = measureBrailleDotHeight(brailleFontSize);
+                        console.log(
+                            `Braille: target ${brailleTargetHeight.toFixed(1)}px, actual ${actualBrailleHeight.toFixed(1)}px, font-size ${brailleFontSize.toFixed(1)}px`
+                        );
+
+                        const brailleY = lastTextY + brailleGap + brailleTargetHeight; // Top of braille + height for baseline
+
+                        // Translate text to braille - remove newlines so it flows continuously
+                        const textWithoutBreaks = text.replace(/\n/g, ' ');
+                        const brailleText = translateToBraille(textWithoutBreaks);
+
+                        // Wrap braille text to fit within sign width
+                        const brailleMeasurer = document.createElement('div');
+                        brailleMeasurer.style.position = 'absolute';
+                        brailleMeasurer.style.visibility = 'hidden';
+                        brailleMeasurer.style.fontFamily = 'Braille, monospace';
+                        brailleMeasurer.style.fontSize = brailleFontSize + 'px';
+                        brailleMeasurer.style.whiteSpace = 'nowrap';
+                        document.body.appendChild(brailleMeasurer);
+
+                        // Simple word wrapping for braille
+                        const brailleWords = brailleText.split(' ');
+                        const brailleLines = [];
+                        let currentBrailleLine = [];
+
+                        brailleWords.forEach(word => {
+                            currentBrailleLine.push(word);
+                            brailleMeasurer.textContent = currentBrailleLine.join(' ');
+                            const lineWidth = brailleMeasurer.offsetWidth;
+
+                            if (lineWidth > boxWidth && currentBrailleLine.length > 1) {
+                                currentBrailleLine.pop();
+                                brailleLines.push(currentBrailleLine.join(' '));
+                                currentBrailleLine = [word];
+                            }
+                        });
+
+                        if (currentBrailleLine.length > 0) {
+                            brailleLines.push(currentBrailleLine.join(' '));
+                        }
+
+                        brailleMeasurer.remove();
+
+                        // Render braille lines
+                        brailleLines.forEach((line, i) => {
+                            brailleContainer
+                                .append('text')
+                                .attr('x', xPos) // Use same horizontal position as main text
+                                .attr('y', brailleY + i * brailleTargetHeight * 1.5) // 1.5 line height for braille spacing
+                                .attr('text-anchor', textAnchor) // Use same text anchor as main text
+                                .attr('font-family', 'Braille, monospace')
+                                .attr('font-size', brailleFontSize)
+                                .attr('fill', '#003875')
+                                .text(line);
+                        });
+
+                        // Add visual indicator for braille area (dotted outline)
+                        const brailleTotalHeight = Math.max(
+                            brailleLines.length * brailleTargetHeight * 1.5,
+                            brailleTargetHeight * 1.5
+                        );
+                        brailleContainer
+                            .append('rect')
+                            .attr('x', textX)
+                            .attr('y', brailleY - brailleTargetHeight)
+                            .attr('width', boxWidth)
+                            .attr('height', brailleTotalHeight + 5)
+                            .attr('fill', 'none')
+                            .attr('stroke', '#6a1b9a')
+                            .attr('stroke-width', 1)
+                            .attr('stroke-dasharray', '3,3')
+                            .attr('opacity', 0.3);
+                    }
+                }); // End forEach loop for messages
+
+                // Update debug info with current message data
+                if (currentMessageId && messageData[currentMessageId]) {
+                    const currentData = messageData[currentMessageId];
+                    const debugInfo = document.getElementById('debug-info');
+                    debugInfo.innerHTML = `
+                    Current Message: MSG${currentMessageId}<br>
+                    Font Size: ${fontSize}px (${(fontSize / 100).toFixed(3)}" at 100 DPI)<br>
+                    Text Area: ${currentData.boxWidth}x${currentData.boxHeight}px<br>
+                    Position: (${currentData.boxX}, ${currentData.boxY})<br>
+                    Total Messages: ${Object.keys(messageData).length}
+                `;
+                }
             }
 
             // Function to set preset text
@@ -1412,6 +1460,11 @@ STORAGE</textarea
 
             // Function to switch tabs
             function switchTab(tabName) {
+                // Save current message data before switching
+                if (currentMessageId && tabName !== 'dimensions') {
+                    saveCurrentMessageData();
+                }
+
                 // Hide all tab contents
                 document.querySelectorAll('.tab-content').forEach(tab => {
                     tab.classList.remove('active');
@@ -1427,6 +1480,126 @@ STORAGE</textarea
 
                 // Add active class to clicked button
                 event.target.classList.add('active');
+
+                // If switching to a message tab, load its data
+                if (tabName.startsWith('msg-')) {
+                    const msgId = parseInt(tabName.split('-')[1]);
+                    loadMessageData(msgId);
+                }
+            }
+
+            // Function to save current message data
+            function saveCurrentMessageData() {
+                if (!currentMessageId) return;
+
+                messageData[currentMessageId] = {
+                    text: document.getElementById('sign-text').value,
+                    boxX: parseInt(document.getElementById('box-x').value),
+                    boxY: parseInt(document.getElementById('box-y').value),
+                    boxWidth: parseInt(document.getElementById('box-width').value),
+                    boxHeight: parseInt(document.getElementById('box-height').value)
+                };
+            }
+
+            // Function to load message data
+            function loadMessageData(msgId) {
+                currentMessageId = msgId;
+                const data = messageData[msgId];
+
+                if (data) {
+                    document.getElementById('sign-text').value = data.text;
+                    document.getElementById('box-x').value = data.boxX;
+                    document.getElementById('box-y').value = data.boxY;
+                    document.getElementById('box-width').value = data.boxWidth;
+                    document.getElementById('box-height').value = data.boxHeight;
+                    updateText();
+                }
+            }
+
+            // Function to add a new tab
+            function addNewTab() {
+                messageCount++;
+                const newMsgId = messageCount;
+
+                // Initialize data for new message
+                messageData[newMsgId] = {
+                    text: 'MSG' + newMsgId,
+                    boxX: 50,
+                    boxY: 300 + (newMsgId - 1) * 50, // Offset each message slightly
+                    boxWidth: 700,
+                    boxHeight: 200
+                };
+
+                // Create new tab button
+                const tabsContainer = document.getElementById('tabs-container');
+                const addButton = tabsContainer.querySelector('.add-tab');
+                const newTabButton = document.createElement('button');
+                newTabButton.className = 'tab-button';
+                newTabButton.textContent = 'MSG' + newMsgId;
+                newTabButton.onclick = () => switchTab('msg-' + newMsgId);
+
+                // Insert before the + button
+                tabsContainer.insertBefore(newTabButton, addButton);
+
+                // Create new tab content
+                const newTabContent = createMessageTabContent(newMsgId);
+                const dimensionsTab = document.getElementById('dimensions-tab');
+                dimensionsTab.parentNode.insertBefore(newTabContent, dimensionsTab);
+
+                // Switch to the new tab
+                switchTab('msg-' + newMsgId);
+            }
+
+            // Function to create message tab content
+            function createMessageTabContent(msgId) {
+                const tabDiv = document.createElement('div');
+                tabDiv.id = 'msg-' + msgId + '-tab';
+                tabDiv.className = 'tab-content';
+                tabDiv.setAttribute('data-msg-id', msgId);
+
+                // Copy the structure from MSG1 tab
+                const msg1Tab = document.getElementById('msg-1-tab');
+                tabDiv.innerHTML = msg1Tab.innerHTML;
+
+                // Add delete button for MSG2+
+                if (msgId > 1) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-tab-btn';
+                    deleteBtn.textContent = 'Delete MSG' + msgId;
+                    deleteBtn.onclick = () => deleteTab(msgId);
+                    tabDiv.appendChild(deleteBtn);
+                }
+
+                return tabDiv;
+            }
+
+            // Function to delete a tab
+            function deleteTab(msgId) {
+                if (
+                    confirm(
+                        'Are you sure you want to delete MSG' + msgId + '? This cannot be undone.'
+                    )
+                ) {
+                    // Remove tab button
+                    const tabButtons = document.querySelectorAll('.tab-button');
+                    tabButtons.forEach(button => {
+                        if (button.textContent === 'MSG' + msgId) {
+                            button.remove();
+                        }
+                    });
+
+                    // Remove tab content
+                    const tabContent = document.getElementById('msg-' + msgId + '-tab');
+                    if (tabContent) {
+                        tabContent.remove();
+                    }
+
+                    // Remove data
+                    delete messageData[msgId];
+
+                    // Switch to MSG1
+                    switchTab('msg-1');
+                }
             }
 
             // Add event listeners for text and spacing
