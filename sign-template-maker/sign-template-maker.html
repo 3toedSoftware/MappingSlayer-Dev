@@ -251,6 +251,15 @@
                 -ms-user-select: none;
                 user-select: none;
             }
+
+            /* Prevent middle mouse auto-scroll on the SVG container */
+            #svg-container {
+                overflow: hidden;
+            }
+
+            #svg-container svg {
+                touch-action: none; /* Prevent touch scrolling */
+            }
         </style>
     </head>
     <body>
@@ -956,7 +965,10 @@ MSG1</textarea
                 .scaleExtent([0.1, 5]) // Min zoom 10%, max zoom 500%
                 .filter(function (event) {
                     // Only allow zoom on wheel and middle mouse drag
-                    if (event.type === 'wheel') return true;
+                    if (event.type === 'wheel') {
+                        event.preventDefault(); // Prevent page scroll
+                        return true;
+                    }
                     if (event.type === 'mousedown' && event.button === 1) return true; // Middle mouse
                     if (event.type === 'mousemove' && event.buttons === 4) return true; // Middle mouse drag
                     return false;
@@ -968,13 +980,39 @@ MSG1</textarea
             // Apply zoom behavior to SVG
             svg.call(zoom);
 
-            // Allow middle mouse button pan
+            // Prevent page scroll when zooming
+            svg.on('wheel', function (event) {
+                event.preventDefault();
+            });
+
+            // Prevent middle mouse button scrolling
             svg.on('mousedown', function (event) {
                 if (event.button === 1) {
                     // Middle mouse button
                     event.preventDefault(); // Prevent default middle mouse behavior
+                    return false;
                 }
             });
+
+            // Also prevent on the container
+            svgContainer.on('mousedown', function (event) {
+                if (event.button === 1) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+
+            // Prevent middle mouse auto-scroll cursor
+            document.getElementById('svg-container').addEventListener(
+                'mousedown',
+                function (e) {
+                    if (e.button === 1) {
+                        e.preventDefault();
+                        return false;
+                    }
+                },
+                true
+            );
 
             // Create all SVG elements that will be redrawn
             let backgroundRect, logoGroup, textContainer, brailleContainer, rulerGroup;
