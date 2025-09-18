@@ -330,7 +330,7 @@
                 <div class="tabs" id="tabs-container">
                     <button class="tab-button active" onclick="switchTab('msg-1')">MSG1</button>
                     <button class="tab-button add-tab" onclick="addNewTab()">+</button>
-                    <button class="tab-button" onclick="switchTab('dimensions')">SIGN DIMS</button>
+                    <button class="tab-button" onclick="switchTab('dimensions')">SETTINGS</button>
                 </div>
 
                 <!-- Tab 1: MSG1 -->
@@ -544,6 +544,40 @@ MSG1</textarea
                             />
                             <span>Show Rulers</span>
                         </label>
+                    </div>
+
+                    <h2 style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px">
+                        Color Settings
+                    </h2>
+
+                    <div class="input-group">
+                        <label for="sign-color">Sign Background Color:</label>
+                        <input
+                            type="color"
+                            id="sign-color"
+                            value="#f5f5f5"
+                            style="width: 100%; height: 40px; cursor: pointer"
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="text-color">Text Color:</label>
+                        <input
+                            type="color"
+                            id="text-color"
+                            value="#003875"
+                            style="width: 100%; height: 40px; cursor: pointer"
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="braille-color">Braille Color:</label>
+                        <input
+                            type="color"
+                            id="braille-color"
+                            value="#003875"
+                            style="width: 100%; height: 40px; cursor: pointer"
+                        />
                     </div>
                 </div>
             </div>
@@ -1131,7 +1165,7 @@ MSG1</textarea
                     .attr('class', 'logo-background')
                     .attr('width', logoPosition.width)
                     .attr('height', logoPosition.height)
-                    .attr('fill', 'white')
+                    .attr('fill', 'transparent')
                     .attr('stroke', '#ddd')
                     .attr('stroke-width', 2)
                     .attr('stroke-dasharray', '5,5')
@@ -1597,13 +1631,16 @@ MSG1</textarea
                 // Clear zoomable content (but keep zoom group)
                 zoomGroup.selectAll('*').remove();
 
+                // Get current color values
+                const signColor = document.getElementById('sign-color').value;
+
                 // Add background (sign plate)
                 backgroundRect = zoomGroup
                     .append('rect')
                     .attr('class', 'sign-background')
                     .attr('width', SIGN_WIDTH)
                     .attr('height', SIGN_HEIGHT)
-                    .attr('fill', '#f5f5f5')
+                    .attr('fill', signColor)
                     .attr('stroke', '#333')
                     .attr('stroke-width', 3);
 
@@ -1884,6 +1921,10 @@ MSG1</textarea
                 const hAlign = document.getElementById('text-h-align').value;
                 const vAlign = document.getElementById('text-v-align').value;
 
+                // Get color values
+                const textColor = document.getElementById('text-color').value;
+                const brailleColor = document.getElementById('braille-color').value;
+
                 // Loop through all message areas
                 Object.keys(messageData).forEach(msgId => {
                     const msgData = messageData[msgId];
@@ -2039,7 +2080,7 @@ MSG1</textarea
                             .attr('font-family', fontFamily)
                             .attr('font-size', fontSize)
                             .attr('font-weight', 'bold')
-                            .attr('fill', '#003875')
+                            .attr('fill', textColor)
                             .style('letter-spacing', letterSpacing + 'px')
                             .style('word-spacing', wordSpacing + 'px')
                             .text(line);
@@ -2108,7 +2149,7 @@ MSG1</textarea
                                 .attr('text-anchor', textAnchor) // Use same text anchor as main text
                                 .attr('font-family', 'Braille, monospace')
                                 .attr('font-size', brailleFontSize)
-                                .attr('fill', '#003875')
+                                .attr('fill', brailleColor)
                                 .text(line);
                         });
 
@@ -2432,6 +2473,17 @@ MSG1</textarea
             // Add event listeners for braille height and gap inputs
             document.getElementById('braille-height').addEventListener('input', updateText);
             document.getElementById('braille-gap').addEventListener('input', updateText);
+
+            // Add event listeners for color pickers
+            document.getElementById('sign-color').addEventListener('input', () => {
+                // Update background color and re-render
+                const signColor = document.getElementById('sign-color').value;
+                if (backgroundRect) {
+                    backgroundRect.attr('fill', signColor);
+                }
+            });
+            document.getElementById('text-color').addEventListener('input', updateText);
+            document.getElementById('braille-color').addEventListener('input', updateText);
 
             // Initial render
             updateSignDimensions();
