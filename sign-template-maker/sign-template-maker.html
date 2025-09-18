@@ -939,13 +939,42 @@ MSG1</textarea
                 });
             });
 
-            // Create SVG container
+            // Create SVG container with zoom
             const svgContainer = d3.select('#svg-container');
             let svg = svgContainer
                 .append('svg')
                 .attr('width', SIGN_WIDTH)
                 .attr('height', SIGN_HEIGHT)
                 .attr('viewBox', `0 0 ${SIGN_WIDTH} ${SIGN_HEIGHT}`);
+
+            // Create a group for zoomable content
+            let zoomGroup = svg.append('g');
+
+            // Set up zoom behavior
+            const zoom = d3
+                .zoom()
+                .scaleExtent([0.1, 5]) // Min zoom 10%, max zoom 500%
+                .filter(function (event) {
+                    // Only allow zoom on wheel and middle mouse drag
+                    if (event.type === 'wheel') return true;
+                    if (event.type === 'mousedown' && event.button === 1) return true; // Middle mouse
+                    if (event.type === 'mousemove' && event.buttons === 4) return true; // Middle mouse drag
+                    return false;
+                })
+                .on('zoom', function (event) {
+                    zoomGroup.attr('transform', event.transform);
+                });
+
+            // Apply zoom behavior to SVG
+            svg.call(zoom);
+
+            // Allow middle mouse button pan
+            svg.on('mousedown', function (event) {
+                if (event.button === 1) {
+                    // Middle mouse button
+                    event.preventDefault(); // Prevent default middle mouse behavior
+                }
+            });
 
             // Create all SVG elements that will be redrawn
             let backgroundRect, logoGroup, textContainer, brailleContainer, rulerGroup;
@@ -959,7 +988,7 @@ MSG1</textarea
 
             // Create logo container with upload functionality
             function createLogoContainer() {
-                logoGroup = svg
+                logoGroup = zoomGroup
                     .append('g')
                     .attr('transform', `translate(${logoPosition.x}, ${logoPosition.y})`);
 
@@ -1034,7 +1063,7 @@ MSG1</textarea
                     if (!isResizingLogo) {
                         isDraggingLogo = true;
                         hasDragged = false; // Reset drag flag
-                        const [mouseX, mouseY] = d3.pointer(event, svg.node());
+                        const [mouseX, mouseY] = d3.pointer(event, zoomGroup.node());
                         dragOffset.x = mouseX - logoPosition.x;
                         dragOffset.y = mouseY - logoPosition.y;
                         event.stopPropagation();
@@ -1217,7 +1246,7 @@ MSG1</textarea
             d3.select(document).on('mousemove', function (event) {
                 if (isDraggingLogo) {
                     hasDragged = true; // Set flag when actual dragging occurs
-                    const [mouseX, mouseY] = d3.pointer(event, svg.node());
+                    const [mouseX, mouseY] = d3.pointer(event, zoomGroup.node());
                     logoPosition.x = mouseX - dragOffset.x;
                     logoPosition.y = mouseY - dragOffset.y;
 
@@ -1233,7 +1262,7 @@ MSG1</textarea
 
                     updateLogoTransform();
                 } else if (isResizingLogo) {
-                    const [mouseX, mouseY] = d3.pointer(event, svg.node());
+                    const [mouseX, mouseY] = d3.pointer(event, zoomGroup.node());
 
                     // Store original aspect ratio
                     const aspectRatio = logoPosition.width / logoPosition.height;
@@ -1341,11 +1370,11 @@ MSG1</textarea
             });
 
             function initializeSVG() {
-                // Clear SVG
-                svg.selectAll('*').remove();
+                // Clear zoomable content (but keep zoom group)
+                zoomGroup.selectAll('*').remove();
 
                 // Add background (sign plate)
-                backgroundRect = svg
+                backgroundRect = zoomGroup
                     .append('rect')
                     .attr('class', 'sign-background')
                     .attr('width', SIGN_WIDTH)
@@ -1360,13 +1389,13 @@ MSG1</textarea
                 // We'll create text area rectangles and labels dynamically in renderAllMessages()
 
                 // Create text container
-                textContainer = svg.append('g').attr('id', 'sign-text-container');
+                textContainer = zoomGroup.append('g').attr('id', 'sign-text-container');
 
                 // Create braille container
-                brailleContainer = svg.append('g').attr('id', 'braille-container');
+                brailleContainer = zoomGroup.append('g').attr('id', 'braille-container');
 
                 // Add measurement rulers
-                rulerGroup = svg.append('g').attr('id', 'rulers');
+                rulerGroup = zoomGroup.append('g').attr('id', 'rulers');
 
                 const showRulers = document.getElementById('show-rulers').checked;
                 rulerGroup.style('display', showRulers ? 'block' : 'none');
