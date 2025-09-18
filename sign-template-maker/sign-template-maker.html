@@ -1286,10 +1286,22 @@ STORAGE</textarea
                                 );
                                 messageData[msgId].boxX = Math.round(newX);
                                 messageData[msgId].boxY = Math.round(newY);
-                                // Only update input fields if this is the current message
+                                // Update input fields - need to update the correct tab's inputs
                                 if (parseInt(msgId) === currentMessageId) {
-                                    document.getElementById('box-x').value = Math.round(newX);
-                                    document.getElementById('box-y').value = Math.round(newY);
+                                    if (currentMessageId === 1) {
+                                        document.getElementById('box-x').value = Math.round(newX);
+                                        document.getElementById('box-y').value = Math.round(newY);
+                                    } else {
+                                        const tabElement = document.getElementById(
+                                            'msg-' + currentMessageId + '-tab'
+                                        );
+                                        if (tabElement) {
+                                            tabElement.querySelector('#box-x').value =
+                                                Math.round(newX);
+                                            tabElement.querySelector('#box-y').value =
+                                                Math.round(newY);
+                                        }
+                                    }
                                 }
                                 renderAllMessages();
                             })
