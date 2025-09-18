@@ -187,9 +187,6 @@
                     <button class="tab-button active" onclick="switchTab('text-input')">
                         Sign Text Input
                     </button>
-                    <button class="tab-button" onclick="switchTab('braille')">
-                        Braille Options
-                    </button>
                     <button class="tab-button" onclick="switchTab('dimensions')">
                         Sign Dimensions
                     </button>
@@ -317,9 +314,48 @@ STORAGE</textarea
                             </select>
                         </div>
                     </div>
+
+                    <h2 style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px">
+                        Braille Options
+                    </h2>
+
+                    <div class="input-group">
+                        <label style="display: flex; align-items: center; cursor: pointer">
+                            <input
+                                type="checkbox"
+                                id="enable-braille"
+                                style="width: auto; margin-right: 10px"
+                            />
+                            <span>Add Braille Translation</span>
+                        </label>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="braille-height">Braille Height (px):</label>
+                        <input
+                            type="number"
+                            id="braille-height"
+                            value="23.9"
+                            min="10"
+                            max="50"
+                            step="0.1"
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="braille-gap">Gap from Text (px):</label>
+                        <input
+                            type="number"
+                            id="braille-gap"
+                            value="40"
+                            min="10"
+                            max="100"
+                            step="1"
+                        />
+                    </div>
                 </div>
 
-                <!-- Tab 3: Sign Dimensions -->
+                <!-- Tab 2: Sign Dimensions -->
                 <div id="dimensions-tab" class="tab-content">
                     <div class="input-group">
                         <label for="sign-width">Sign Width (px):</label>
@@ -367,44 +403,6 @@ STORAGE</textarea
                             />
                             <span>Show Rulers</span>
                         </label>
-                    </div>
-                </div>
-
-                <!-- Tab 2: Braille Options -->
-                <div id="braille-tab" class="tab-content">
-                    <div class="input-group">
-                        <label style="display: flex; align-items: center; cursor: pointer">
-                            <input
-                                type="checkbox"
-                                id="enable-braille"
-                                style="width: auto; margin-right: 10px"
-                            />
-                            <span>Add Braille Translation</span>
-                        </label>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="braille-height">Braille Height (px):</label>
-                        <input
-                            type="number"
-                            id="braille-height"
-                            value="23.9"
-                            min="10"
-                            max="50"
-                            step="0.1"
-                        />
-                    </div>
-
-                    <div class="input-group">
-                        <label for="braille-gap">Gap from Text (px):</label>
-                        <input
-                            type="number"
-                            id="braille-gap"
-                            value="40"
-                            min="10"
-                            max="100"
-                            step="1"
-                        />
                     </div>
                 </div>
             </div>
