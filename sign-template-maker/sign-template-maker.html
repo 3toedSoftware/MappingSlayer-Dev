@@ -1223,19 +1223,91 @@ MSG1</textarea
                 } else if (isResizingLogo) {
                     const [mouseX, mouseY] = d3.pointer(event, svg.node());
 
-                    // Calculate new dimensions based on handle
-                    if (resizeHandle.includes('e')) {
-                        logoPosition.width = Math.max(30, mouseX - logoPosition.x);
+                    // Store original aspect ratio
+                    const aspectRatio = logoPosition.width / logoPosition.height;
+
+                    // Handle corner resizes (maintain aspect ratio)
+                    if (resizeHandle === 'se') {
+                        // Southeast corner - anchor at northwest (top-left stays fixed)
+                        const newWidth = Math.max(30, mouseX - logoPosition.x);
+                        const newHeight = Math.max(30, mouseY - logoPosition.y);
+
+                        // Use diagonal distance to determine scale
+                        const distX = mouseX - logoPosition.x;
+                        const distY = mouseY - logoPosition.y;
+                        const diagonal = Math.sqrt(distX * distX + distY * distY);
+                        const originalDiagonal = Math.sqrt(
+                            logoPosition.width * logoPosition.width +
+                                logoPosition.height * logoPosition.height
+                        );
+
+                        // Scale based on mouse position along diagonal
+                        if (distX / aspectRatio > distY) {
+                            logoPosition.width = newWidth;
+                            logoPosition.height = newWidth / aspectRatio;
+                        } else {
+                            logoPosition.height = newHeight;
+                            logoPosition.width = newHeight * aspectRatio;
+                        }
+                    } else if (resizeHandle === 'sw') {
+                        // Southwest corner - anchor at northeast (top-right stays fixed)
+                        const anchorX = logoPosition.x + logoPosition.width;
+                        const newWidth = Math.max(30, anchorX - mouseX);
+                        const newHeight = Math.max(30, mouseY - logoPosition.y);
+
+                        if (newWidth / aspectRatio > newHeight) {
+                            logoPosition.width = newWidth;
+                            logoPosition.height = newWidth / aspectRatio;
+                            logoPosition.x = anchorX - newWidth;
+                        } else {
+                            logoPosition.height = newHeight;
+                            logoPosition.width = newHeight * aspectRatio;
+                            logoPosition.x = anchorX - newHeight * aspectRatio;
+                        }
+                    } else if (resizeHandle === 'ne') {
+                        // Northeast corner - anchor at southwest (bottom-left stays fixed)
+                        const anchorY = logoPosition.y + logoPosition.height;
+                        const newWidth = Math.max(30, mouseX - logoPosition.x);
+                        const newHeight = Math.max(30, anchorY - mouseY);
+
+                        if (newWidth / aspectRatio > newHeight) {
+                            logoPosition.width = newWidth;
+                            logoPosition.height = newWidth / aspectRatio;
+                            logoPosition.y = anchorY - newWidth / aspectRatio;
+                        } else {
+                            logoPosition.height = newHeight;
+                            logoPosition.width = newHeight * aspectRatio;
+                            logoPosition.y = anchorY - newHeight;
+                        }
+                    } else if (resizeHandle === 'nw') {
+                        // Northwest corner - anchor at southeast (bottom-right stays fixed)
+                        const anchorX = logoPosition.x + logoPosition.width;
+                        const anchorY = logoPosition.y + logoPosition.height;
+                        const newWidth = Math.max(30, anchorX - mouseX);
+                        const newHeight = Math.max(30, anchorY - mouseY);
+
+                        if (newWidth / aspectRatio > newHeight) {
+                            logoPosition.width = newWidth;
+                            logoPosition.height = newWidth / aspectRatio;
+                            logoPosition.x = anchorX - newWidth;
+                            logoPosition.y = anchorY - newWidth / aspectRatio;
+                        } else {
+                            logoPosition.height = newHeight;
+                            logoPosition.width = newHeight * aspectRatio;
+                            logoPosition.x = anchorX - newHeight * aspectRatio;
+                            logoPosition.y = anchorY - newHeight;
+                        }
                     }
-                    if (resizeHandle.includes('w')) {
+                    // Handle edge resizes (allow stretching)
+                    else if (resizeHandle === 'e') {
+                        logoPosition.width = Math.max(30, mouseX - logoPosition.x);
+                    } else if (resizeHandle === 'w') {
                         const newWidth = Math.max(30, logoPosition.x + logoPosition.width - mouseX);
                         logoPosition.x = logoPosition.x + logoPosition.width - newWidth;
                         logoPosition.width = newWidth;
-                    }
-                    if (resizeHandle.includes('s')) {
+                    } else if (resizeHandle === 's') {
                         logoPosition.height = Math.max(30, mouseY - logoPosition.y);
-                    }
-                    if (resizeHandle.includes('n')) {
+                    } else if (resizeHandle === 'n') {
                         const newHeight = Math.max(
                             30,
                             logoPosition.y + logoPosition.height - mouseY
