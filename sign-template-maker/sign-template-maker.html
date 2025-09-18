@@ -146,6 +146,7 @@
                 gap: 5px;
                 margin-bottom: 20px;
                 border-bottom: 2px solid #ddd;
+                overflow-x: auto;
             }
 
             .tab-button {
@@ -157,6 +158,13 @@
                 font-weight: bold;
                 color: #666;
                 transition: all 0.3s ease;
+                white-space: nowrap;
+                flex-shrink: 1;
+                min-width: 60px;
+            }
+
+            .tab-button:not(.add-tab):not(:last-child) {
+                flex: 0 1 auto;
             }
 
             .tab-button:hover {
@@ -182,6 +190,12 @@
                 font-size: 18px;
                 padding: 10px 15px;
                 min-width: 40px;
+                flex-shrink: 0;
+            }
+
+            /* Keep SIGN DIMS button from shrinking */
+            .tab-button[onclick*='dimensions'] {
+                flex-shrink: 0;
             }
 
             .tab-button.add-tab:hover {
@@ -213,9 +227,7 @@
                 <div class="tabs" id="tabs-container">
                     <button class="tab-button active" onclick="switchTab('msg-1')">MSG1</button>
                     <button class="tab-button add-tab" onclick="addNewTab()">+</button>
-                    <button class="tab-button" onclick="switchTab('dimensions')">
-                        Sign Dimensions
-                    </button>
+                    <button class="tab-button" onclick="switchTab('dimensions')">SIGN DIMS</button>
                 </div>
 
                 <!-- Tab 1: MSG1 -->
