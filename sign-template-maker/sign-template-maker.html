@@ -449,7 +449,10 @@ STORAGE</textarea
                     boxX: 50,
                     boxY: 300,
                     boxWidth: 700,
-                    boxHeight: 200
+                    boxHeight: 200,
+                    brailleEnabled: true,
+                    brailleHeight: 23.9,
+                    brailleGap: 40
                 }
             };
             let currentMessageId = 1;
@@ -1206,7 +1209,6 @@ STORAGE</textarea
                 // Get alignment settings
                 const hAlign = document.getElementById('text-h-align').value;
                 const vAlign = document.getElementById('text-v-align').value;
-                const brailleEnabled = document.getElementById('enable-braille').checked;
 
                 // Loop through all message areas
                 Object.keys(messageData).forEach(msgId => {
@@ -1358,14 +1360,11 @@ STORAGE</textarea
                         lastTextY = y;
                     });
 
-                    // Add braille if enabled
-                    if (brailleEnabled && brailleReady) {
-                        // Calculate braille position using input values
-                        // Get braille height and gap from inputs
-                        const brailleGap =
-                            parseFloat(document.getElementById('braille-gap').value) || 40;
-                        const brailleTargetHeight =
-                            parseFloat(document.getElementById('braille-height').value) || 23.9;
+                    // Add braille if enabled for this message
+                    if (msgData.brailleEnabled && brailleReady) {
+                        // Use per-message braille settings
+                        const brailleGap = msgData.brailleGap || 40;
+                        const brailleTargetHeight = msgData.brailleHeight || 23.9;
 
                         // Calculate font-size needed to achieve exact braille dot height
                         const brailleFontSize = calculateBrailleFontSize(brailleTargetHeight);
@@ -1509,7 +1508,11 @@ STORAGE</textarea
                     boxX: parseInt(document.getElementById('box-x').value),
                     boxY: parseInt(document.getElementById('box-y').value),
                     boxWidth: parseInt(document.getElementById('box-width').value),
-                    boxHeight: parseInt(document.getElementById('box-height').value)
+                    boxHeight: parseInt(document.getElementById('box-height').value),
+                    brailleEnabled: document.getElementById('enable-braille').checked,
+                    brailleHeight:
+                        parseFloat(document.getElementById('braille-height').value) || 23.9,
+                    brailleGap: parseFloat(document.getElementById('braille-gap').value) || 40
                 };
             }
 
@@ -1524,6 +1527,9 @@ STORAGE</textarea
                     document.getElementById('box-y').value = data.boxY;
                     document.getElementById('box-width').value = data.boxWidth;
                     document.getElementById('box-height').value = data.boxHeight;
+                    document.getElementById('enable-braille').checked = data.brailleEnabled;
+                    document.getElementById('braille-height').value = data.brailleHeight;
+                    document.getElementById('braille-gap').value = data.brailleGap;
                     updateText();
                 }
             }
@@ -1539,7 +1545,10 @@ STORAGE</textarea
                     boxX: 50,
                     boxY: 300 + (newMsgId - 1) * 50, // Offset each message slightly
                     boxWidth: 700,
-                    boxHeight: 200
+                    boxHeight: 200,
+                    brailleEnabled: true,
+                    brailleHeight: 23.9,
+                    brailleGap: 40
                 };
 
                 // Create new tab button
