@@ -941,6 +941,318 @@ MSG1</textarea
 
             // Create all SVG elements that will be redrawn
             let backgroundRect, logoGroup, textContainer, brailleContainer, rulerGroup;
+            let uploadedLogoSVG = null; // Store uploaded SVG content
+            let logoPosition = { x: SIGN_WIDTH - 150, y: 50, width: 100, height: 100 };
+            let isDraggingLogo = false;
+            let isResizingLogo = false;
+            let resizeHandle = null;
+            let dragOffset = { x: 0, y: 0 };
+            let hasDragged = false; // Track if actual dragging occurred
+
+            // Create logo container with upload functionality
+            function createLogoContainer() {
+                logoGroup = svg
+                    .append('g')
+                    .attr('transform', `translate(${logoPosition.x}, ${logoPosition.y})`);
+
+                // Background container
+                const logoContainer = logoGroup.append('g').attr('class', 'logo-container');
+
+                // Add border/background
+                const logoBackground = logoContainer
+                    .append('rect')
+                    .attr('class', 'logo-background')
+                    .attr('width', logoPosition.width)
+                    .attr('height', logoPosition.height)
+                    .attr('fill', 'white')
+                    .attr('stroke', '#ddd')
+                    .attr('stroke-width', 2)
+                    .attr('stroke-dasharray', '5,5')
+                    .style('cursor', 'pointer');
+
+                if (!uploadedLogoSVG) {
+                    // Show placeholder (orange cross) if no logo uploaded
+                    const placeholderGroup = logoContainer
+                        .append('g')
+                        .attr('class', 'logo-placeholder');
+
+                    // Vertical bar of cross
+                    placeholderGroup
+                        .append('rect')
+                        .attr('x', logoPosition.width / 2 - 15)
+                        .attr('y', 10)
+                        .attr('width', 30)
+                        .attr('height', logoPosition.height - 20)
+                        .attr('fill', '#FF6B35')
+                        .style('pointer-events', 'none');
+
+                    // Horizontal bar of cross
+                    placeholderGroup
+                        .append('rect')
+                        .attr('x', 10)
+                        .attr('y', logoPosition.height / 2 - 15)
+                        .attr('width', logoPosition.width - 20)
+                        .attr('height', 30)
+                        .attr('fill', '#FF6B35')
+                        .style('pointer-events', 'none');
+
+                    // Add "Click to Upload" text
+                    placeholderGroup
+                        .append('text')
+                        .attr('x', logoPosition.width / 2)
+                        .attr('y', logoPosition.height - 5)
+                        .attr('text-anchor', 'middle')
+                        .attr('font-size', '12')
+                        .attr('fill', '#666')
+                        .text('Click to Upload')
+                        .style('pointer-events', 'none');
+                } else {
+                    // Display uploaded SVG
+                    displayUploadedLogo(logoContainer);
+                }
+
+                // Add resize handles
+                addResizeHandles(logoGroup);
+
+                // Add click handler for upload
+                logoBackground.on('click', function () {
+                    if (!hasDragged && !isResizingLogo) {
+                        triggerLogoUpload();
+                    }
+                });
+
+                // Add drag functionality
+                logoBackground.on('mousedown', function (event) {
+                    if (!isResizingLogo) {
+                        isDraggingLogo = true;
+                        hasDragged = false; // Reset drag flag
+                        const [mouseX, mouseY] = d3.pointer(event, svg.node());
+                        dragOffset.x = mouseX - logoPosition.x;
+                        dragOffset.y = mouseY - logoPosition.y;
+                        event.stopPropagation();
+                    }
+                });
+            }
+
+            // Display uploaded SVG in container
+            function displayUploadedLogo(container) {
+                // Remove placeholder if it exists
+                container.select('.logo-placeholder').remove();
+
+                // Create a group for the SVG content
+                const svgGroup = container.append('g').attr('class', 'uploaded-logo');
+
+                // Parse and insert the SVG
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(uploadedLogoSVG, 'image/svg+xml');
+                const svgElement = doc.documentElement;
+
+                // Get viewBox or dimensions from the original SVG
+                let viewBox = svgElement.getAttribute('viewBox');
+                let originalWidth, originalHeight;
+
+                if (viewBox) {
+                    const parts = viewBox.split(' ');
+                    originalWidth = parseFloat(parts[2]);
+                    originalHeight = parseFloat(parts[3]);
+                } else {
+                    originalWidth = parseFloat(svgElement.getAttribute('width')) || 100;
+                    originalHeight = parseFloat(svgElement.getAttribute('height')) || 100;
+                }
+
+                // Calculate scale to fit container
+                const scaleX = logoPosition.width / originalWidth;
+                const scaleY = logoPosition.height / originalHeight;
+
+                // Apply transform to fit and stretch
+                svgGroup.attr('transform', `scale(${scaleX}, ${scaleY})`);
+
+                // Copy all children from uploaded SVG
+                Array.from(svgElement.children).forEach(child => {
+                    const d3Node = d3.select(svgGroup.node()).append(() => child.cloneNode(true));
+                });
+
+                // Make sure pointer events work
+                svgGroup.style('pointer-events', 'none');
+            }
+
+            // Add resize handles to logo container
+            function addResizeHandles(group) {
+                const handleSize = 10;
+                const handles = [
+                    { name: 'nw', x: 0, y: 0, cursor: 'nw-resize' },
+                    { name: 'ne', x: logoPosition.width, y: 0, cursor: 'ne-resize' },
+                    { name: 'sw', x: 0, y: logoPosition.height, cursor: 'sw-resize' },
+                    {
+                        name: 'se',
+                        x: logoPosition.width,
+                        y: logoPosition.height,
+                        cursor: 'se-resize'
+                    },
+                    { name: 'n', x: logoPosition.width / 2, y: 0, cursor: 'n-resize' },
+                    {
+                        name: 's',
+                        x: logoPosition.width / 2,
+                        y: logoPosition.height,
+                        cursor: 's-resize'
+                    },
+                    { name: 'w', x: 0, y: logoPosition.height / 2, cursor: 'w-resize' },
+                    {
+                        name: 'e',
+                        x: logoPosition.width,
+                        y: logoPosition.height / 2,
+                        cursor: 'e-resize'
+                    }
+                ];
+
+                handles.forEach(handle => {
+                    group
+                        .append('rect')
+                        .attr('class', `resize-handle handle-${handle.name}`)
+                        .attr('x', handle.x - handleSize / 2)
+                        .attr('y', handle.y - handleSize / 2)
+                        .attr('width', handleSize)
+                        .attr('height', handleSize)
+                        .attr('fill', '#003875')
+                        .attr('stroke', 'white')
+                        .attr('stroke-width', 1)
+                        .style('cursor', handle.cursor)
+                        .on('mousedown', function (event) {
+                            isResizingLogo = true;
+                            resizeHandle = handle.name;
+                            event.stopPropagation();
+                        });
+                });
+            }
+
+            // Trigger file upload dialog
+            function triggerLogoUpload() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.svg,image/svg+xml';
+                input.onchange = function (e) {
+                    const file = e.target.files[0];
+                    if (file && file.type === 'image/svg+xml') {
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            uploadedLogoSVG = event.target.result;
+                            // Recreate logo container with uploaded SVG
+                            logoGroup.remove();
+                            createLogoContainer();
+                        };
+                        reader.readAsText(file);
+                    } else {
+                        alert('Please upload an SVG file');
+                    }
+                };
+                input.click();
+            }
+
+            // Update logo position and size
+            function updateLogoTransform() {
+                logoGroup.attr('transform', `translate(${logoPosition.x}, ${logoPosition.y})`);
+
+                // Update background rect
+                logoGroup
+                    .select('.logo-background')
+                    .attr('width', logoPosition.width)
+                    .attr('height', logoPosition.height);
+
+                // Update placeholder if no logo uploaded
+                if (!uploadedLogoSVG) {
+                    const placeholder = logoGroup.select('.logo-placeholder');
+                    placeholder
+                        .select('rect:nth-child(1)')
+                        .attr('x', logoPosition.width / 2 - 15)
+                        .attr('height', logoPosition.height - 20);
+
+                    placeholder
+                        .select('rect:nth-child(2)')
+                        .attr('y', logoPosition.height / 2 - 15)
+                        .attr('width', logoPosition.width - 20);
+
+                    placeholder
+                        .select('text')
+                        .attr('x', logoPosition.width / 2)
+                        .attr('y', logoPosition.height - 5);
+                } else {
+                    // Re-render uploaded logo with new dimensions
+                    logoGroup.select('.logo-container').select('.uploaded-logo').remove();
+                    displayUploadedLogo(logoGroup.select('.logo-container'));
+                }
+
+                // Update resize handles
+                const handles = [
+                    { name: 'nw', x: 0, y: 0 },
+                    { name: 'ne', x: logoPosition.width, y: 0 },
+                    { name: 'sw', x: 0, y: logoPosition.height },
+                    { name: 'se', x: logoPosition.width, y: logoPosition.height },
+                    { name: 'n', x: logoPosition.width / 2, y: 0 },
+                    { name: 's', x: logoPosition.width / 2, y: logoPosition.height },
+                    { name: 'w', x: 0, y: logoPosition.height / 2 },
+                    { name: 'e', x: logoPosition.width, y: logoPosition.height / 2 }
+                ];
+
+                handles.forEach(handle => {
+                    logoGroup
+                        .select(`.handle-${handle.name}`)
+                        .attr('x', handle.x - 5)
+                        .attr('y', handle.y - 5);
+                });
+            }
+
+            // Add mouse move and mouse up handlers for dragging and resizing
+            d3.select(document).on('mousemove', function (event) {
+                if (isDraggingLogo) {
+                    hasDragged = true; // Set flag when actual dragging occurs
+                    const [mouseX, mouseY] = d3.pointer(event, svg.node());
+                    logoPosition.x = mouseX - dragOffset.x;
+                    logoPosition.y = mouseY - dragOffset.y;
+
+                    // Keep logo within bounds
+                    logoPosition.x = Math.max(
+                        0,
+                        Math.min(SIGN_WIDTH - logoPosition.width, logoPosition.x)
+                    );
+                    logoPosition.y = Math.max(
+                        0,
+                        Math.min(SIGN_HEIGHT - logoPosition.height, logoPosition.y)
+                    );
+
+                    updateLogoTransform();
+                } else if (isResizingLogo) {
+                    const [mouseX, mouseY] = d3.pointer(event, svg.node());
+
+                    // Calculate new dimensions based on handle
+                    if (resizeHandle.includes('e')) {
+                        logoPosition.width = Math.max(30, mouseX - logoPosition.x);
+                    }
+                    if (resizeHandle.includes('w')) {
+                        const newWidth = Math.max(30, logoPosition.x + logoPosition.width - mouseX);
+                        logoPosition.x = logoPosition.x + logoPosition.width - newWidth;
+                        logoPosition.width = newWidth;
+                    }
+                    if (resizeHandle.includes('s')) {
+                        logoPosition.height = Math.max(30, mouseY - logoPosition.y);
+                    }
+                    if (resizeHandle.includes('n')) {
+                        const newHeight = Math.max(
+                            30,
+                            logoPosition.y + logoPosition.height - mouseY
+                        );
+                        logoPosition.y = logoPosition.y + logoPosition.height - newHeight;
+                        logoPosition.height = newHeight;
+                    }
+
+                    updateLogoTransform();
+                }
+            });
+
+            d3.select(document).on('mouseup', function () {
+                isDraggingLogo = false;
+                isResizingLogo = false;
+                resizeHandle = null;
+            });
 
             function initializeSVG() {
                 // Clear SVG
@@ -956,24 +1268,8 @@ MSG1</textarea
                     .attr('stroke', '#333')
                     .attr('stroke-width', 3);
 
-                // Add logo placeholder (orange cross)
-                logoGroup = svg.append('g').attr('transform', `translate(${SIGN_WIDTH - 150}, 50)`);
-
-                logoGroup
-                    .append('rect')
-                    .attr('x', 35)
-                    .attr('y', 0)
-                    .attr('width', 30)
-                    .attr('height', 100)
-                    .attr('fill', '#FF6B35');
-
-                logoGroup
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', 35)
-                    .attr('width', 100)
-                    .attr('height', 30)
-                    .attr('fill', '#FF6B35');
+                // Add interactive logo container
+                createLogoContainer();
 
                 // We'll create text area rectangles and labels dynamically in renderAllMessages()
 
