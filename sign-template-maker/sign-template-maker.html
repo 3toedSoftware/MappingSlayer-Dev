@@ -1618,10 +1618,52 @@ MSG1</textarea
                 }
             }
 
+            // Function to find the next available MSG number
+            function findNextMsgNumber() {
+                let msgNum = 1;
+                while (messageData[msgNum]) {
+                    msgNum++;
+                }
+                return msgNum;
+            }
+
+            // Function to reorder tabs
+            function reorderTabs() {
+                const tabsContainer = document.getElementById('tabs-container');
+                const addButton = tabsContainer.querySelector('.add-tab');
+                const dimsButton = tabsContainer.querySelector('[onclick*="dimensions"]');
+
+                // Get all MSG tab buttons
+                const msgButtons = Array.from(tabsContainer.querySelectorAll('.tab-button')).filter(
+                    btn => btn.textContent.startsWith('MSG')
+                );
+
+                // Sort by MSG number
+                msgButtons.sort((a, b) => {
+                    const numA = parseInt(a.textContent.replace('MSG', ''));
+                    const numB = parseInt(b.textContent.replace('MSG', ''));
+                    return numA - numB;
+                });
+
+                // Remove all buttons
+                msgButtons.forEach(btn => btn.remove());
+                addButton.remove();
+                dimsButton.remove();
+
+                // Re-add in order
+                msgButtons.forEach(btn => tabsContainer.appendChild(btn));
+                tabsContainer.appendChild(addButton);
+                tabsContainer.appendChild(dimsButton);
+            }
+
             // Function to add a new tab
             function addNewTab() {
-                messageCount++;
-                const newMsgId = messageCount;
+                const newMsgId = findNextMsgNumber();
+
+                // Update message count if needed
+                if (newMsgId > messageCount) {
+                    messageCount = newMsgId;
+                }
 
                 // Initialize data for new message
                 messageData[newMsgId] = {
@@ -1637,7 +1679,6 @@ MSG1</textarea
 
                 // Create new tab button
                 const tabsContainer = document.getElementById('tabs-container');
-                const addButton = tabsContainer.querySelector('.add-tab');
                 const newTabButton = document.createElement('button');
                 newTabButton.className = 'tab-button';
                 newTabButton.textContent = 'MSG' + newMsgId;
@@ -1645,13 +1686,17 @@ MSG1</textarea
                     switchTab('msg-' + newMsgId, this);
                 };
 
-                // Insert before the + button
+                // Add button to container
+                const addButton = tabsContainer.querySelector('.add-tab');
                 tabsContainer.insertBefore(newTabButton, addButton);
 
                 // Create new tab content
                 const newTabContent = createMessageTabContent(newMsgId);
                 const dimensionsTab = document.getElementById('dimensions-tab');
                 dimensionsTab.parentNode.insertBefore(newTabContent, dimensionsTab);
+
+                // Reorder tabs to maintain sequence
+                reorderTabs();
 
                 // Switch to the new tab
                 switchTab('msg-' + newMsgId, newTabButton);
