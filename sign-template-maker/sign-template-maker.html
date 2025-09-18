@@ -287,6 +287,25 @@ STORAGE</textarea
                             <input type="number" id="box-height" value="400" min="100" max="2000" />
                         </div>
                     </div>
+
+                    <div class="dimensions">
+                        <div class="input-group">
+                            <label for="text-h-align">Horizontal Align:</label>
+                            <select id="text-h-align">
+                                <option value="left">Left</option>
+                                <option value="center" selected>Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="text-v-align">Vertical Align:</label>
+                            <select id="text-v-align">
+                                <option value="top">Top</option>
+                                <option value="middle" selected>Middle</option>
+                                <option value="bottom">Bottom</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Tab 3: Sign Dimensions -->
@@ -1170,11 +1189,38 @@ STORAGE</textarea
                     boxHeight
                 );
 
-                // Calculate vertical centering
+                // Get alignment settings
+                const hAlign = document.getElementById('text-h-align').value;
+                const vAlign = document.getElementById('text-v-align').value;
+
+                // Calculate vertical position based on alignment
                 const lineHeightPx = fontSize * lineHeight;
                 const totalTextHeight = lines.length * lineHeightPx;
-                const verticalPadding = (boxHeight - totalTextHeight) / 2;
-                const startY = textY + verticalPadding + fontSize; // Add fontSize for baseline adjustment
+
+                let startY;
+                if (vAlign === 'top') {
+                    startY = textY + fontSize; // Top aligned
+                } else if (vAlign === 'bottom') {
+                    startY = textY + boxHeight - totalTextHeight + fontSize;
+                } else {
+                    // middle
+                    const verticalPadding = (boxHeight - totalTextHeight) / 2;
+                    startY = textY + verticalPadding + fontSize;
+                }
+
+                // Calculate horizontal position based on alignment
+                let textAnchor, xPos;
+                if (hAlign === 'left') {
+                    textAnchor = 'start';
+                    xPos = textX;
+                } else if (hAlign === 'right') {
+                    textAnchor = 'end';
+                    xPos = textX + boxWidth;
+                } else {
+                    // center
+                    textAnchor = 'middle';
+                    xPos = textX + boxWidth / 2;
+                }
 
                 // Render each line
                 let lastTextY = startY;
@@ -1182,9 +1228,9 @@ STORAGE</textarea
                     const y = startY + i * lineHeightPx;
                     textContainer
                         .append('text')
-                        .attr('x', textX + boxWidth / 2)
+                        .attr('x', xPos)
                         .attr('y', y)
-                        .attr('text-anchor', 'middle')
+                        .attr('text-anchor', textAnchor)
                         .attr('font-family', fontFamily)
                         .attr('font-size', fontSize)
                         .attr('font-weight', 'bold')
@@ -1256,9 +1302,9 @@ STORAGE</textarea
                     brailleLines.forEach((line, i) => {
                         brailleContainer
                             .append('text')
-                            .attr('x', textX + boxWidth / 2)
+                            .attr('x', xPos) // Use same horizontal position as main text
                             .attr('y', brailleY + i * brailleTargetHeight * 1.5) // 1.5 line height for braille spacing
-                            .attr('text-anchor', 'middle')
+                            .attr('text-anchor', textAnchor) // Use same text anchor as main text
                             .attr('font-family', 'Braille, monospace')
                             .attr('font-size', brailleFontSize)
                             .attr('fill', '#003875')
@@ -1329,6 +1375,8 @@ STORAGE</textarea
             document.getElementById('word-spacing').addEventListener('input', updateText);
             document.getElementById('box-width').addEventListener('input', updateText);
             document.getElementById('box-height').addEventListener('input', updateText);
+            document.getElementById('text-h-align').addEventListener('change', updateText);
+            document.getElementById('text-v-align').addEventListener('change', updateText);
 
             // Add event listeners for sign dimensions
             document.getElementById('sign-width').addEventListener('input', updateSignDimensions);
