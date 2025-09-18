@@ -1503,17 +1503,35 @@ STORAGE</textarea
             function saveCurrentMessageData() {
                 if (!currentMessageId) return;
 
-                messageData[currentMessageId] = {
-                    text: document.getElementById('sign-text').value,
-                    boxX: parseInt(document.getElementById('box-x').value),
-                    boxY: parseInt(document.getElementById('box-y').value),
-                    boxWidth: parseInt(document.getElementById('box-width').value),
-                    boxHeight: parseInt(document.getElementById('box-height').value),
-                    brailleEnabled: document.getElementById('enable-braille').checked,
-                    brailleHeight:
-                        parseFloat(document.getElementById('braille-height').value) || 23.9,
-                    brailleGap: parseFloat(document.getElementById('braille-gap').value) || 40
-                };
+                // Get the current tab's elements
+                const currentTab = document.getElementById('msg-' + currentMessageId + '-tab');
+
+                // For MSG1, use getElementById; for others, query within the tab
+                if (currentMessageId === 1) {
+                    messageData[currentMessageId] = {
+                        text: document.getElementById('sign-text').value,
+                        boxX: parseInt(document.getElementById('box-x').value),
+                        boxY: parseInt(document.getElementById('box-y').value),
+                        boxWidth: parseInt(document.getElementById('box-width').value),
+                        boxHeight: parseInt(document.getElementById('box-height').value),
+                        brailleEnabled: document.getElementById('enable-braille').checked,
+                        brailleHeight:
+                            parseFloat(document.getElementById('braille-height').value) || 23.9,
+                        brailleGap: parseFloat(document.getElementById('braille-gap').value) || 40
+                    };
+                } else if (currentTab) {
+                    messageData[currentMessageId] = {
+                        text: currentTab.querySelector('#sign-text').value,
+                        boxX: parseInt(currentTab.querySelector('#box-x').value),
+                        boxY: parseInt(currentTab.querySelector('#box-y').value),
+                        boxWidth: parseInt(currentTab.querySelector('#box-width').value),
+                        boxHeight: parseInt(currentTab.querySelector('#box-height').value),
+                        brailleEnabled: currentTab.querySelector('#enable-braille').checked,
+                        brailleHeight:
+                            parseFloat(currentTab.querySelector('#braille-height').value) || 23.9,
+                        brailleGap: parseFloat(currentTab.querySelector('#braille-gap').value) || 40
+                    };
+                }
             }
 
             // Function to load message data
@@ -1522,14 +1540,29 @@ STORAGE</textarea
                 const data = messageData[msgId];
 
                 if (data) {
-                    document.getElementById('sign-text').value = data.text;
-                    document.getElementById('box-x').value = data.boxX;
-                    document.getElementById('box-y').value = data.boxY;
-                    document.getElementById('box-width').value = data.boxWidth;
-                    document.getElementById('box-height').value = data.boxHeight;
-                    document.getElementById('enable-braille').checked = data.brailleEnabled;
-                    document.getElementById('braille-height').value = data.brailleHeight;
-                    document.getElementById('braille-gap').value = data.brailleGap;
+                    // Get the current tab's elements
+                    const currentTab = document.getElementById('msg-' + msgId + '-tab');
+
+                    // For MSG1, use getElementById; for others, query within the tab
+                    if (msgId === 1) {
+                        document.getElementById('sign-text').value = data.text;
+                        document.getElementById('box-x').value = data.boxX;
+                        document.getElementById('box-y').value = data.boxY;
+                        document.getElementById('box-width').value = data.boxWidth;
+                        document.getElementById('box-height').value = data.boxHeight;
+                        document.getElementById('enable-braille').checked = data.brailleEnabled;
+                        document.getElementById('braille-height').value = data.brailleHeight;
+                        document.getElementById('braille-gap').value = data.brailleGap;
+                    } else if (currentTab) {
+                        currentTab.querySelector('#sign-text').value = data.text;
+                        currentTab.querySelector('#box-x').value = data.boxX;
+                        currentTab.querySelector('#box-y').value = data.boxY;
+                        currentTab.querySelector('#box-width').value = data.boxWidth;
+                        currentTab.querySelector('#box-height').value = data.boxHeight;
+                        currentTab.querySelector('#enable-braille').checked = data.brailleEnabled;
+                        currentTab.querySelector('#braille-height').value = data.brailleHeight;
+                        currentTab.querySelector('#braille-gap').value = data.brailleGap;
+                    }
                     updateText();
                 }
             }
@@ -1583,6 +1616,18 @@ STORAGE</textarea
                 // Copy the structure from MSG1 tab
                 const msg1Tab = document.getElementById('msg-1-tab');
                 tabDiv.innerHTML = msg1Tab.innerHTML;
+
+                // Add event listeners to the new tab's elements
+                tabDiv.querySelector('#sign-text').addEventListener('input', updateText);
+                tabDiv.querySelector('#box-x').addEventListener('input', updateText);
+                tabDiv.querySelector('#box-y').addEventListener('input', updateText);
+                tabDiv.querySelector('#box-width').addEventListener('input', updateText);
+                tabDiv.querySelector('#box-height').addEventListener('input', updateText);
+                tabDiv.querySelector('#enable-braille').addEventListener('change', updateText);
+                tabDiv.querySelector('#braille-height').addEventListener('input', updateText);
+                tabDiv.querySelector('#braille-gap').addEventListener('input', updateText);
+                tabDiv.querySelector('#text-h-align').addEventListener('change', updateText);
+                tabDiv.querySelector('#text-v-align').addEventListener('change', updateText);
 
                 // Add delete button for MSG2+
                 if (msgId > 1) {
