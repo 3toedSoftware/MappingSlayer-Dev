@@ -260,6 +260,65 @@
             #svg-container svg {
                 touch-action: none; /* Prevent touch scrolling */
             }
+
+            /* Context menu for logo */
+            .logo-context-menu {
+                display: none;
+                position: fixed;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 15px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                min-width: 250px;
+            }
+
+            .logo-context-menu.show {
+                display: block;
+            }
+
+            .logo-context-menu h3 {
+                margin-top: 0;
+                margin-bottom: 10px;
+                color: #003875;
+                font-size: 14px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 5px;
+            }
+
+            .context-menu-group {
+                margin-bottom: 10px;
+            }
+
+            .context-menu-group label {
+                display: inline-block;
+                width: 80px;
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 3px;
+            }
+
+            .context-menu-group input {
+                width: 60px;
+                padding: 4px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+            }
+
+            .context-menu-row {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                margin-bottom: 5px;
+            }
+
+            .context-menu-info {
+                font-size: 11px;
+                color: #888;
+                margin-top: 5px;
+            }
         </style>
     </head>
     <body>
@@ -493,6 +552,38 @@ MSG1</textarea
                 <h2>Sign Preview</h2>
                 <div id="svg-container"></div>
                 <div class="debug-info" id="debug-info">Initializing...</div>
+            </div>
+        </div>
+
+        <!-- Logo Context Menu -->
+        <div id="logo-context-menu" class="logo-context-menu">
+            <h3>Logo Properties</h3>
+            <div class="context-menu-group">
+                <div class="context-menu-row">
+                    <label>X:</label>
+                    <input type="number" id="logo-x" min="0" />
+                    <span style="font-size: 11px; color: #888">px</span>
+                </div>
+                <div class="context-menu-row">
+                    <label>Y:</label>
+                    <input type="number" id="logo-y" min="0" />
+                    <span style="font-size: 11px; color: #888">px</span>
+                </div>
+            </div>
+            <div class="context-menu-group">
+                <div class="context-menu-row">
+                    <label>Width:</label>
+                    <input type="number" id="logo-width" min="30" />
+                    <span style="font-size: 11px; color: #888">px</span>
+                </div>
+                <div class="context-menu-row">
+                    <label>Height:</label>
+                    <input type="number" id="logo-height" min="30" />
+                    <span style="font-size: 11px; color: #888">px</span>
+                </div>
+            </div>
+            <div class="context-menu-info">
+                <div id="logo-edge-info"></div>
             </div>
         </div>
 
@@ -900,6 +991,7 @@ MSG1</textarea
             // Handle font file upload
             document.addEventListener('DOMContentLoaded', async function () {
                 loadStoredFonts();
+                setupContextMenuHandlers();
 
                 // Initialize braille
                 await initializeBraille();
@@ -1096,9 +1188,16 @@ MSG1</textarea
                     }
                 });
 
+                // Add right-click handler for context menu
+                logoBackground.on('contextmenu', function (event) {
+                    event.preventDefault();
+                    showLogoContextMenu(event);
+                });
+
                 // Add drag functionality
                 logoBackground.on('mousedown', function (event) {
-                    if (!isResizingLogo) {
+                    if (!isResizingLogo && event.button === 0) {
+                        // Left mouse button only
                         isDraggingLogo = true;
                         hasDragged = false; // Reset drag flag
                         const [mouseX, mouseY] = d3.pointer(event, zoomGroup.node());
@@ -1201,6 +1300,93 @@ MSG1</textarea
                             // Prevent text selection during resize
                             document.body.classList.add('no-select');
                         });
+                });
+            }
+
+            // Show logo context menu
+            function showLogoContextMenu(event) {
+                const menu = document.getElementById('logo-context-menu');
+
+                // Position menu at cursor
+                menu.style.left = event.clientX + 'px';
+                menu.style.top = event.clientY + 'px';
+
+                // Update input values with current logo position/size
+                document.getElementById('logo-x').value = Math.round(logoPosition.x);
+                document.getElementById('logo-y').value = Math.round(logoPosition.y);
+                document.getElementById('logo-width').value = Math.round(logoPosition.width);
+                document.getElementById('logo-height').value = Math.round(logoPosition.height);
+
+                // Calculate distances from edges
+                const rightEdge = SIGN_WIDTH - (logoPosition.x + logoPosition.width);
+                const bottomEdge = SIGN_HEIGHT - (logoPosition.y + logoPosition.height);
+
+                // Update edge info
+                document.getElementById('logo-edge-info').innerHTML = `
+                    Distances from edges:<br>
+                    Top: ${Math.round(logoPosition.y)}px |
+                    Right: ${Math.round(rightEdge)}px<br>
+                    Bottom: ${Math.round(bottomEdge)}px |
+                    Left: ${Math.round(logoPosition.x)}px
+                `;
+
+                // Show menu
+                menu.classList.add('show');
+
+                // Prevent menu from going off-screen
+                const rect = menu.getBoundingClientRect();
+                if (rect.right > window.innerWidth) {
+                    menu.style.left = window.innerWidth - rect.width - 10 + 'px';
+                }
+                if (rect.bottom > window.innerHeight) {
+                    menu.style.top = window.innerHeight - rect.height - 10 + 'px';
+                }
+            }
+
+            // Hide logo context menu
+            function hideLogoContextMenu() {
+                document.getElementById('logo-context-menu').classList.remove('show');
+            }
+
+            // Setup context menu input handlers
+            function setupContextMenuHandlers() {
+                // X position
+                document.getElementById('logo-x').addEventListener('input', function () {
+                    logoPosition.x = parseInt(this.value) || 0;
+                    updateLogoTransform();
+                });
+
+                // Y position
+                document.getElementById('logo-y').addEventListener('input', function () {
+                    logoPosition.y = parseInt(this.value) || 0;
+                    updateLogoTransform();
+                });
+
+                // Width
+                document.getElementById('logo-width').addEventListener('input', function () {
+                    logoPosition.width = Math.max(30, parseInt(this.value) || 30);
+                    updateLogoTransform();
+                });
+
+                // Height
+                document.getElementById('logo-height').addEventListener('input', function () {
+                    logoPosition.height = Math.max(30, parseInt(this.value) || 30);
+                    updateLogoTransform();
+                });
+
+                // Close menu on click away
+                document.addEventListener('click', function (event) {
+                    const menu = document.getElementById('logo-context-menu');
+                    if (!menu.contains(event.target) && !event.target.closest('.logo-background')) {
+                        hideLogoContextMenu();
+                    }
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        hideLogoContextMenu();
+                    }
                 });
             }
 
