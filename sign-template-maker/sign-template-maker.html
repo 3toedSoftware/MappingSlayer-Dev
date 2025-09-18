@@ -243,6 +243,14 @@
             .delete-tab-btn:hover {
                 background: #c82333;
             }
+
+            /* Prevent text selection during dragging */
+            .no-select {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
         </style>
     </head>
     <body>
@@ -1030,6 +1038,8 @@ MSG1</textarea
                         dragOffset.x = mouseX - logoPosition.x;
                         dragOffset.y = mouseY - logoPosition.y;
                         event.stopPropagation();
+                        // Prevent text selection during drag
+                        document.body.classList.add('no-select');
                     }
                 });
             }
@@ -1121,6 +1131,8 @@ MSG1</textarea
                             isResizingLogo = true;
                             resizeHandle = handle.name;
                             event.stopPropagation();
+                            // Prevent text selection during resize
+                            document.body.classList.add('no-select');
                         });
                 });
             }
@@ -1324,6 +1336,8 @@ MSG1</textarea
                 isDraggingLogo = false;
                 isResizingLogo = false;
                 resizeHandle = null;
+                // Re-enable text selection
+                document.body.classList.remove('no-select');
             });
 
             function initializeSVG() {
