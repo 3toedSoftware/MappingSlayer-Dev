@@ -6661,8 +6661,12 @@ function displayTemplate(templateData) {
                     <text x="${textX}"
                           fill="${templateData.colors?.text || '#000000'}"
                           font-family="${msg.fontFamily || 'Arial, sans-serif'}"
-                          font-size="${fontSize}"
-                          font-weight="${msg.fontWeight || 'normal'}"
+                          font-size="${fontSize}"${
+                              msg.fontWeight
+                                  ? `
+                          font-weight="${msg.fontWeight}"`
+                                  : ''
+                          }
                           letter-spacing="${msg.letterSpacing || 0}"
                           word-spacing="${msg.wordSpacing || 0}"
                           text-anchor="${textAnchor}">
@@ -6682,8 +6686,12 @@ function displayTemplate(templateData) {
                     <text x="${textX}" y="${textY}"
                           fill="${templateData.colors?.text || '#000000'}"
                           font-family="${msg.fontFamily || 'Arial, sans-serif'}"
-                          font-size="${fontSize}"
-                          font-weight="${msg.fontWeight || 'normal'}"
+                          font-size="${fontSize}"${
+                              msg.fontWeight
+                                  ? `
+                          font-weight="${msg.fontWeight}"`
+                                  : ''
+                          }
                           letter-spacing="${msg.letterSpacing || 0}"
                           word-spacing="${msg.wordSpacing || 0}"
                           text-anchor="${textAnchor}"

@@ -1756,7 +1756,6 @@ MSG1</textarea
                     .append('text')
                     .style('font-family', fontFamily)
                     .style('font-size', fontSize + 'px')
-                    .style('font-weight', 'bold')
                     .style('letter-spacing', letterSpacing + 'px')
                     .style('word-spacing', wordSpacing + 'px')
                     .style('visibility', 'hidden');
@@ -1835,7 +1834,7 @@ MSG1</textarea
                 // Create a temporary canvas to measure text metrics
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                ctx.font = `bold ${fontSize}px ${fontFamily}`;
+                ctx.font = `${fontSize}px ${fontFamily}`;
 
                 // Measure an 'X' to get cap height
                 const metrics = ctx.measureText('X');
@@ -2109,7 +2108,6 @@ MSG1</textarea
                             .attr('text-anchor', textAnchor)
                             .attr('font-family', fontFamily)
                             .attr('font-size', fontSize)
-                            .attr('font-weight', 'bold')
                             .attr('fill', textColor)
                             .style('letter-spacing', letterSpacing + 'px')
                             .style('word-spacing', wordSpacing + 'px')
@@ -2650,7 +2648,6 @@ MSG1</textarea
                         fontFamily: fontFamily,
                         capHeight: capHeight,
                         fontSize: fontSize, // Save the calculated font size
-                        fontWeight: 'bold', // Text is always bold in template maker
                         lineHeight: msgData.lineHeight || 1.2,
                         letterSpacing: msgData.letterSpacing || 0,
                         wordSpacing: msgData.wordSpacing || 0,
