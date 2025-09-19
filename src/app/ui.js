@@ -6527,6 +6527,9 @@ function openSignPreviewModal(dot) {
 
     console.log('=== OPENING SIGN PREVIEW ===');
     console.log('Dot:', dot);
+    console.log('Preview modal element exists?', !!previewModal);
+    console.log('Preview modal current display:', previewModal?.style.display);
+    console.log('Preview modal classList:', previewModal?.classList?.toString());
 
     // Get the template for this marker type from loadedTemplates
     const template = loadedTemplates.get(dot.markerType);
@@ -6567,13 +6570,18 @@ function openSignPreviewModal(dot) {
             left = 10;
         }
 
+        console.log('Positioning preview modal:', { left, top, editRect });
         previewModal.style.left = left + 'px';
         previewModal.style.top = top + 'px';
+    } else {
+        console.log('Could not find edit modal content for positioning');
     }
 
     // Show the modal
     previewModal.classList.add('ms-visible');
     previewModal.style.display = 'block';
+    console.log('Preview modal display after show:', previewModal.style.display);
+    console.log('Preview modal visibility:', window.getComputedStyle(previewModal).display);
 }
 
 function closeSignPreviewModal() {
