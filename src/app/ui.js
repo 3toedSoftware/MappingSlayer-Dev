@@ -3465,6 +3465,12 @@ function setupModalEventListeners() {
             }
         });
     }
+
+    // Sign Preview Modal Event Listeners
+    const signPreviewCloseBtn = document.getElementById('sign-preview-close-btn');
+    if (signPreviewCloseBtn) {
+        signPreviewCloseBtn.addEventListener('click', closeSignPreviewModal);
+    }
 }
 
 function addButtonEventListeners() {
