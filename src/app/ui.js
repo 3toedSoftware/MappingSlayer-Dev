@@ -6586,17 +6586,115 @@ function displayTemplate(templateData) {
             `;
 
             // Add message text
-            const textX = msg.boxX + msg.boxWidth / 2;
-            const textY = msg.boxY + msg.boxHeight / 2;
-            svgContent += `
-                <text x="${textX}" y="${textY}"
-                      fill="${templateData.colors?.text || '#000000'}"
-                      font-family="${msg.fontFamily || 'Arial, sans-serif'}"
-                      font-size="${msg.capHeight || 62.5}"
-                      text-anchor="middle" dominant-baseline="middle">
-                    ${msg.text || `MSG${id}`}
-                </text>
-            `;
+            const messageText = msg.text || `MSG${id}`;
+
+            // Calculate text position based on alignment
+            const horizontalAlign = msg.horizontalAlign || 'center';
+            const verticalAlign = msg.verticalAlign || 'middle';
+
+            let textX, textAnchor;
+            if (horizontalAlign === 'left') {
+                textX = msg.boxX + 10; // Small padding
+                textAnchor = 'start';
+            } else if (horizontalAlign === 'right') {
+                textX = msg.boxX + msg.boxWidth - 10;
+                textAnchor = 'end';
+            } else {
+                // center
+                textX = msg.boxX + msg.boxWidth / 2;
+                textAnchor = 'middle';
+            }
+
+            let textY, dominantBaseline;
+            if (verticalAlign === 'top') {
+                textY = msg.boxY + (msg.capHeight || 62.5);
+                dominantBaseline = 'hanging';
+            } else if (verticalAlign === 'bottom') {
+                textY = msg.boxY + msg.boxHeight - 10;
+                dominantBaseline = 'baseline';
+            } else {
+                // middle
+                textY = msg.boxY + msg.boxHeight / 2;
+                dominantBaseline = 'middle';
+            }
+
+            // Check for multi-line text
+            const lines = messageText.split('\n');
+            const lineHeight = msg.lineHeight || 1.2;
+            const fontSize = msg.capHeight || 62.5;
+            const lineSpacing = fontSize * lineHeight;
+
+            if (lines.length > 1) {
+                // Multi-line text - use tspan elements
+                let startY = textY;
+
+                // Adjust starting position for vertical alignment with multiple lines
+                if (verticalAlign === 'middle') {
+                    startY = textY - ((lines.length - 1) * lineSpacing) / 2;
+                } else if (verticalAlign === 'bottom') {
+                    startY = textY - (lines.length - 1) * lineSpacing;
+                }
+
+                svgContent += `
+                    <text x="${textX}"
+                          fill="${templateData.colors?.text || '#000000'}"
+                          font-family="${msg.fontFamily || 'Arial, sans-serif'}"
+                          font-size="${fontSize}"
+                          letter-spacing="${msg.letterSpacing || 0}"
+                          word-spacing="${msg.wordSpacing || 0}"
+                          text-anchor="${textAnchor}">
+                `;
+
+                lines.forEach((line, index) => {
+                    const lineY = startY + index * lineSpacing;
+                    svgContent += `
+                        <tspan x="${textX}" y="${lineY}" dominant-baseline="${dominantBaseline}">${line}</tspan>
+                    `;
+                });
+
+                svgContent += '</text>';
+            } else {
+                // Single line text
+                svgContent += `
+                    <text x="${textX}" y="${textY}"
+                          fill="${templateData.colors?.text || '#000000'}"
+                          font-family="${msg.fontFamily || 'Arial, sans-serif'}"
+                          font-size="${fontSize}"
+                          letter-spacing="${msg.letterSpacing || 0}"
+                          word-spacing="${msg.wordSpacing || 0}"
+                          text-anchor="${textAnchor}"
+                          dominant-baseline="${dominantBaseline}">
+                        ${messageText}
+                    </text>
+                `;
+            }
+
+            // Add braille text if enabled
+            if (msg.brailleEnabled && window.translateToGrade2Braille) {
+                const brailleText = window.translateToGrade2Braille(messageText.toLowerCase());
+
+                // Calculate braille position based on text position and gap
+                let brailleY;
+                if (verticalAlign === 'top') {
+                    brailleY = textY + (msg.capHeight || 62.5) + (msg.brailleGap || 40);
+                } else if (verticalAlign === 'bottom') {
+                    brailleY = textY + (msg.brailleGap || 40);
+                } else {
+                    // middle
+                    brailleY = textY + (msg.capHeight || 62.5) / 2 + (msg.brailleGap || 40);
+                }
+
+                svgContent += `
+                    <text x="${textX}" y="${brailleY}"
+                          fill="${templateData.colors?.braille || '#000000'}"
+                          font-family="Braille, monospace"
+                          font-size="${msg.brailleHeight || 23.9}"
+                          text-anchor="${textAnchor}"
+                          dominant-baseline="middle">
+                        ${brailleText}
+                    </text>
+                `;
+            }
         });
     }
 

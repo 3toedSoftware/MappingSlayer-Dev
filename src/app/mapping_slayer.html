@@ -19,6 +19,8 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <!-- Braille support -->
+        <script src="../../braille-grade2.js"></script>
     </head>
     <body>
         <div id="app-container"></div>
@@ -103,6 +105,36 @@
                             'PDF.js failed to load, continuing without PDF support:',
                             pdfError
                         );
+                    }
+
+                    // Load Braille font
+                    try {
+                        const response = await fetch('../../BRAILLE.TTF');
+                        const blob = await response.blob();
+                        const reader = new FileReader();
+
+                        await new Promise((resolve, reject) => {
+                            reader.onload = function (event) {
+                                const base64 = event.target.result;
+                                const style = document.createElement('style');
+                                style.id = 'braille-font-style';
+                                style.textContent = `
+                                    @font-face {
+                                        font-family: 'Braille';
+                                        src: url(${base64}) format('truetype');
+                                        font-weight: normal;
+                                        font-style: normal;
+                                    }
+                                `;
+                                document.head.appendChild(style);
+                                console.log('Braille font loaded successfully');
+                                resolve();
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        });
+                    } catch (brailleError) {
+                        console.warn('Braille font failed to load:', brailleError);
                     }
 
                     // Import core framework
