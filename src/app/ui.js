@@ -3477,36 +3477,51 @@ function setupModalEventListeners() {
     const toggleGalleryBtn = document.getElementById('toggle-gallery-btn');
 
     if (toggleSignPreviewBtn) {
-        toggleSignPreviewBtn.addEventListener('click', () => {
+        toggleSignPreviewBtn.addEventListener('click', e => {
+            e.stopPropagation(); // Prevent event bubbling
             const isActive = toggleSignPreviewBtn.classList.contains('active');
+            console.log(
+                'Sign Preview button clicked, current state:',
+                isActive ? 'active' : 'inactive'
+            );
+
             if (isActive) {
-                closeSignPreviewModal();
                 toggleSignPreviewBtn.classList.remove('active');
+                closeSignPreviewModal();
             } else {
                 const dot = appState.editingDot
                     ? getCurrentPageDots().get(appState.editingDot)
                     : null;
                 if (dot) {
                     openSignPreviewModal(dot);
-                    toggleSignPreviewBtn.classList.add('active');
+                    // Add active class after opening modal to ensure it sticks
+                    setTimeout(() => {
+                        toggleSignPreviewBtn.classList.add('active');
+                    }, 0);
                 }
             }
         });
     }
 
     if (toggleGalleryBtn) {
-        toggleGalleryBtn.addEventListener('click', () => {
+        toggleGalleryBtn.addEventListener('click', e => {
+            e.stopPropagation(); // Prevent event bubbling
             const isActive = toggleGalleryBtn.classList.contains('active');
+            console.log('Gallery button clicked, current state:', isActive ? 'active' : 'inactive');
+
             if (isActive) {
-                closeGalleryModal();
                 toggleGalleryBtn.classList.remove('active');
+                closeGalleryModal();
             } else {
                 const dot = appState.editingDot
                     ? getCurrentPageDots().get(appState.editingDot)
                     : null;
                 if (dot) {
                     openGalleryModal(dot);
-                    toggleGalleryBtn.classList.add('active');
+                    // Add active class after opening modal to ensure it sticks
+                    setTimeout(() => {
+                        toggleGalleryBtn.classList.add('active');
+                    }, 0);
                 }
             }
         });
@@ -6160,12 +6175,6 @@ function closeGalleryModal() {
 
     // Clear current dot reference
     currentGalleryDot = null;
-
-    // Update toggle button state
-    const toggleBtn = document.getElementById('toggle-gallery-btn');
-    if (toggleBtn) {
-        toggleBtn.classList.remove('active');
-    }
 }
 
 function populateGallery(dot) {
@@ -6670,7 +6679,6 @@ function closeSignPreviewModal() {
     const previewModal = document.getElementById('mapping-slayer-sign-preview-modal');
     if (previewModal) {
         previewModal.classList.remove('ms-visible');
-        previewModal.style.display = 'none';
     }
 
     // Clean up resize listener
@@ -6681,12 +6689,6 @@ function closeSignPreviewModal() {
 
     // Clear current dot reference
     currentSignPreviewDot = null;
-
-    // Update toggle button state
-    const toggleBtn = document.getElementById('toggle-sign-preview-btn');
-    if (toggleBtn) {
-        toggleBtn.classList.remove('active');
-    }
 }
 
 function updateSignPreview(dot, templateData) {
