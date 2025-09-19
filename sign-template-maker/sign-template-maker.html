@@ -403,7 +403,6 @@ MSG1</textarea
                             accept=".ttf,.otf,.woff,.woff2"
                             style="margin-bottom: 5px"
                         />
-                        <div id="uploaded-fonts" style="margin-top: 10px"></div>
                     </div>
 
                     <div class="dimensions">
@@ -993,7 +992,7 @@ MSG1</textarea
                 document.head.appendChild(style);
             }
 
-            // Add font to the dropdown and uploaded fonts list
+            // Add font to the dropdown
             function addFontToList(fontName) {
                 // Add to dropdown if not already there
                 const select = document.getElementById('font-family');
@@ -1004,21 +1003,6 @@ MSG1</textarea
                     option.value = `'${fontName}', sans-serif`;
                     option.textContent = fontName + ' (Custom)';
                     select.appendChild(option);
-                }
-
-                // Add to uploaded fonts display
-                const uploadedDiv = document.getElementById('uploaded-fonts');
-                const fontId = 'uploaded-' + fontName.replace(/\s+/g, '-');
-                if (!document.getElementById(fontId)) {
-                    const fontItem = document.createElement('div');
-                    fontItem.id = fontId;
-                    fontItem.style.cssText =
-                        'padding: 5px; background: #f0f0f0; margin-bottom: 5px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;';
-                    fontItem.innerHTML = `
-                    <span style="font-family: '${fontName}', sans-serif;">${fontName}</span>
-                    <button onclick="removeFont('${fontName}')" style="background: #dc3545; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">Remove</button>
-                `;
-                    uploadedDiv.appendChild(fontItem);
                 }
             }
 
@@ -1037,11 +1021,6 @@ MSG1</textarea
                 const optionId = 'font-option-' + fontName.replace(/\s+/g, '-');
                 const option = document.getElementById(optionId);
                 if (option) option.remove();
-
-                // Remove from uploaded list
-                const fontId = 'uploaded-' + fontName.replace(/\s+/g, '-');
-                const fontItem = document.getElementById(fontId);
-                if (fontItem) fontItem.remove();
 
                 // If this was the selected font, switch to Arial
                 const select = document.getElementById('font-family');
