@@ -6596,6 +6596,78 @@ function wrapTextForTemplate(text, fontSize, fontFamily, maxWidth) {
     return allLines;
 }
 
+// Helper function for braille translation (matches template maker's approach)
+function translateToBrailleForTemplate(text) {
+    // IMPORTANT: Convert to lowercase for ADA compliance
+    // ADA signage is visually all caps, but braille should be lowercase
+    const lowercaseText = text.toLowerCase();
+
+    // Try LibLouis first if available
+    if (typeof window.translator !== 'undefined' && window.translator?.translateString) {
+        try {
+            const result = window.translator.translateString('en-us-g2.ctb', lowercaseText);
+            console.log(`LibLouis Grade 2: "${lowercaseText}" -> "${result}"`);
+            return result;
+        } catch (e) {
+            console.warn('LibLouis translation failed:', e);
+        }
+    }
+
+    // Use JavaScript Grade 2 translation if available
+    if (typeof window.translateToGrade2Braille === 'function') {
+        const result = window.translateToGrade2Braille(lowercaseText);
+        console.log(`Fallback Grade 2: "${lowercaseText}" -> "${result}"`);
+        return result;
+    }
+
+    // Last resort: basic ASCII to braille mapping
+    console.warn('No Grade 2 translator available, using basic ASCII mapping');
+    const brailleMap = {
+        a: '⠁',
+        b: '⠃',
+        c: '⠉',
+        d: '⠙',
+        e: '⠑',
+        f: '⠋',
+        g: '⠛',
+        h: '⠓',
+        i: '⠊',
+        j: '⠚',
+        k: '⠅',
+        l: '⠇',
+        m: '⠍',
+        n: '⠝',
+        o: '⠕',
+        p: '⠏',
+        q: '⠟',
+        r: '⠗',
+        s: '⠎',
+        t: '⠞',
+        u: '⠥',
+        v: '⠧',
+        w: '⠺',
+        x: '⠭',
+        y: '⠽',
+        z: '⠵',
+        ' ': ' ',
+        0: '⠴',
+        1: '⠂',
+        2: '⠆',
+        3: '⠒',
+        4: '⠲',
+        5: '⠢',
+        6: '⠖',
+        7: '⠶',
+        8: '⠦',
+        9: '⠔'
+    };
+
+    return lowercaseText
+        .split('')
+        .map(char => brailleMap[char] || char)
+        .join('');
+}
+
 function displayTemplate(templateData) {
     const display = document.getElementById('template-display');
     const info = document.getElementById('template-info');
@@ -6761,8 +6833,10 @@ function displayTemplate(templateData) {
             }
 
             // Add braille text if enabled
-            if (msg.brailleEnabled && window.translateToGrade2Braille) {
-                const brailleText = window.translateToGrade2Braille(messageText.toLowerCase());
+            if (msg.brailleEnabled) {
+                // Remove line breaks so braille flows continuously (ADA standard)
+                const textWithoutBreaks = messageText.replace(/\n/g, ' ');
+                const brailleText = translateToBrailleForTemplate(textWithoutBreaks);
 
                 // Calculate braille position based on the last line of text
                 let lastTextY;
