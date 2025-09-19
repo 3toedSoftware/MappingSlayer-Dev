@@ -6552,18 +6552,15 @@ function openSignPreviewModal(dot) {
             display.innerHTML =
                 '<span class="ms-sign-preview-placeholder">No template assigned</span>';
         }
-        const info = document.getElementById('sign-preview-info');
-        if (info) {
-            info.textContent = `Marker type: ${dot.markerType}`;
-        }
     }
 
-    // Position the modal to the left of the edit modal
+    // Position the modal to the left of the edit modal and match height
     const editModal = document.getElementById('mapping-slayer-edit-modal');
     const editContent = editModal?.querySelector('.ms-modal-content');
 
     if (editContent) {
         const editRect = editContent.getBoundingClientRect();
+        const editHeight = editContent.offsetHeight;
         const modalWidth = 450; // Width of sign preview modal
         const gap = 20; // Gap between modals
 
@@ -6576,7 +6573,14 @@ function openSignPreviewModal(dot) {
             left = 10;
         }
 
-        console.log('Positioning preview modal:', { left, top, editRect });
+        // Set the height of the preview modal content to match edit modal
+        const previewContent = previewModal.querySelector('.ms-sign-preview-content');
+        if (previewContent) {
+            previewContent.style.height = editHeight + 'px';
+            previewContent.style.minHeight = editHeight + 'px';
+        }
+
+        console.log('Positioning preview modal:', { left, top, editRect, editHeight });
         previewModal.style.left = left + 'px';
         previewModal.style.top = top + 'px';
     } else {
@@ -6600,7 +6604,6 @@ function closeSignPreviewModal() {
 
 function updateSignPreview(dot, templateData) {
     const display = document.getElementById('sign-preview-display');
-    const info = document.getElementById('sign-preview-info');
 
     if (!display || !templateData) return;
 
@@ -6631,18 +6634,15 @@ function updateSignPreview(dot, templateData) {
 
     display.innerHTML = '';
     display.appendChild(tempContainer);
-    info.innerHTML = '';
-    info.appendChild(tempInfo);
+    display.appendChild(tempInfo);
 
     // Call displayTemplate to render the sign
     displayTemplate(previewData);
 
     // Move the rendered content to our preview modal
     const renderedContent = tempContainer.innerHTML;
-    const renderedInfo = tempInfo.innerHTML;
 
     display.innerHTML = renderedContent;
-    info.innerHTML = renderedInfo || `Marker type: ${dot.markerType}`;
 
     // Clean up
     tempContainer.remove();

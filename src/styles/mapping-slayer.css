@@ -3942,52 +3942,24 @@ body {
 
 .ms-sign-preview-content {
     padding: 0;
-}
-
-.ms-sign-preview-header {
+    height: 100%;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background: #1a1a1a;
-    border-bottom: 1px solid #444;
-    border-radius: 8px 8px 0 0;
-}
-
-.ms-sign-preview-title {
-    color: #f07727;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.ms-sign-preview-close-btn {
-    background: none;
-    border: none;
-    color: #999;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 0;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-}
-
-.ms-sign-preview-close-btn:hover {
-    color: #fff;
+    flex-direction: column;
 }
 
 .ms-sign-preview-body {
     padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .ms-sign-preview-display {
     background: white;
     border: 1px solid #444;
     border-radius: 4px;
-    min-height: 200px;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;

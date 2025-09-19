@@ -286,15 +286,10 @@ class MappingSlayerApp extends SlayerAppBase {
             <!-- Sign Preview Modal (shows to the left of Edit Location modal) -->
             <div class="ms-sign-preview-modal" id="mapping-slayer-sign-preview-modal" style="display: none;">
                 <div class="ms-sign-preview-content">
-                    <div class="ms-sign-preview-header">
-                        <span class="ms-sign-preview-title">Sign Preview</span>
-                        <button class="ms-sign-preview-close-btn" id="sign-preview-close-btn" title="Close preview">✕</button>
-                    </div>
                     <div class="ms-sign-preview-body">
                         <div class="ms-sign-preview-display" id="sign-preview-display">
                             <span class="ms-sign-preview-placeholder">No template assigned</span>
                         </div>
-                        <div class="ms-sign-preview-info" id="sign-preview-info"></div>
                     </div>
                 </div>
             </div>
