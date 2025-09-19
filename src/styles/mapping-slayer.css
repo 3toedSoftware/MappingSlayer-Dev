@@ -3965,6 +3965,8 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
 }
 
 .ms-sign-preview-display {
@@ -3976,7 +3978,9 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
-    overflow: hidden;
+    overflow: auto;
+    min-height: 0;
+    max-height: 100%;
 }
 
 .ms-sign-preview-display svg {

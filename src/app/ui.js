@@ -7072,10 +7072,8 @@ function displayTemplate(templateData) {
     svgContent += '</svg>';
 
     display.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; height: 100%; box-sizing: border-box;">
-            <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
-                ${svgContent}
-            </div>
+        <div style="display: flex; align-items: center; justify-content: center; padding: 20px; width: 100%; height: 100%; box-sizing: border-box; overflow: auto;">
+            ${svgContent}
         </div>
     `;
 
