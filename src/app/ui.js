@@ -6609,63 +6609,15 @@ function translateToBrailleForTemplate(text) {
             console.log(`LibLouis Grade 2: "${lowercaseText}" -> "${result}"`);
             return result;
         } catch (e) {
-            console.warn('LibLouis translation failed:', e);
+            console.error('LibLouis translation failed:', e);
+            // Return error message instead of falling back
+            return 'BROKEN BRAILLE - LibLouis ERROR';
         }
     }
 
-    // Use JavaScript Grade 2 translation if available
-    if (typeof window.translateToGrade2Braille === 'function') {
-        const result = window.translateToGrade2Braille(lowercaseText);
-        console.log(`Fallback Grade 2: "${lowercaseText}" -> "${result}"`);
-        return result;
-    }
-
-    // Last resort: basic ASCII to braille mapping
-    console.warn('No Grade 2 translator available, using basic ASCII mapping');
-    const brailleMap = {
-        a: '⠁',
-        b: '⠃',
-        c: '⠉',
-        d: '⠙',
-        e: '⠑',
-        f: '⠋',
-        g: '⠛',
-        h: '⠓',
-        i: '⠊',
-        j: '⠚',
-        k: '⠅',
-        l: '⠇',
-        m: '⠍',
-        n: '⠝',
-        o: '⠕',
-        p: '⠏',
-        q: '⠟',
-        r: '⠗',
-        s: '⠎',
-        t: '⠞',
-        u: '⠥',
-        v: '⠧',
-        w: '⠺',
-        x: '⠭',
-        y: '⠽',
-        z: '⠵',
-        ' ': ' ',
-        0: '⠴',
-        1: '⠂',
-        2: '⠆',
-        3: '⠒',
-        4: '⠲',
-        5: '⠢',
-        6: '⠖',
-        7: '⠶',
-        8: '⠦',
-        9: '⠔'
-    };
-
-    return lowercaseText
-        .split('')
-        .map(char => brailleMap[char] || char)
-        .join('');
+    // No LibLouis available - return error message
+    console.error('LibLouis not available - cannot produce accurate braille');
+    return 'BROKEN BRAILLE - NO LibLouis';
 }
 
 function displayTemplate(templateData) {

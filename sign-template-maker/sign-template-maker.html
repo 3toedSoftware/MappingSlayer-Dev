@@ -924,24 +924,14 @@ MSG1</textarea
                         return result;
                     } catch (error) {
                         console.error('LibLouis translation failed:', error);
+                        // Return error message instead of falling back
+                        return 'BROKEN BRAILLE - LibLouis ERROR';
                     }
                 }
 
-                // Use JavaScript Grade 2 translation if available
-                if (typeof window.translateToGrade2Braille === 'function') {
-                    const result = window.translateToGrade2Braille(lowercaseText);
-                    console.log(`Fallback Grade 2: "${lowercaseText}" -> "${result}"`);
-                    return result;
-                }
-
-                // Last resort: simple mapping (already uses uppercase internally for mapping)
-                const result = lowercaseText
-                    .toUpperCase()
-                    .split('')
-                    .map(char => simpleBrailleMap[char] || char)
-                    .join('');
-                console.log(`Simple mapping: "${lowercaseText}" -> "${result}"`);
-                return result;
+                // No LibLouis available - return error message
+                console.error('LibLouis not available - cannot produce accurate braille');
+                return 'BROKEN BRAILLE - NO LibLouis';
             }
 
             // Load stored fonts from localStorage on startup
