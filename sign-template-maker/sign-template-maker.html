@@ -2794,15 +2794,33 @@ MSG1</textarea
                                 const msgData = templateData.messages[msgId];
 
                                 if (msgId === '1') {
-                                    // Update MSG1 - including all position data
+                                    // Update MSG1 - including all position data and typography
                                     messageData[1] = msgData;
                                     document.getElementById('sign-text').value = msgData.text || '';
+                                    // Typography settings
+                                    document.getElementById('font-family').value =
+                                        msgData.fontFamily || 'Arial, sans-serif';
+                                    document.getElementById('cap-height').value =
+                                        msgData.capHeight || 62.5;
+                                    document.getElementById('line-height').value =
+                                        msgData.lineHeight || 1.2;
+                                    document.getElementById('letter-spacing').value =
+                                        msgData.letterSpacing || 0;
+                                    document.getElementById('word-spacing').value =
+                                        msgData.wordSpacing || 0;
+                                    // Position
                                     document.getElementById('box-x').value = msgData.boxX || 50;
                                     document.getElementById('box-y').value = msgData.boxY || 100;
                                     document.getElementById('box-width').value =
                                         msgData.boxWidth || 700;
                                     document.getElementById('box-height').value =
                                         msgData.boxHeight || 200;
+                                    // Alignment
+                                    document.getElementById('text-h-align').value =
+                                        msgData.horizontalAlign || 'center';
+                                    document.getElementById('text-v-align').value =
+                                        msgData.verticalAlign || 'middle';
+                                    // Braille
                                     document.getElementById('enable-braille').checked =
                                         msgData.brailleEnabled || false;
                                     document.getElementById('braille-height').value =
@@ -2820,12 +2838,30 @@ MSG1</textarea
                                     if (newTab) {
                                         newTab.querySelector('#sign-text').value =
                                             msgData.text || '';
+                                        // Typography settings
+                                        newTab.querySelector('#font-family').value =
+                                            msgData.fontFamily || 'Arial, sans-serif';
+                                        newTab.querySelector('#cap-height').value =
+                                            msgData.capHeight || 62.5;
+                                        newTab.querySelector('#line-height').value =
+                                            msgData.lineHeight || 1.2;
+                                        newTab.querySelector('#letter-spacing').value =
+                                            msgData.letterSpacing || 0;
+                                        newTab.querySelector('#word-spacing').value =
+                                            msgData.wordSpacing || 0;
+                                        // Position
                                         newTab.querySelector('#box-x').value = msgData.boxX || 50;
                                         newTab.querySelector('#box-y').value = msgData.boxY || 100;
                                         newTab.querySelector('#box-width').value =
                                             msgData.boxWidth || 700;
                                         newTab.querySelector('#box-height').value =
                                             msgData.boxHeight || 200;
+                                        // Alignment
+                                        newTab.querySelector('#text-h-align').value =
+                                            msgData.horizontalAlign || 'center';
+                                        newTab.querySelector('#text-v-align').value =
+                                            msgData.verticalAlign || 'middle';
+                                        // Braille
                                         newTab.querySelector('#enable-braille').checked =
                                             msgData.brailleEnabled || false;
                                         newTab.querySelector('#braille-height').value =
