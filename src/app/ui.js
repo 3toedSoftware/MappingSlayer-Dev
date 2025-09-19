@@ -6527,15 +6527,52 @@ function showMarkerTypeContextMenu(event, markerTypeCode) {
 window.showMarkerTypeContextMenu = showMarkerTypeContextMenu;
 
 // Sign Preview Modal Functions
+let signPreviewResizeHandler = null;
+let currentSignPreviewDot = null;
+
+function updateSignPreviewPosition() {
+    const previewModal = document.getElementById('mapping-slayer-sign-preview-modal');
+    const editModal = document.getElementById('mapping-slayer-edit-modal');
+    if (!previewModal || !editModal) return;
+
+    const editModalContent = editModal.querySelector('.ms-modal-content');
+    if (editModalContent) {
+        const editHeight = editModalContent.offsetHeight;
+        const previewContent = previewModal.querySelector('.ms-sign-preview-content');
+        if (previewContent) {
+            previewContent.style.height = editHeight + 'px';
+            previewContent.style.minHeight = editHeight + 'px';
+        }
+
+        // Position preview modal to the left of edit modal
+        const editRect = editModalContent.getBoundingClientRect();
+        const editTop = editRect.top;
+        const editLeft = editRect.left;
+        const modalWidth = 450; // Width of sign preview modal
+        const gap = 20; // Gap between modals
+
+        // Calculate position to the left
+        let left = editLeft - modalWidth - gap;
+
+        // Make sure it doesn't go off-screen
+        if (left < 10) {
+            left = 10;
+        }
+
+        previewModal.style.top = editTop + 'px';
+        previewModal.style.left = left + 'px';
+        previewModal.style.transform = 'none'; // Remove any transforms
+    }
+}
+
 function openSignPreviewModal(dot) {
     const previewModal = document.getElementById('mapping-slayer-sign-preview-modal');
     if (!previewModal) return;
 
     console.log('=== OPENING SIGN PREVIEW ===');
-    console.log('Dot:', dot);
-    console.log('Preview modal element exists?', !!previewModal);
-    console.log('Preview modal current display:', previewModal?.style.display);
-    console.log('Preview modal classList:', previewModal?.classList?.toString());
+
+    // Store current dot reference
+    currentSignPreviewDot = dot;
 
     // Get the template for this marker type from loadedTemplates
     const template = loadedTemplates.get(dot.markerType);
@@ -6554,44 +6591,29 @@ function openSignPreviewModal(dot) {
         }
     }
 
-    // Position the modal to the left of the edit modal and match height
-    const editModal = document.getElementById('mapping-slayer-edit-modal');
-    const editContent = editModal?.querySelector('.ms-modal-content');
-
-    if (editContent) {
-        const editRect = editContent.getBoundingClientRect();
-        const editHeight = editContent.offsetHeight;
-        const modalWidth = 450; // Width of sign preview modal
-        const gap = 20; // Gap between modals
-
-        // Calculate position to the left of edit modal
-        let left = editRect.left - modalWidth - gap;
-        const top = editRect.top;
-
-        // Make sure it doesn't go off-screen
-        if (left < 10) {
-            left = 10;
-        }
-
-        // Set the height of the preview modal content to match edit modal
-        const previewContent = previewModal.querySelector('.ms-sign-preview-content');
-        if (previewContent) {
-            previewContent.style.height = editHeight + 'px';
-            previewContent.style.minHeight = editHeight + 'px';
-        }
-
-        console.log('Positioning preview modal:', { left, top, editRect, editHeight });
-        previewModal.style.left = left + 'px';
-        previewModal.style.top = top + 'px';
-    } else {
-        console.log('Could not find edit modal content for positioning');
-    }
+    // Position the preview modal
+    updateSignPreviewPosition();
 
     // Show the modal
     previewModal.classList.add('ms-visible');
     previewModal.style.display = 'block';
-    console.log('Preview modal display after show:', previewModal.style.display);
-    console.log('Preview modal visibility:', window.getComputedStyle(previewModal).display);
+
+    // Add resize listener with debouncing
+    if (signPreviewResizeHandler) {
+        window.removeEventListener('resize', signPreviewResizeHandler);
+    }
+
+    let resizeTimeout;
+    signPreviewResizeHandler = () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (previewModal.classList.contains('ms-visible')) {
+                updateSignPreviewPosition();
+            }
+        }, 100); // Debounce by 100ms
+    };
+
+    window.addEventListener('resize', signPreviewResizeHandler);
 }
 
 function closeSignPreviewModal() {
@@ -6600,6 +6622,15 @@ function closeSignPreviewModal() {
         previewModal.classList.remove('ms-visible');
         previewModal.style.display = 'none';
     }
+
+    // Clean up resize listener
+    if (signPreviewResizeHandler) {
+        window.removeEventListener('resize', signPreviewResizeHandler);
+        signPreviewResizeHandler = null;
+    }
+
+    // Clear current dot reference
+    currentSignPreviewDot = null;
 }
 
 function updateSignPreview(dot, templateData) {
