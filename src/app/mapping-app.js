@@ -343,6 +343,33 @@ class MappingSlayerApp extends SlayerAppBase {
                 </div>
             </div>
 
+            <!-- Template Modal (for setting sign templates) -->
+            <div class="ms-template-modal" id="mapping-slayer-template-modal" style="display: none;">
+                <div class="ms-template-content">
+                    <div class="ms-template-header">
+                        <span class="ms-template-title">Sign Template: <span id="template-marker-type"></span></span>
+                        <div class="ms-template-controls">
+                            <button class="ms-template-btn ms-template-add-btn" id="template-add-btn" title="Load template JSON">+</button>
+                            <button class="ms-template-btn ms-template-remove-btn" id="template-remove-btn" title="Remove current template">−</button>
+                            <button class="ms-template-btn ms-template-close-btn" id="template-close-btn" title="Close">✕</button>
+                        </div>
+                    </div>
+                    <div class="ms-template-body">
+                        <div class="ms-template-preview">
+                            <div class="ms-template-display" id="template-display">
+                                <span class="ms-template-placeholder">NO TEMPLATE LOADED</span>
+                            </div>
+                        </div>
+                        <div class="ms-template-info" id="template-info" style="display: none;">
+                            <div class="ms-template-filename"></div>
+                            <div class="ms-template-details"></div>
+                        </div>
+                    </div>
+                    <!-- Hidden file input for template selection -->
+                    <input type="file" id="template-file-input" accept=".json" style="display: none;">
+                </div>
+            </div>
+
             <!-- Group Edit Modal -->
             <div class="ms-modal" id="mapping-slayer-group-edit-modal">
                 <div class="ms-modal-content">

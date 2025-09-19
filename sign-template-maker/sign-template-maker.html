@@ -322,7 +322,48 @@
         </style>
     </head>
     <body>
-        <h1>Sign Template Maker</h1>
+        <div
+            style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            "
+        >
+            <h1 style="margin: 0">Sign Template Maker</h1>
+            <div>
+                <button
+                    id="save-template-btn"
+                    style="
+                        background: #4caf50;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        margin-right: 10px;
+                    "
+                >
+                    💾 Save Template
+                </button>
+                <button
+                    id="load-template-btn"
+                    style="
+                        background: #2196f3;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        font-size: 14px;
+                        cursor: pointer;
+                    "
+                >
+                    📁 Load Template
+                </button>
+                <input type="file" id="load-template-input" accept=".json" style="display: none" />
+            </div>
+        </div>
 
         <div class="container">
             <div class="controls">
@@ -2484,6 +2525,284 @@ MSG1</textarea
             });
             document.getElementById('text-color').addEventListener('input', updateText);
             document.getElementById('braille-color').addEventListener('input', updateText);
+
+            // Save/Load Template Functions
+            async function saveTemplate() {
+                // Gather all template data
+                const templateName = prompt('Enter template name:', 'Sign Template');
+                if (!templateName) return; // User cancelled
+
+                const templateData = {
+                    name: templateName,
+                    version: '1.0',
+                    created: new Date().toISOString(),
+
+                    // Sign dimensions
+                    signWidth: parseInt(document.getElementById('sign-width').value),
+                    signHeight: parseInt(document.getElementById('sign-height').value),
+                    dpi: parseInt(document.getElementById('sign-dpi').value),
+
+                    // Colors
+                    colors: {
+                        signBackground: document.getElementById('sign-color').value,
+                        text: document.getElementById('text-color').value,
+                        braille: document.getElementById('braille-color').value
+                    },
+
+                    // Typography settings
+                    typography: {
+                        fontFamily: document.getElementById('font-family').value,
+                        capHeight: parseFloat(document.getElementById('cap-height').value),
+                        lineHeight: parseFloat(document.getElementById('line-height').value),
+                        letterSpacing: parseFloat(document.getElementById('letter-spacing').value),
+                        wordSpacing: parseFloat(document.getElementById('word-spacing').value),
+                        horizontalAlign: document.getElementById('text-h-align').value,
+                        verticalAlign: document.getElementById('text-v-align').value
+                    },
+
+                    // Message areas
+                    messages: {}
+                };
+
+                // Collect all message area data - now properly includes brailleEnabled
+                Object.keys(messageData).forEach(msgId => {
+                    const msgData = messageData[msgId];
+                    templateData.messages[msgId] = {
+                        text: msgData.text,
+                        boxX: msgData.boxX,
+                        boxY: msgData.boxY,
+                        boxWidth: msgData.boxWidth,
+                        boxHeight: msgData.boxHeight,
+                        brailleEnabled: msgData.brailleEnabled || false,
+                        brailleHeight: msgData.brailleHeight || 23.9,
+                        brailleGap: msgData.brailleGap || 40
+                    };
+                });
+
+                // Logo data - include SVG content and position
+                if (uploadedLogoSVG && logoPosition) {
+                    templateData.logo = {
+                        svgContent: uploadedLogoSVG, // Store the actual SVG content
+                        x: logoPosition.x,
+                        y: logoPosition.y,
+                        width: logoPosition.width,
+                        height: logoPosition.height
+                    };
+                }
+
+                // Create JSON string
+                const jsonStr = JSON.stringify(templateData, null, 2);
+
+                // Try to use File System Access API for proper save dialog
+                if ('showSaveFilePicker' in window) {
+                    try {
+                        // Show save file picker
+                        const handle = await window.showSaveFilePicker({
+                            suggestedName:
+                                (templateName || 'template')
+                                    .replace(/[^a-z0-9]/gi, '-')
+                                    .toLowerCase() + '.json',
+                            types: [
+                                {
+                                    description: 'JSON Template',
+                                    accept: { 'application/json': ['.json'] }
+                                }
+                            ]
+                        });
+
+                        // Create a writable stream
+                        const writable = await handle.createWritable();
+
+                        // Write the JSON content
+                        await writable.write(jsonStr);
+
+                        // Close the file
+                        await writable.close();
+
+                        console.log('Template saved:', templateData);
+                        alert('Template saved successfully!');
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            console.error('Save error:', err);
+                            // Fall back to download method
+                            downloadTemplate(jsonStr, templateName);
+                        }
+                    }
+                } else {
+                    // Fallback for browsers without File System Access API
+                    downloadTemplate(jsonStr, templateName);
+                }
+            }
+
+            // Fallback download function
+            function downloadTemplate(jsonStr, templateName) {
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download =
+                    (templateName || 'template').replace(/[^a-z0-9]/gi, '-').toLowerCase() +
+                    '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                console.log('Template downloaded (fallback method)');
+            }
+
+            function loadTemplate(file) {
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const templateData = JSON.parse(event.target.result);
+
+                        // Apply dimensions
+                        if (templateData.signWidth)
+                            document.getElementById('sign-width').value = templateData.signWidth;
+                        if (templateData.signHeight)
+                            document.getElementById('sign-height').value = templateData.signHeight;
+                        if (templateData.dpi)
+                            document.getElementById('sign-dpi').value = templateData.dpi;
+
+                        // Apply colors
+                        if (templateData.colors) {
+                            if (templateData.colors.signBackground)
+                                document.getElementById('sign-color').value =
+                                    templateData.colors.signBackground;
+                            if (templateData.colors.text)
+                                document.getElementById('text-color').value =
+                                    templateData.colors.text;
+                            if (templateData.colors.braille)
+                                document.getElementById('braille-color').value =
+                                    templateData.colors.braille;
+                        }
+
+                        // Apply typography
+                        if (templateData.typography) {
+                            const typo = templateData.typography;
+                            if (typo.fontFamily)
+                                document.getElementById('font-family').value = typo.fontFamily;
+                            if (typo.capHeight)
+                                document.getElementById('cap-height').value = typo.capHeight;
+                            if (typo.lineHeight)
+                                document.getElementById('line-height').value = typo.lineHeight;
+                            if (typo.letterSpacing)
+                                document.getElementById('letter-spacing').value =
+                                    typo.letterSpacing;
+                            if (typo.wordSpacing)
+                                document.getElementById('word-spacing').value = typo.wordSpacing;
+                            if (typo.horizontalAlign)
+                                document.getElementById('text-h-align').value =
+                                    typo.horizontalAlign;
+                            if (typo.verticalAlign)
+                                document.getElementById('text-v-align').value = typo.verticalAlign;
+                        }
+
+                        // Apply message areas
+                        if (templateData.messages) {
+                            // Clear existing messages (except MSG1)
+                            messageData = { 1: messageData[1] }; // Keep MSG1
+
+                            // Remove extra tabs
+                            const tabsToRemove = document.querySelectorAll(
+                                '.tab-button[data-msg-id]:not([onclick*="msg-1"])'
+                            );
+                            tabsToRemove.forEach(tab => tab.remove());
+                            const contentToRemove = document.querySelectorAll(
+                                '.tab-content[data-msg-id]:not([id="msg-1-tab"])'
+                            );
+                            contentToRemove.forEach(content => content.remove());
+
+                            // Load messages from template
+                            Object.keys(templateData.messages).forEach(msgId => {
+                                const msgData = templateData.messages[msgId];
+
+                                if (msgId === '1') {
+                                    // Update MSG1 - including all position data
+                                    messageData[1] = msgData;
+                                    document.getElementById('sign-text').value = msgData.text || '';
+                                    document.getElementById('box-x').value = msgData.boxX || 50;
+                                    document.getElementById('box-y').value = msgData.boxY || 100;
+                                    document.getElementById('box-width').value =
+                                        msgData.boxWidth || 700;
+                                    document.getElementById('box-height').value =
+                                        msgData.boxHeight || 200;
+                                    document.getElementById('enable-braille').checked =
+                                        msgData.brailleEnabled || false;
+                                    document.getElementById('braille-height').value =
+                                        msgData.brailleHeight || 23.9;
+                                    document.getElementById('braille-gap').value =
+                                        msgData.brailleGap || 40;
+                                } else {
+                                    // Create new message tabs for additional messages
+                                    addNewTab(false); // Don't switch to the new tab
+                                    const newMsgId = Object.keys(messageData).length;
+                                    messageData[newMsgId] = msgData;
+
+                                    // Update the input fields for the new tab
+                                    const newTab = document.querySelector(`#msg-${newMsgId}-tab`);
+                                    if (newTab) {
+                                        newTab.querySelector('#sign-text').value =
+                                            msgData.text || '';
+                                        newTab.querySelector('#box-x').value = msgData.boxX || 50;
+                                        newTab.querySelector('#box-y').value = msgData.boxY || 100;
+                                        newTab.querySelector('#box-width').value =
+                                            msgData.boxWidth || 700;
+                                        newTab.querySelector('#box-height').value =
+                                            msgData.boxHeight || 200;
+                                        newTab.querySelector('#enable-braille').checked =
+                                            msgData.brailleEnabled || false;
+                                        newTab.querySelector('#braille-height').value =
+                                            msgData.brailleHeight || 23.9;
+                                        newTab.querySelector('#braille-gap').value =
+                                            msgData.brailleGap || 40;
+                                    }
+                                }
+                            });
+                        }
+
+                        // Apply logo if exists
+                        if (templateData.logo) {
+                            // Restore logo position
+                            logoPosition = {
+                                x: templateData.logo.x,
+                                y: templateData.logo.y,
+                                width: templateData.logo.width,
+                                height: templateData.logo.height
+                            };
+
+                            // Restore SVG content if present
+                            if (templateData.logo.svgContent) {
+                                uploadedLogoSVG = templateData.logo.svgContent;
+                            }
+                        }
+
+                        // Re-render everything
+                        updateSignDimensions();
+
+                        alert(`Template "${templateData.name}" loaded successfully!`);
+                    } catch (err) {
+                        console.error('Error loading template:', err);
+                        alert('Error loading template file. Please check the file format.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // Add save/load button event listeners
+            document.getElementById('save-template-btn').addEventListener('click', saveTemplate);
+
+            document.getElementById('load-template-btn').addEventListener('click', () => {
+                document.getElementById('load-template-input').click();
+            });
+
+            document.getElementById('load-template-input').addEventListener('change', e => {
+                const file = e.target.files[0];
+                if (file && file.type === 'application/json') {
+                    loadTemplate(file);
+                }
+                e.target.value = ''; // Reset for re-selection
+            });
 
             // Initial render
             updateSignDimensions();

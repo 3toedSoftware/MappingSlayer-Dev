@@ -1,0 +1,41 @@
+{
+    "name": "Sign Template",
+    "version": "1.0",
+    "created": "2025-09-19T00:17:08.700Z",
+    "signWidth": 800,
+    "signHeight": 300,
+    "dpi": 100,
+    "colors": {
+        "signBackground": "#828282",
+        "text": "#b30000",
+        "braille": "#007bff"
+    },
+    "typography": {
+        "fontFamily": "Arial, sans-serif",
+        "capHeight": 62.5,
+        "lineHeight": 1.2,
+        "letterSpacing": 0,
+        "wordSpacing": 0,
+        "horizontalAlign": "center",
+        "verticalAlign": "middle"
+    },
+    "messages": {
+        "1": {
+            "text": "HELLO\nCONFERENCE",
+            "boxX": 174,
+            "boxY": 21,
+            "boxWidth": 600,
+            "boxHeight": 200,
+            "brailleEnabled": true,
+            "brailleHeight": 23.9,
+            "brailleGap": 40
+        }
+    },
+    "logo": {
+        "svgContent": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\r\n<!-- Creator: CorelDRAW -->\r\n<svg xmlns=\"http://www.w3.org/2000/svg\" xml:space=\"preserve\" width=\"200px\" height=\"200px\" version=\"1.1\" style=\"shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd\"\r\nviewBox=\"0 0 17.63 17.63\"\r\n xmlns:xlink=\"http://www.w3.org/1999/xlink\"\r\n xmlns:xodm=\"http://www.corel.com/coreldraw/odm/2003\">\r\n <defs>\r\n  <style type=\"text/css\">\r\n   <![CDATA[\r\n    .fil0 {fill:#CF252B;fill-rule:nonzero}\r\n   ]]>\r\n  </style>\r\n </defs>\r\n <g id=\"Layer_x0020_1\">\r\n  <metadata id=\"CorelCorpID_0Corel-Layer\"/>\r\n  <path class=\"fil0\" d=\"M8.23 14.39c-0.67,0 -1.21,-0.55 -1.21,-1.22l0 -1.61c0,-0.44 -0.35,-0.78 -0.78,-0.78l-1.62 0c-0.67,0 -1.21,-0.55 -1.21,-1.22l0 -1.18c0,-0.67 0.54,-1.21 1.21,-1.21l1.18 0c0.65,0 1.21,0.52 1.21,1.24l0 1.59c0,0.43 0.35,0.78 0.79,0.78l2.04 0c0.43,0 0.78,-0.35 0.78,-0.78l0 -1.58c0,-0.78 0.62,-1.25 1.21,-1.25l1.17 0c0.66,0 1.22,0.54 1.22,1.21l0 1.18c0,0.68 -0.54,1.22 -1.22,1.22l-1.6 0c-0.44,0 -0.78,0.34 -0.78,0.78l0 1.61c0,0.67 -0.54,1.22 -1.22,1.22l-1.17 0zm1.18 -11.15c0.67,0 1.21,0.55 1.21,1.22l0 1.17c0,0.68 -0.54,1.22 -1.21,1.22l-1.18 0c-0.67,0 -1.21,-0.54 -1.21,-1.22l0 -1.17c0,-0.67 0.54,-1.22 1.21,-1.22l1.18 0zm-0.6 13.25c-4.23,0 -7.67,-3.44 -7.67,-7.68 0,-4.23 3.44,-7.67 7.67,-7.67 4.24,0 7.68,3.44 7.68,7.67 0,4.24 -3.44,7.68 -7.68,7.68zm0 -16.49c-4.86,0 -8.81,3.95 -8.81,8.81 0,4.87 3.95,8.82 8.81,8.82 4.87,0 8.82,-3.95 8.82,-8.82 0,-4.86 -3.95,-8.81 -8.82,-8.81z\"/>\r\n </g>\r\n</svg>\r\n",
+        "x": 23.00005340576172,
+        "y": 21,
+        "width": 130.46664428710938,
+        "height": 130.46664428710938
+    }
+}

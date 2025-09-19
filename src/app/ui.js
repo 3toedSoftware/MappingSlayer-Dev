@@ -393,14 +393,18 @@ function updateFilterCheckboxesImmediate() {
                 selectAllDotsOfMarkerType(markerTypeCode);
             });
 
-            // DEPRECATED - Right-click on individual marker types no longer opens flag modal
-            // Now accessed from marker types header instead
-            // item.addEventListener('contextmenu', (e) => {
-            //     if (e.target.closest('input, .pcr-app, .ms-color-picker-wrapper, .ms-delete-marker-type-btn, .ms-design-reference-square')) return;
-            //     e.preventDefault();
-            //     e.stopPropagation();
-            //     openFlagModal(markerTypeCode);
-            // });
+            // Right-click context menu for marker types
+            item.addEventListener('contextmenu', e => {
+                if (
+                    e.target.closest(
+                        'input, .pcr-app, .ms-color-picker-wrapper, .ms-delete-marker-type-btn, .ms-design-reference-square'
+                    )
+                )
+                    return;
+                e.preventDefault();
+                e.stopPropagation();
+                showMarkerTypeContextMenu(e, markerTypeCode);
+            });
 
             item.querySelector('input[type="checkbox"]').addEventListener('change', applyFilters);
             codeInputEl.addEventListener('change', e => handleMarkerTypeCodeChange(e.target));
@@ -6438,3 +6442,207 @@ function addPhotoToDot(base64Data) {
 // Make gallery functions available globally
 window.openGalleryModal = openGalleryModal;
 window.closeGalleryModal = closeGalleryModal;
+
+// Marker Type Context Menu Functions
+function showMarkerTypeContextMenu(event, markerTypeCode) {
+    // Remove any existing context menu
+    const existingMenu = document.querySelector('.ms-marker-type-context-menu');
+    if (existingMenu) {
+        existingMenu.remove();
+    }
+
+    // Create context menu
+    const menu = document.createElement('div');
+    menu.className = 'ms-marker-type-context-menu';
+
+    // Add menu items
+    menu.innerHTML = `
+        <div class="ms-context-menu-item" data-action="template">
+            <span>📄</span> Set Sign Template
+        </div>
+    `;
+
+    // Position menu at cursor
+    menu.style.left = event.clientX + 'px';
+    menu.style.top = event.clientY + 'px';
+
+    // Add to body
+    document.body.appendChild(menu);
+
+    // Handle menu item clicks
+    menu.addEventListener('click', e => {
+        const item = e.target.closest('.ms-context-menu-item');
+        if (item) {
+            const action = item.dataset.action;
+
+            if (action === 'template') {
+                openTemplateModal(markerTypeCode);
+            }
+
+            menu.remove();
+        }
+    });
+
+    // Close menu when clicking elsewhere
+    setTimeout(() => {
+        document.addEventListener('click', function closeMenu(e) {
+            if (!menu.contains(e.target)) {
+                menu.remove();
+                document.removeEventListener('click', closeMenu);
+            }
+        });
+    }, 0);
+}
+
+window.showMarkerTypeContextMenu = showMarkerTypeContextMenu;
+
+// Template Modal Functions
+let currentTemplateMarkerType = null;
+const loadedTemplates = new Map(); // Store loaded templates by marker type
+
+function openTemplateModal(markerTypeCode) {
+    const modal = document.getElementById('mapping-slayer-template-modal');
+    const markerTypeSpan = document.getElementById('template-marker-type');
+
+    if (!modal) return;
+
+    currentTemplateMarkerType = markerTypeCode;
+    markerTypeSpan.textContent = markerTypeCode;
+
+    // Show the modal
+    modal.style.display = 'block';
+
+    // Check if there's already a template loaded for this marker type
+    if (loadedTemplates.has(markerTypeCode)) {
+        displayTemplate(loadedTemplates.get(markerTypeCode));
+    } else {
+        resetTemplateDisplay();
+    }
+
+    // Setup event listeners if not already done
+    setupTemplateModalListeners();
+}
+
+function closeTemplateModal() {
+    const modal = document.getElementById('mapping-slayer-template-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    currentTemplateMarkerType = null;
+}
+
+function resetTemplateDisplay() {
+    const display = document.getElementById('template-display');
+    const info = document.getElementById('template-info');
+
+    if (display) {
+        display.innerHTML = '<span class="ms-template-placeholder">NO TEMPLATE LOADED</span>';
+    }
+    if (info) {
+        info.style.display = 'none';
+    }
+}
+
+function displayTemplate(templateData) {
+    const display = document.getElementById('template-display');
+    const info = document.getElementById('template-info');
+
+    if (!display) return;
+
+    // For now, just show the template data as formatted JSON
+    // Later this will render a visual preview
+    display.innerHTML = `
+        <div style="padding: 10px; text-align: left;">
+            <div style="color: #f07727; margin-bottom: 10px; font-weight: bold;">
+                ${templateData.name || 'Unnamed Template'}
+            </div>
+            <div style="color: #999; font-size: 12px;">
+                <div>Width: ${templateData.signWidth}px</div>
+                <div>Height: ${templateData.signHeight}px</div>
+                <div>Messages: ${templateData.messages ? Object.keys(templateData.messages).length : 0}</div>
+            </div>
+        </div>
+    `;
+
+    // Show info section
+    if (info) {
+        const filenameDiv = info.querySelector('.ms-template-filename');
+        const detailsDiv = info.querySelector('.ms-template-details');
+
+        if (filenameDiv) {
+            filenameDiv.textContent = templateData.filename || 'template.json';
+        }
+        if (detailsDiv) {
+            detailsDiv.textContent = `Loaded for ${currentTemplateMarkerType}`;
+        }
+
+        info.style.display = 'block';
+    }
+}
+
+function setupTemplateModalListeners() {
+    const addBtn = document.getElementById('template-add-btn');
+    const removeBtn = document.getElementById('template-remove-btn');
+    const closeBtn = document.getElementById('template-close-btn');
+    const fileInput = document.getElementById('template-file-input');
+
+    // Remove existing listeners to prevent duplicates
+    if (addBtn && !addBtn.hasListener) {
+        addBtn.hasListener = true;
+        addBtn.addEventListener('click', () => {
+            fileInput?.click();
+        });
+    }
+
+    if (removeBtn && !removeBtn.hasListener) {
+        removeBtn.hasListener = true;
+        removeBtn.addEventListener('click', () => {
+            if (currentTemplateMarkerType && loadedTemplates.has(currentTemplateMarkerType)) {
+                loadedTemplates.delete(currentTemplateMarkerType);
+                resetTemplateDisplay();
+                console.log(`Removed template for ${currentTemplateMarkerType}`);
+            }
+        });
+    }
+
+    if (closeBtn && !closeBtn.hasListener) {
+        closeBtn.hasListener = true;
+        closeBtn.addEventListener('click', closeTemplateModal);
+    }
+
+    if (fileInput && !fileInput.hasListener) {
+        fileInput.hasListener = true;
+        fileInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (file && file.type === 'application/json') {
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const templateData = JSON.parse(event.target.result);
+                        templateData.filename = file.name;
+
+                        // Store the template for this marker type
+                        if (currentTemplateMarkerType) {
+                            loadedTemplates.set(currentTemplateMarkerType, templateData);
+                            displayTemplate(templateData);
+                            console.log(
+                                `Loaded template for ${currentTemplateMarkerType}:`,
+                                templateData
+                            );
+                        }
+                    } catch (err) {
+                        console.error('Invalid JSON file:', err);
+                        alert('Invalid template file. Please select a valid JSON template.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+            // Reset file input for re-selection
+            fileInput.value = '';
+        });
+    }
+}
+
+// Make template functions available globally
+window.openTemplateModal = openTemplateModal;
+window.closeTemplateModal = closeTemplateModal;
