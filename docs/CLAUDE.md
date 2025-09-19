@@ -131,18 +131,24 @@ If any of these files are modified, ALWAYS run tests:
 ## File Structure Reference
 
 ```
-slayer-suite/
-├── apps/
-│   ├── mapping_slayer/     # Map creation app
-│   ├── design_slayer/      # Sign design app
-│   └── thumbnail_slayer/   # Thumbnail generation app
-├── core/                   # Shared core functionality
-│   ├── app-bridge.js      # Cross-app communication
-│   ├── sync-manager.js    # Data synchronization
-│   └── slayer-app-base.js # Base app class
-├── tests/                  # Test suites
-├── test-runner.js         # Main test runner
-└── TESTING_WORKFLOW.md    # Detailed testing guide
+mapping-slayer-dev/
+├── index.html              # Simple redirect to mapping_slayer.html
+├── src/
+│   ├── app/               # Main application code
+│   │   ├── mapping_slayer.html  # Main application entry point
+│   │   ├── mapping-app.js       # Core application logic
+│   │   ├── ui.js               # UI components and handlers
+│   │   ├── state.js            # State management
+│   │   ├── ai-interface.js     # Sidekick AI integration
+│   │   └── ...                 # Other app modules
+│   ├── core/              # Shared core functionality
+│   │   ├── app-bridge.js      # Cross-app communication
+│   │   ├── sync-manager.js    # Data synchronization
+│   │   └── slayer-app-base.js # Base app class
+│   └── styles/            # CSS styles
+├── tests/                 # Test suites
+├── test-runner.js        # Main test runner
+└── docs/                 # Documentation
 ```
 
 ## Quick Commands
@@ -239,7 +245,7 @@ The Chrome DevTools MCP server is installed to allow direct access to browser co
 
 The Chrome DevTools MCP server has been installed and configured:
 
-- Location: `C:\Users\iam3toed\Desktop\slayer-suite\chrome-devtools-mcp\`
+- Location: `C:\Users\iam3toed\Desktop\mapping-slayer-dev\chrome-devtools-mcp\`
 - Configuration: Added to Claude MCP servers
 - Port: 9222 (Chrome remote debugging port)
 
@@ -251,9 +257,9 @@ When debugging browser issues:
 
 ```bash
 # Windows
-start chrome --remote-debugging-port=9222 "http://localhost:8080"
+start chrome --remote-debugging-port=9222 "http://localhost:8080/src/app/mapping_slayer.html"
 
-# Or with a specific profile
+# Or just the redirect page
 chrome --remote-debugging-port=9222 --user-data-dir=temp-profile "http://localhost:8080"
 ```
 

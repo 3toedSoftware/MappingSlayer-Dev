@@ -7,7 +7,7 @@
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
         <title>Mapping Slayer - Professional Sign Mapping Platform</title>
-        <link rel="stylesheet" href="./mapping-slayer.css" />
+        <link rel="stylesheet" href="../styles/mapping-slayer.css" />
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"
@@ -47,7 +47,7 @@
                     <div class="slayer-header">
                         <!-- Logo Section -->
                         <div class="logo-section">
-                            <img src="./MSLogo.svg" alt="Mapping Slayer" class="mapping-logo" style="height: 30px; width: auto;" onerror="this.style.display='none'; document.getElementById('logo-text').style.display='inline';">
+                            <img src="../assets/MSLogo.svg" alt="Mapping Slayer" class="mapping-logo" style="height: 30px; width: auto;" onerror="this.style.display='none'; document.getElementById('logo-text').style.display='inline';">
                             <span id="logo-text" style="display: none;" class="mapping-logo">MAPPING SLAYER</span>
                         </div>
 
@@ -81,7 +81,7 @@
             async function initializeMappingSlayer() {
                 try {
                     // Load debug configuration first
-                    await loadScript('../../core/debug-config.js');
+                    await loadScript('../core/debug-config.js');
 
                     // Load PDF.js
                     if (window.debugLog) {
@@ -107,7 +107,7 @@
 
                     // Import core framework
                     const { initializeCore, appBridge, saveManager } = await import(
-                        '../../core/index.js'
+                        '../core/index.js'
                     );
 
                     // Import Mapping Slayer app

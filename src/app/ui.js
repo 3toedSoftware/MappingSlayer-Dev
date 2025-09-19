@@ -399,8 +399,9 @@ function updateFilterCheckboxesImmediate() {
                     e.target.closest(
                         'input, .pcr-app, .ms-color-picker-wrapper, .ms-delete-marker-type-btn, .ms-design-reference-square'
                     )
-                )
+                ) {
                     return;
+                }
                 e.preventDefault();
                 e.stopPropagation();
                 showMarkerTypeContextMenu(e, markerTypeCode);
@@ -6549,17 +6550,79 @@ function displayTemplate(templateData) {
 
     if (!display) return;
 
-    // For now, just show the template data as formatted JSON
-    // Later this will render a visual preview
+    // Create a scale factor to fit the sign in the modal
+    // Account for padding and ensure it fits comfortably in the preview area
+    const containerWidth = display.offsetWidth || 750; // Use actual width or fallback
+    const containerHeight = 360; // Leave room for title and info
+    const padding = 40; // Padding on all sides
+
+    const maxWidth = containerWidth - padding * 2;
+    const maxHeight = containerHeight - padding * 2;
+
+    const scaleX = maxWidth / templateData.signWidth;
+    const scaleY = maxHeight / templateData.signHeight;
+    const scale = Math.min(scaleX, scaleY, 0.9); // Scale down to 90% max to ensure it fits
+
+    // Create SVG element for the sign preview
+    const scaledWidth = templateData.signWidth * scale;
+    const scaledHeight = templateData.signHeight * scale;
+
+    let svgContent = `
+        <svg width="${scaledWidth}" height="${scaledHeight}" viewBox="0 0 ${templateData.signWidth} ${templateData.signHeight}" xmlns="http://www.w3.org/2000/svg">
+            <!-- Sign background -->
+            <rect width="${templateData.signWidth}" height="${templateData.signHeight}"
+                  fill="${templateData.colors?.signBackground || '#ffffff'}"
+                  stroke="#666" stroke-width="2"/>
+    `;
+
+    // Add message boxes
+    if (templateData.messages) {
+        Object.entries(templateData.messages).forEach(([id, msg]) => {
+            // Draw message box outline
+            svgContent += `
+                <rect x="${msg.boxX}" y="${msg.boxY}"
+                      width="${msg.boxWidth}" height="${msg.boxHeight}"
+                      fill="none" stroke="#999" stroke-width="1" stroke-dasharray="5,5" opacity="0.5"/>
+            `;
+
+            // Add message text
+            const textX = msg.boxX + msg.boxWidth / 2;
+            const textY = msg.boxY + msg.boxHeight / 2;
+            svgContent += `
+                <text x="${textX}" y="${textY}"
+                      fill="${templateData.colors?.text || '#000000'}"
+                      font-family="${msg.fontFamily || 'Arial, sans-serif'}"
+                      font-size="${msg.capHeight || 62.5}"
+                      text-anchor="middle" dominant-baseline="middle">
+                    ${msg.text || `MSG${id}`}
+                </text>
+            `;
+        });
+    }
+
+    // Add logo if present
+    if (templateData.logo && templateData.logo.svgContent) {
+        svgContent += `
+            <g transform="translate(${templateData.logo.x}, ${templateData.logo.y})">
+                <svg width="${templateData.logo.width}" height="${templateData.logo.height}">
+                    ${templateData.logo.svgContent.replace(/<\?xml.*?\?>|<!DOCTYPE.*?>|<svg[^>]*>|<\/svg>/gi, '')}
+                </svg>
+            </g>
+        `;
+    }
+
+    svgContent += '</svg>';
+
     display.innerHTML = `
-        <div style="padding: 10px; text-align: left;">
-            <div style="color: #f07727; margin-bottom: 10px; font-weight: bold;">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; height: 100%; box-sizing: border-box;">
+            <div style="color: #f07727; margin-bottom: 15px; font-weight: bold; font-size: 14px;">
                 ${templateData.name || 'Unnamed Template'}
             </div>
-            <div style="color: #999; font-size: 12px;">
-                <div>Width: ${templateData.signWidth}px</div>
-                <div>Height: ${templateData.signHeight}px</div>
-                <div>Messages: ${templateData.messages ? Object.keys(templateData.messages).length : 0}</div>
+            <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
+                ${svgContent}
+            </div>
+            <div style="color: #999; font-size: 11px; margin-top: 15px;">
+                ${templateData.signWidth} × ${templateData.signHeight}px | ${Object.keys(templateData.messages || {}).length} messages
             </div>
         </div>
     `;

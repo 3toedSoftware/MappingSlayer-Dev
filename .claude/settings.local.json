@@ -106,7 +106,13 @@
             "Bash(git push:*)",
             "Bash(git config:*)",
             "mcp__chrome-devtools__navigate_to_url",
-            "Bash(netstat:*)"
+            "Bash(netstat:*)",
+            "Bash(git remote remove:*)",
+            "Bash(git remote add:*)",
+            "Bash(git branch:*)",
+            "Bash(tesseract:*)",
+            "Bash(tasklist)",
+            "Bash(git restore:*)"
         ],
         "deny": [],
         "defaultMode": "acceptEdits",

@@ -4,6 +4,13 @@
 
 Mapping Slayer is a professional sign mapping platform for creating detailed maps with marker placement, PDF integration, and comprehensive project management.
 
+### Correct Path Structure
+
+**Important**: The application is located at:
+
+- Main entry: `http://localhost:8080/index.html` (redirects to mapping_slayer.html)
+- Direct access: `http://localhost:8080/src/app/mapping_slayer.html`
+
 ### Sidekick AI Note
 
 The Sidekick AI feature in Mapping Slayer is an API/backend system without a human-facing UI. It includes:
@@ -55,7 +62,7 @@ Run tests automatically when:
 ### Test Commands
 
 ```bash
-# Start dev server in background (Ctrl+B)
+# Start dev server in background
 npm run dev
 
 # Run integration tests
@@ -69,9 +76,9 @@ npm run test:watch
 
 If any of these files are modified, ALWAYS run tests:
 
-- `core/app-bridge.js`
-- `core/sync-manager.js`
-- `core/slayer-app-base.js`
+- `src/core/app-bridge.js`
+- `src/core/sync-manager.js`
+- `src/core/slayer-app-base.js`
 - Any `state.js` file
 - Any `*-app.js` file
 - Canvas-related files
@@ -131,18 +138,24 @@ If any of these files are modified, ALWAYS run tests:
 ## File Structure Reference
 
 ```
-slayer-suite/
-├── apps/
-│   ├── mapping_slayer/     # Map creation app
-│   ├── design_slayer/      # Sign design app
-│   └── thumbnail_slayer/   # Thumbnail generation app
-├── core/                   # Shared core functionality
-│   ├── app-bridge.js      # Cross-app communication
-│   ├── sync-manager.js    # Data synchronization
-│   └── slayer-app-base.js # Base app class
-├── tests/                  # Test suites
-├── test-runner.js         # Main test runner
-└── TESTING_WORKFLOW.md    # Detailed testing guide
+mapping-slayer-dev/
+├── index.html              # Simple redirect to mapping_slayer.html
+├── src/
+│   ├── app/               # Main application code
+│   │   ├── mapping_slayer.html  # Main application entry point
+│   │   ├── mapping-app.js       # Core application logic
+│   │   ├── ui.js               # UI components and handlers
+│   │   ├── state.js            # State management
+│   │   ├── ai-interface.js     # Sidekick AI integration
+│   │   └── ...                 # Other app modules
+│   ├── core/              # Shared core functionality
+│   │   ├── app-bridge.js      # Cross-app communication
+│   │   ├── sync-manager.js    # Data synchronization
+│   │   └── slayer-app-base.js # Base app class
+│   └── styles/            # CSS styles
+├── tests/                 # Test suites
+├── test-runner.js        # Main test runner
+└── docs/                 # Documentation
 ```
 
 ## Quick Commands
@@ -239,7 +252,7 @@ The Chrome DevTools MCP server is installed to allow direct access to browser co
 
 The Chrome DevTools MCP server has been installed and configured:
 
-- Location: `C:\Users\iam3toed\Desktop\slayer-suite\chrome-devtools-mcp\`
+- Location: `C:\Users\iam3toed\Desktop\mapping-slayer-dev\chrome-devtools-mcp\`
 - Configuration: Added to Claude MCP servers
 - Port: 9222 (Chrome remote debugging port)
 
@@ -250,11 +263,11 @@ When debugging browser issues:
 1. **Start Chrome with debugging enabled**:
 
 ```bash
-# Windows
-start chrome --remote-debugging-port=9222 "http://localhost:8080"
+# Windows - Open Mapping Slayer with devtools
+start chrome --remote-debugging-port=9222 --user-data-dir=temp-profile "http://localhost:8080/src/app/mapping_slayer.html"
 
-# Or with a specific profile
-chrome --remote-debugging-port=9222 --user-data-dir=temp-profile "http://localhost:8080"
+# Or just the redirect page
+start chrome --remote-debugging-port=9222 --user-data-dir=temp-profile "http://localhost:8080"
 ```
 
 2. **After restarting Claude Code session**, MCP tools will be available with `mcp__` prefix to:
@@ -311,7 +324,7 @@ This can be used to verify the Chrome DevTools MCP connection is working properl
 ## Remember:
 
 - Always run tests after significant changes
-- Use background server (Ctrl+B) for continuous development
+- Use background server for continuous development
 - Auto-fix common errors without asking
 - Only request manual testing for visual/UX issues
 - Keep test suite updated with new features
@@ -322,3 +335,11 @@ This can be used to verify the Chrome DevTools MCP connection is working properl
 - Start Chrome with `--remote-debugging-port=9222` for console access
 - Be honest about what you don't know - it's better than guessing wrong
 - Work collaboratively with the user - you're a team
+- **The main application is at `src/app/mapping_slayer.html`, not in an `apps` folder**
+
+# Important Instructions
+
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly requested by the User.

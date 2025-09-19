@@ -49,7 +49,7 @@ Mapping Slayer is a sophisticated web application designed for professional sign
 
 #### `src/core/slayer-app-base.js`
 
-- **Purpose**: Abstract base class for all Slayer Suite applications
+- **Purpose**: Abstract base class for all Mapping Slayer modules
 - **Key Functions**:
     - `initialize()` - Standard app initialization
     - `activate()`, `deactivate()` - App lifecycle management

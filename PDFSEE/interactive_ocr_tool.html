@@ -1,0 +1,741 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Interactive OCR Tool for PDFSEE</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+                background: #1a1a1a;
+                color: #e0e0e0;
+                display: flex;
+                height: 100vh;
+            }
+
+            .sidebar {
+                width: 350px;
+                background: #2d2d2d;
+                padding: 20px;
+                overflow-y: auto;
+                border-right: 1px solid #444;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+                color: #fff;
+            }
+
+            .section {
+                margin-bottom: 25px;
+                padding: 15px;
+                background: #1a1a1a;
+                border-radius: 8px;
+            }
+
+            .section h3 {
+                margin-bottom: 15px;
+                color: #4a9eff;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .control-group {
+                margin-bottom: 15px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 13px;
+                color: #bbb;
+            }
+
+            input[type='range'] {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            input[type='number'],
+            select {
+                width: 100%;
+                padding: 8px;
+                background: #2d2d2d;
+                border: 1px solid #444;
+                color: white;
+                border-radius: 4px;
+            }
+
+            .range-value {
+                text-align: right;
+                font-size: 12px;
+                color: #4a9eff;
+            }
+
+            button {
+                width: 100%;
+                padding: 12px;
+                background: #4a9eff;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                transition: background 0.2s;
+            }
+
+            button:hover {
+                background: #3a8eef;
+            }
+
+            button:disabled {
+                background: #666;
+                cursor: not-allowed;
+            }
+
+            .main-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .stats-bar {
+                background: #2d2d2d;
+                padding: 15px 20px;
+                border-bottom: 1px solid #444;
+                display: flex;
+                gap: 30px;
+                flex-wrap: wrap;
+            }
+
+            .stat {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .stat-label {
+                font-size: 11px;
+                color: #888;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+                color: #4a9eff;
+                font-weight: 600;
+            }
+
+            .visualization {
+                flex: 1;
+                padding: 20px;
+                overflow: auto;
+                position: relative;
+            }
+
+            #canvas-container {
+                position: relative;
+                display: inline-block;
+                background: #0d0d0d;
+                border: 2px solid #444;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            #pdf-canvas {
+                display: block;
+                max-width: 100%;
+                height: auto;
+            }
+
+            .ocr-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+            }
+
+            .text-box {
+                position: absolute;
+                border: 1px solid rgba(74, 158, 255, 0.5);
+                background: rgba(74, 158, 255, 0.1);
+                pointer-events: auto;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .text-box:hover {
+                border-color: #4a9eff;
+                background: rgba(74, 158, 255, 0.3);
+                z-index: 100;
+            }
+
+            .text-box.room-name {
+                border-color: rgba(76, 175, 80, 0.7);
+                background: rgba(76, 175, 80, 0.2);
+            }
+
+            .text-box.multiline {
+                border-color: rgba(255, 152, 0, 0.7);
+                background: rgba(255, 152, 0, 0.2);
+            }
+
+            .tooltip {
+                position: absolute;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-size: 12px;
+                pointer-events: none;
+                z-index: 1000;
+                display: none;
+                max-width: 300px;
+                word-wrap: break-word;
+            }
+
+            .progress {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(45, 45, 45, 0.95);
+                padding: 30px;
+                border-radius: 8px;
+                text-align: center;
+                display: none;
+                z-index: 2000;
+            }
+
+            .progress.active {
+                display: block;
+            }
+
+            .spinner {
+                width: 50px;
+                height: 50px;
+                border: 3px solid #444;
+                border-top: 3px solid #4a9eff;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 20px;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .legend {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: rgba(45, 45, 45, 0.95);
+                padding: 15px;
+                border-radius: 8px;
+                font-size: 12px;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                margin-bottom: 8px;
+            }
+
+            .legend-color {
+                width: 20px;
+                height: 12px;
+                margin-right: 10px;
+                border: 1px solid #666;
+            }
+
+            .results-panel {
+                background: #2d2d2d;
+                padding: 15px;
+                max-height: 200px;
+                overflow-y: auto;
+                border-top: 1px solid #444;
+            }
+
+            .result-item {
+                padding: 8px;
+                margin-bottom: 5px;
+                background: #1a1a1a;
+                border-radius: 4px;
+                font-size: 12px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .result-text {
+                flex: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .result-conf {
+                color: #4a9eff;
+                margin-left: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <h1>OCR Control Panel</h1>
+
+            <div class="section">
+                <h3>PDF File</h3>
+                <div class="control-group">
+                    <input
+                        type="file"
+                        id="pdf-file"
+                        accept=".pdf"
+                        onchange="handleFileSelect(event)"
+                        style="width: 100%"
+                    />
+                    <div id="file-status" style="margin-top: 10px; font-size: 12px; color: #ff6b6b">
+                        No file selected - please choose a PDF
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>OCR Parameters</h3>
+
+                <div class="control-group">
+                    <label for="scale">Resolution Scale</label>
+                    <input type="range" id="scale" min="1" max="5" step="0.5" value="2.5" />
+                    <div class="range-value" id="scale-value">2.5x</div>
+                </div>
+
+                <div class="control-group">
+                    <label for="psm">Page Segmentation Mode</label>
+                    <select id="psm">
+                        <option value="3">3 - Automatic page segmentation</option>
+                        <option value="6" selected>6 - Uniform block of text</option>
+                        <option value="11">11 - Sparse text</option>
+                        <option value="12">12 - Sparse text with OSD</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="conf-threshold">Confidence Threshold</label>
+                    <input type="range" id="conf-threshold" min="0" max="100" step="5" value="30" />
+                    <div class="range-value" id="conf-value">30%</div>
+                </div>
+
+                <div class="control-group">
+                    <label for="preprocess">Preprocessing</label>
+                    <select id="preprocess">
+                        <option value="normal">Normal</option>
+                        <option value="high_contrast">High Contrast</option>
+                        <option value="sharpen">Sharpen</option>
+                        <option value="both">Both Enhancements</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Text Grouping</h3>
+
+                <div class="control-group">
+                    <label for="y-tolerance">Y-axis Tolerance (pixels)</label>
+                    <input type="range" id="y-tolerance" min="5" max="50" step="5" value="15" />
+                    <div class="range-value" id="y-value">15px</div>
+                </div>
+
+                <div class="control-group">
+                    <label for="x-tolerance">X-axis Tolerance (pixels)</label>
+                    <input type="range" id="x-tolerance" min="20" max="200" step="10" value="100" />
+                    <div class="range-value" id="x-value">100px</div>
+                </div>
+
+                <div class="control-group">
+                    <label for="multiline-threshold">Multiline Threshold</label>
+                    <input
+                        type="range"
+                        id="multiline-threshold"
+                        min="10"
+                        max="100"
+                        step="10"
+                        value="40"
+                    />
+                    <div class="range-value" id="multi-value">40px</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <button id="run-ocr" onclick="runOCR()">Run OCR Analysis</button>
+                <button id="export-results" onclick="exportResults()" style="margin-top: 10px">
+                    Export Results
+                </button>
+            </div>
+
+            <div class="section">
+                <h3>Quick Presets</h3>
+                <button onclick="applyPreset('fast')" style="margin-bottom: 10px">Fast Scan</button>
+                <button onclick="applyPreset('balanced')" style="margin-bottom: 10px">
+                    Balanced
+                </button>
+                <button onclick="applyPreset('quality')" style="margin-bottom: 10px">
+                    High Quality
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="stats-bar">
+                <div class="stat">
+                    <span class="stat-label">Raw Texts</span>
+                    <span class="stat-value" id="raw-count">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Phrases</span>
+                    <span class="stat-value" id="phrase-count">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Room Names</span>
+                    <span class="stat-value" id="room-count">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Multiline</span>
+                    <span class="stat-value" id="multi-count">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Process Time</span>
+                    <span class="stat-value" id="time-count">0s</span>
+                </div>
+            </div>
+
+            <div class="visualization">
+                <div id="canvas-container">
+                    <canvas id="pdf-canvas"></canvas>
+                    <div class="ocr-overlay" id="overlay"></div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(74, 158, 255, 0.3)"></div>
+                        <span>OCR Text</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(76, 175, 80, 0.3)"></div>
+                        <span>Room Name</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(255, 152, 0, 0.3)"></div>
+                        <span>Multiline</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-panel" id="results">
+                <div style="color: #888; text-align: center; padding: 20px">
+                    Run OCR to see results here
+                </div>
+            </div>
+        </div>
+
+        <div class="tooltip" id="tooltip"></div>
+        <div class="progress" id="progress">
+            <div class="spinner"></div>
+            <div>Processing OCR...</div>
+            <div id="progress-text" style="margin-top: 10px; font-size: 12px; color: #888"></div>
+        </div>
+
+        <script>
+            // Update range display values
+            document.querySelectorAll('input[type="range"]').forEach(input => {
+                input.addEventListener('input', e => {
+                    const valueDisplay = document.getElementById(e.target.id + '-value');
+                    if (valueDisplay) {
+                        if (e.target.id === 'scale') {
+                            valueDisplay.textContent = e.target.value + 'x';
+                        } else if (e.target.id === 'conf-threshold') {
+                            valueDisplay.textContent = e.target.value + '%';
+                        } else {
+                            valueDisplay.textContent = e.target.value + 'px';
+                        }
+                    }
+                });
+            });
+
+            // OCR data storage
+            let ocrResults = null;
+            let selectedPdfFile = null;
+
+            function handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (file && file.type === 'application/pdf') {
+                    selectedPdfFile = file;
+                    document.getElementById('file-status').innerHTML = `
+                    <span style="color: #4a9eff;">Selected: ${file.name}</span><br>
+                    <span style="color: #888;">Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                `;
+                } else if (file) {
+                    alert('Please select a PDF file');
+                    event.target.value = '';
+                }
+            }
+
+            async function runOCR() {
+                // Check if a file is selected
+                if (!selectedPdfFile) {
+                    alert('Please select a PDF file first');
+                    return;
+                }
+
+                // Show progress
+                document.getElementById('progress').classList.add('active');
+                document.getElementById('progress-text').textContent = 'Preparing request...';
+
+                try {
+                    // Create FormData to send file and parameters
+                    const formData = new FormData();
+
+                    // Add PDF file
+                    formData.append('pdf', selectedPdfFile);
+
+                    // Add OCR parameters
+                    formData.append('scale', document.getElementById('scale').value);
+                    formData.append('psm', document.getElementById('psm').value);
+                    formData.append('confidence', document.getElementById('conf-threshold').value);
+                    formData.append('preprocess', document.getElementById('preprocess').value);
+                    formData.append('yTolerance', document.getElementById('y-tolerance').value);
+                    formData.append('xTolerance', document.getElementById('x-tolerance').value);
+                    formData.append(
+                        'multilineThreshold',
+                        document.getElementById('multiline-threshold').value
+                    );
+
+                    document.getElementById('progress-text').textContent =
+                        'Running OCR on server...';
+
+                    const response = await fetch('http://localhost:5000/api/ocr', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('OCR request failed');
+                    }
+
+                    const results = await response.json();
+
+                    if (results.success) {
+                        ocrResults = results;
+                        updateDisplay();
+                    } else {
+                        alert('OCR failed: ' + (results.error || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(
+                        'Failed to connect to OCR server. Make sure the server is running on port 5000.'
+                    );
+                } finally {
+                    document.getElementById('progress').classList.remove('active');
+                }
+            }
+
+            function simulateOCRResults(params) {
+                // Simulate OCR results
+                ocrResults = {
+                    rawTexts: 5912,
+                    phrases: 1847,
+                    roomNames: 632,
+                    multiline: 89,
+                    processTime: 28.7,
+                    texts: [
+                        { text: 'RECOVERY', x: 100, y: 200, confidence: 96, isRoom: true },
+                        {
+                            text: 'ROOM #2',
+                            x: 100,
+                            y: 220,
+                            confidence: 92,
+                            isRoom: true,
+                            multiline: true
+                        },
+                        { text: 'OFFICE', x: 300, y: 150, confidence: 88, isRoom: true },
+                        { text: 'PREP.', x: 450, y: 300, confidence: 85, isRoom: true },
+                        { text: 'T1025', x: 450, y: 320, confidence: 78, isRoom: false }
+                        // Add more simulated results
+                    ]
+                };
+
+                updateDisplay();
+                document.getElementById('progress').classList.remove('active');
+            }
+
+            function updateDisplay() {
+                // Update stats
+                document.getElementById('raw-count').textContent =
+                    ocrResults.rawTexts.toLocaleString();
+                document.getElementById('phrase-count').textContent =
+                    ocrResults.phrases.toLocaleString();
+                document.getElementById('room-count').textContent = ocrResults.roomNames;
+                document.getElementById('multi-count').textContent = ocrResults.multiline;
+                document.getElementById('time-count').textContent = ocrResults.processTime + 's';
+
+                // Update PDF image if available
+                if (ocrResults.pdfImage) {
+                    const canvas = document.getElementById('pdf-canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    img.onload = function () {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+
+                        // Update container size
+                        document.getElementById('canvas-container').style.width = img.width + 'px';
+                        document.getElementById('canvas-container').style.height =
+                            img.height + 'px';
+                    };
+                    img.src = 'data:image/png;base64,' + ocrResults.pdfImage;
+                }
+
+                // Update visualization overlay
+                const overlay = document.getElementById('overlay');
+                overlay.innerHTML = '';
+
+                // Draw text boxes
+                if (ocrResults.texts) {
+                    ocrResults.texts.forEach(text => {
+                        const box = document.createElement('div');
+                        box.className = 'text-box';
+
+                        // Position based on display coordinates
+                        box.style.left = (text.display_x || text.x) + 'px';
+                        box.style.top = (text.display_y || text.y) + 'px';
+                        box.style.width = (text.display_width || text.width || 50) + 'px';
+                        box.style.height = (text.display_height || text.height || 20) + 'px';
+
+                        box.onmouseenter = e => showTooltip(e, text);
+                        box.onmouseleave = hideTooltip;
+
+                        overlay.appendChild(box);
+                    });
+                }
+
+                // Highlight room phrases
+                if (ocrResults.roomPhrases) {
+                    ocrResults.roomPhrases.forEach(phrase => {
+                        const box = document.createElement('div');
+                        box.className = 'text-box room-name';
+                        if (phrase.multiline) box.classList.add('multiline');
+
+                        box.style.left = (phrase.display_x || phrase.x) + 'px';
+                        box.style.top = (phrase.display_y || phrase.y) + 'px';
+                        box.style.width = Math.max(100, phrase.text.length * 7) + 'px';
+                        box.style.height = '25px';
+
+                        box.onmouseenter = e => showTooltip(e, phrase);
+                        box.onmouseleave = hideTooltip;
+
+                        overlay.appendChild(box);
+                    });
+                }
+
+                // Update results panel
+                const resultsPanel = document.getElementById('results');
+                resultsPanel.innerHTML = '';
+
+                if (ocrResults.roomPhrases) {
+                    ocrResults.roomPhrases.forEach(phrase => {
+                        const item = document.createElement('div');
+                        item.className = 'result-item';
+                        item.innerHTML = `
+                        <span class="result-text">${phrase.text}</span>
+                        <span class="result-conf">${Math.round(phrase.confidence)}%</span>
+                    `;
+                        resultsPanel.appendChild(item);
+                    });
+                }
+            }
+
+            function showTooltip(e, text) {
+                const tooltip = document.getElementById('tooltip');
+                tooltip.innerHTML = `
+                <strong>${text.text}</strong><br>
+                Confidence: ${text.confidence}%<br>
+                Position: (${text.x}, ${text.y})
+                ${text.multiline ? '<br>Multiline text' : ''}
+            `;
+                tooltip.style.display = 'block';
+                tooltip.style.left = e.pageX + 10 + 'px';
+                tooltip.style.top = e.pageY + 10 + 'px';
+            }
+
+            function hideTooltip() {
+                document.getElementById('tooltip').style.display = 'none';
+            }
+
+            function applyPreset(preset) {
+                if (preset === 'fast') {
+                    document.getElementById('scale').value = 2;
+                    document.getElementById('psm').value = '3';
+                    document.getElementById('conf-threshold').value = 40;
+                    document.getElementById('preprocess').value = 'normal';
+                } else if (preset === 'balanced') {
+                    document.getElementById('scale').value = 3;
+                    document.getElementById('psm').value = '6';
+                    document.getElementById('conf-threshold').value = 30;
+                    document.getElementById('preprocess').value = 'high_contrast';
+                } else if (preset === 'quality') {
+                    document.getElementById('scale').value = 4;
+                    document.getElementById('psm').value = '6';
+                    document.getElementById('conf-threshold').value = 25;
+                    document.getElementById('preprocess').value = 'both';
+                }
+
+                // Update display values
+                document.querySelectorAll('input[type="range"]').forEach(input => {
+                    input.dispatchEvent(new Event('input'));
+                });
+            }
+
+            function exportResults() {
+                if (!ocrResults) {
+                    alert('No OCR results to export. Run OCR first.');
+                    return;
+                }
+
+                const data = JSON.stringify(ocrResults, null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ocr_results.json';
+                a.click();
+            }
+
+            // Initialize canvas with placeholder
+            const canvas = document.getElementById('pdf-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 800;
+            canvas.height = 600;
+            ctx.fillStyle = '#2d2d2d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#666';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('PDF will appear here after OCR', canvas.width / 2, canvas.height / 2);
+        </script>
+    </body>
+</html>

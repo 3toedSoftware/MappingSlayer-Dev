@@ -235,4 +235,4 @@ graph LR
 
 ## Contact & Questions
 
-This system is part of the Slayer Suite ecosystem, designed to streamline the complete sign production workflow from initial mapping to final production files.
+This system is part of the Mapping Slayer ecosystem, designed to streamline the complete sign production workflow from initial mapping to final production files.

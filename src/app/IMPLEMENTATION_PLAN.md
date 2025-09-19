@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines how to fix the current mapping_slayer implementation to match the original's functionality while maintaining integration with the Slayer Suite.
+This document outlines how to fix the current mapping_slayer implementation to match the original's functionality.
 
 ## Current Understanding
 

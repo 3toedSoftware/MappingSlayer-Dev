@@ -159,4 +159,4 @@ If Sidekick isn't available:
 
 **Version**: 1.0.0  
 **Created**: 2025  
-**Part of**: Slayer Suite
+**Part of**: Mapping Slayer
