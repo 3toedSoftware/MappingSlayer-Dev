@@ -174,27 +174,94 @@
 
                         if (lou) {
                             console.log('LibLouis object created, setting up table loading...');
-                            const tablePath = '../../sign-template-maker/lib/liblouis/tables/';
-                            console.log('Table path:', tablePath);
 
-                            // Set up virtual filesystem for LibLouis
-                            lou.enableOnDemandTableLoading(tablePath);
-                            console.log('enableOnDemandTableLoading called');
-
-                            // Test if it works
                             try {
-                                console.log('Testing LibLouis with simple text...');
-                                const testResult = lou.translateString('en-us-g2.ctb', 'test');
-                                console.log('LibLouis test successful! Result:', testResult);
-                            } catch (testError) {
-                                console.error('LibLouis test failed:', testError);
-                            }
+                                // Load all necessary table files including ALL dependencies
+                                const tablesToLoad = [
+                                    'unicode.dis', // Required for Unicode braille output
+                                    'loweredDigits6Dots.uti', // Required by chardefs.cti
+                                    'latinLetterDef8Dots.uti', // Required by chardefs.cti
+                                    'latinLetterDef6Dots.uti', // Alternative letter definitions
+                                    'chardefs.cti', // Character definitions (loads after its dependencies)
+                                    'braille-patterns.cti', // Braille pattern definitions
+                                    'litdigits6Dots.uti', // Literal digits for 6-dot braille
+                                    'digits6Dots.uti', // Standard digits
+                                    'en-us-g1.ctb', // Grade 1 US English (included by g2)
+                                    'en-us-g2.ctb' // Grade 2 US English (main table)
+                                ];
 
-                            // Make it globally available
-                            window.lou = lou;
-                            window.translator = lou;
-                            console.log('LibLouis set as window.lou and window.translator');
-                            console.log('LibLouis Grade 2 translator initialized successfully!');
+                                const tableContents = {};
+
+                                // Load all table files
+                                for (const tableName of tablesToLoad) {
+                                    const response = await fetch(
+                                        `../../sign-template-maker/lib/liblouis/tables/${tableName}`
+                                    );
+                                    if (response.ok) {
+                                        tableContents[tableName] = await response.text();
+                                        console.log(
+                                            `Loaded table ${tableName}, size: ${tableContents[tableName].length}`
+                                        );
+                                    } else {
+                                        console.error(`Failed to load table ${tableName}`);
+                                    }
+                                }
+
+                                // Set up the virtual filesystem
+                                const FS = lou.getFilesystem();
+                                if (FS) {
+                                    // Create tables directory in virtual filesystem root
+                                    try {
+                                        FS.mkdir('/tables');
+                                    } catch (e) {
+                                        // Directory might already exist
+                                    }
+
+                                    // Write all tables to virtual filesystem
+                                    for (const [name, content] of Object.entries(tableContents)) {
+                                        FS.writeFile(`/tables/${name}`, content);
+                                        console.log(
+                                            `Wrote ${name} to virtual filesystem at /tables/${name}`
+                                        );
+                                    }
+
+                                    // Set the data path for LibLouis to root
+                                    lou.setDataPath('/');
+                                    console.log('LibLouis data path set to /');
+
+                                    // Test if it works
+                                    try {
+                                        console.log('Testing LibLouis with simple text...');
+                                        const tableList = 'tables/unicode.dis,tables/en-us-g2.ctb';
+                                        const testResult = lou.translateString(tableList, 'test');
+                                        console.log(
+                                            'LibLouis test successful! Result:',
+                                            testResult
+                                        );
+
+                                        // Store the table list for use in translation
+                                        window.liblouisTableList = tableList;
+                                        console.log(
+                                            'Table list stored for translation:',
+                                            tableList
+                                        );
+                                    } catch (testError) {
+                                        console.error('LibLouis test failed:', testError);
+                                    }
+
+                                    // Make it globally available
+                                    window.lou = lou;
+                                    window.translator = lou;
+                                    console.log('LibLouis set as window.lou and window.translator');
+                                    console.log(
+                                        'LibLouis Grade 2 translator initialized successfully!'
+                                    );
+                                } else {
+                                    console.error('Could not get LibLouis filesystem');
+                                }
+                            } catch (tableLoadError) {
+                                console.error('Error loading tables:', tableLoadError);
+                            }
                         } else {
                             console.error('LibLouis object could not be created');
                         }

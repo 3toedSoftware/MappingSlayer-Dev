@@ -6613,8 +6613,10 @@ function translateToBrailleForTemplate(text) {
     if (typeof window.translator !== 'undefined' && window.translator?.translateString) {
         console.log('Found window.translator with translateString method');
         try {
-            console.log('Attempting translation with en-us-g2.ctb table');
-            const result = window.translator.translateString('en-us-g2.ctb', lowercaseText);
+            // Use the table list that includes unicode.dis for proper output
+            const tableList = window.liblouisTableList || 'tables/unicode.dis,tables/en-us-g2.ctb';
+            console.log('Attempting translation with table list:', tableList);
+            const result = window.translator.translateString(tableList, lowercaseText);
             console.log(`LibLouis Grade 2 SUCCESS: "${lowercaseText}" -> "${result}"`);
             return result;
         } catch (e) {
