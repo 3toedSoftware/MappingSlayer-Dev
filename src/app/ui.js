@@ -6544,6 +6544,58 @@ function resetTemplateDisplay() {
     }
 }
 
+// Helper function to wrap text for template display
+function wrapTextForTemplate(text, fontSize, fontFamily, maxWidth) {
+    // Create a temporary SVG for text measurement
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.style.position = 'absolute';
+    svg.style.visibility = 'hidden';
+    document.body.appendChild(svg);
+
+    const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textElement.style.fontSize = fontSize + 'px';
+    textElement.style.fontFamily = fontFamily || 'Arial, sans-serif';
+    svg.appendChild(textElement);
+
+    // Split text by newlines first (manual line breaks)
+    const paragraphs = text.split('\n');
+    const allLines = [];
+
+    // Process each paragraph
+    paragraphs.forEach(paragraph => {
+        if (paragraph.trim() === '') {
+            allLines.push(''); // Preserve empty lines
+            return;
+        }
+
+        const words = paragraph.trim().split(/\s+/);
+        let currentLine = [];
+
+        words.forEach(word => {
+            currentLine.push(word);
+            textElement.textContent = currentLine.join(' ');
+            const lineWidth = textElement.getComputedTextLength();
+
+            if (lineWidth > maxWidth && currentLine.length > 1) {
+                // Line is too long, remove last word and start new line
+                currentLine.pop();
+                allLines.push(currentLine.join(' '));
+                currentLine = [word];
+            }
+        });
+
+        // Add remaining words
+        if (currentLine.length > 0) {
+            allLines.push(currentLine.join(' '));
+        }
+    });
+
+    // Clean up
+    document.body.removeChild(svg);
+
+    return allLines;
+}
+
 function displayTemplate(templateData) {
     const display = document.getElementById('template-display');
     const info = document.getElementById('template-info');
@@ -6639,12 +6691,19 @@ function displayTemplate(templateData) {
                 dominantBaseline = 'middle';
             }
 
-            // Check for multi-line text
-            const lines = messageText.split('\n');
+            // Check for multi-line text and wrap if needed
             const lineHeight = msg.lineHeight || 1.2;
             // Use the exact calculated fontSize from template maker
             const fontSize = msg.fontSize;
             const lineSpacing = fontSize * lineHeight;
+
+            // Use wrapTextForTemplate to wrap text based on box width
+            const lines = wrapTextForTemplate(
+                messageText,
+                fontSize,
+                msg.fontFamily || 'Arial, sans-serif',
+                msg.boxWidth - 20
+            ); // 20px padding (10 on each side)
 
             if (lines.length > 1) {
                 // Multi-line text - use tspan elements
