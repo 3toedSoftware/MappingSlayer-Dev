@@ -6548,7 +6548,7 @@ function updateSignPreviewPosition() {
         const editRect = editModalContent.getBoundingClientRect();
         const editTop = editRect.top;
         const editLeft = editRect.left;
-        const modalWidth = 450; // Width of sign preview modal
+        const modalWidth = 380; // Width of sign preview modal (matches gallery modal)
         const gap = 20; // Gap between modals
 
         // Calculate position to the left
@@ -6847,25 +6847,29 @@ function displayTemplate(templateData) {
         });
     }
 
-    // Create a scale factor to fit the sign in the modal
-    // Account for padding and ensure it fits comfortably in the preview area
-    const containerWidth = display.offsetWidth || 750; // Use actual width or fallback
-    const containerHeight = 360; // Leave room for title and info
-    const padding = 40; // Padding on all sides
+    // Get actual container dimensions dynamically
+    const containerRect = display.getBoundingClientRect();
+    const containerWidth = containerRect.width || 340; // Sign preview modal is 380px minus padding
+    const containerHeight = containerRect.height || 300; // Use actual height
+
+    // Use less padding for better space utilization
+    const padding = 20;
 
     const maxWidth = containerWidth - padding * 2;
     const maxHeight = containerHeight - padding * 2;
 
+    // Calculate scale to fit the sign within the container
     const scaleX = maxWidth / templateData.signWidth;
     const scaleY = maxHeight / templateData.signHeight;
-    const scale = Math.min(scaleX, scaleY, 0.9); // Scale down to 90% max to ensure it fits
+    const scale = Math.min(scaleX, scaleY, 1); // Don't scale up beyond 100%
 
     // Create SVG element for the sign preview
-    const scaledWidth = templateData.signWidth * scale;
-    const scaledHeight = templateData.signHeight * scale;
-
+    // Use viewBox for proper scaling and preserveAspectRatio for maintaining proportions
     let svgContent = `
-        <svg width="${scaledWidth}" height="${scaledHeight}" viewBox="0 0 ${templateData.signWidth} ${templateData.signHeight}" xmlns="http://www.w3.org/2000/svg">
+        <svg width="100%" height="100%" viewBox="0 0 ${templateData.signWidth} ${templateData.signHeight}"
+             preserveAspectRatio="xMidYMid meet"
+             xmlns="http://www.w3.org/2000/svg"
+             style="max-width: ${templateData.signWidth * scale}px; max-height: ${templateData.signHeight * scale}px;">
             <!-- Sign background -->
             <rect width="${templateData.signWidth}" height="${templateData.signHeight}"
                   fill="${templateData.colors?.signBackground || '#ffffff'}"
