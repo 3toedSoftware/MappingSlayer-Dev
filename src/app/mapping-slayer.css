@@ -1405,6 +1405,99 @@ body {
     color: #ffc107;
 }
 
+/* Sign Preview Modal Styles */
+.ms-sign-preview-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000; /* Same level as edit modal */
+    width: 450px;
+    max-width: 450px;
+    /* Position will be set dynamically by JavaScript */
+}
+
+.ms-sign-preview-modal.ms-visible {
+    display: block;
+}
+
+.ms-sign-preview-content {
+    background: #2a2a2a;
+    border: 2px solid #444;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.ms-sign-preview-header {
+    background: #333;
+    padding: 12px;
+    border-bottom: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ms-sign-preview-title {
+    color: #e0e0e0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.ms-sign-preview-close-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ms-sign-preview-close-btn:hover {
+    color: #fff;
+}
+
+.ms-sign-preview-body {
+    padding: 12px;
+}
+
+.ms-sign-preview-display {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    padding: 10px;
+}
+
+.ms-sign-preview-display svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.ms-sign-preview-placeholder {
+    color: #666;
+    font-size: 14px;
+}
+
+.ms-sign-preview-info {
+    margin-top: 10px;
+    padding: 8px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #999;
+    font-size: 12px;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
 /* Gallery Modal Styles */
 .ms-gallery-modal {
     display: none;

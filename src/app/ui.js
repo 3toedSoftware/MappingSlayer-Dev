@@ -3780,6 +3780,7 @@ function openEditModal(internalId) {
     // Use setTimeout to ensure edit modal is fully rendered first
     setTimeout(() => {
         openGalleryModal(dot);
+        openSignPreviewModal(dot);
     }, 50);
 }
 
@@ -3832,8 +3833,9 @@ function closeEditModal() {
         appState.editingDot = null;
     }
 
-    // Also close the gallery modal
+    // Also close the gallery modal and sign preview modal
     closeGalleryModal();
+    closeSignPreviewModal();
 }
 
 function closeGroupEditModal() {
@@ -5438,6 +5440,27 @@ function generateDynamicTextFields(prefix, dot = null) {
         // Set value for edit mode
         if (prefix === 'edit' && dot) {
             input.value = dot[field.fieldName] || '';
+
+            // Add listener to update sign preview when message changes
+            if (
+                field.fieldName === 'message' ||
+                field.fieldName === 'message2' ||
+                field.fieldName === 'message1'
+            ) {
+                input.addEventListener('input', () => {
+                    const editingDot = getCurrentPageDots().get(appState.editingDot);
+                    if (editingDot) {
+                        // Update the dot's message value
+                        editingDot[field.fieldName] = input.value;
+
+                        // Update the sign preview if it's open
+                        const template = appState.signTemplates?.get(editingDot.markerType);
+                        if (template) {
+                            updateSignPreview(editingDot, template);
+                        }
+                    }
+                });
+            }
         } else if (prefix === 'group-edit') {
             input.placeholder = `Leave blank to keep existing ${formatFieldName(field.fieldName).toLowerCase()}`;
         }
@@ -6496,6 +6519,120 @@ function showMarkerTypeContextMenu(event, markerTypeCode) {
 }
 
 window.showMarkerTypeContextMenu = showMarkerTypeContextMenu;
+
+// Sign Preview Modal Functions
+function openSignPreviewModal(dot) {
+    const previewModal = document.getElementById('mapping-slayer-sign-preview-modal');
+    if (!previewModal) return;
+
+    console.log('=== OPENING SIGN PREVIEW ===');
+    console.log('Dot:', dot);
+
+    // Get the template for this marker type
+    const template = appState.signTemplates?.get(dot.markerType);
+
+    if (template) {
+        console.log('Template found for marker type:', dot.markerType);
+        updateSignPreview(dot, template);
+    } else {
+        console.log('No template found for marker type:', dot.markerType);
+        // Show placeholder if no template
+        const display = document.getElementById('sign-preview-display');
+        if (display) {
+            display.innerHTML =
+                '<span class="ms-sign-preview-placeholder">No template assigned</span>';
+        }
+        const info = document.getElementById('sign-preview-info');
+        if (info) {
+            info.textContent = `Marker type: ${dot.markerType}`;
+        }
+    }
+
+    // Position the modal to the left of the edit modal
+    const editModal = document.getElementById('mapping-slayer-edit-modal');
+    const editContent = editModal?.querySelector('.ms-modal-content');
+
+    if (editContent) {
+        const editRect = editContent.getBoundingClientRect();
+        const modalWidth = 450; // Width of sign preview modal
+        const gap = 20; // Gap between modals
+
+        // Calculate position to the left of edit modal
+        let left = editRect.left - modalWidth - gap;
+        const top = editRect.top;
+
+        // Make sure it doesn't go off-screen
+        if (left < 10) {
+            left = 10;
+        }
+
+        previewModal.style.left = left + 'px';
+        previewModal.style.top = top + 'px';
+    }
+
+    // Show the modal
+    previewModal.classList.add('ms-visible');
+    previewModal.style.display = 'block';
+}
+
+function closeSignPreviewModal() {
+    const previewModal = document.getElementById('mapping-slayer-sign-preview-modal');
+    if (previewModal) {
+        previewModal.classList.remove('ms-visible');
+        previewModal.style.display = 'none';
+    }
+}
+
+function updateSignPreview(dot, templateData) {
+    const display = document.getElementById('sign-preview-display');
+    const info = document.getElementById('sign-preview-info');
+
+    if (!display || !templateData) return;
+
+    // Create a copy of the template data with actual messages
+    const previewData = JSON.parse(JSON.stringify(templateData));
+
+    // Replace MSG1 and MSG2 with actual message values
+    if (previewData.messages) {
+        if (previewData.messages['1']) {
+            // Try message1, then message (for backward compatibility)
+            previewData.messages['1'].text = dot.message1 || dot.message || 'MSG1';
+        }
+        if (previewData.messages['2']) {
+            previewData.messages['2'].text = dot.message2 || 'MSG2';
+        }
+    }
+
+    // Use the existing displayTemplate function to render the preview
+    // Create a temporary container for the preview
+    const tempContainer = document.createElement('div');
+    tempContainer.id = 'template-display';
+    const tempInfo = document.createElement('div');
+    tempInfo.id = 'template-info';
+
+    // Temporarily replace the display elements
+    const originalDisplay = document.getElementById('template-display');
+    const originalInfo = document.getElementById('template-info');
+
+    display.innerHTML = '';
+    display.appendChild(tempContainer);
+    info.innerHTML = '';
+    info.appendChild(tempInfo);
+
+    // Call displayTemplate to render the sign
+    displayTemplate(previewData);
+
+    // Move the rendered content to our preview modal
+    const renderedContent = tempContainer.innerHTML;
+    const renderedInfo = tempInfo.innerHTML;
+
+    display.innerHTML = renderedContent;
+    info.innerHTML = renderedInfo || `Marker type: ${dot.markerType}`;
+
+    // Clean up
+    tempContainer.remove();
+    tempInfo.remove();
+}
 
 // Template Modal Functions
 let currentTemplateMarkerType = null;
