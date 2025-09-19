@@ -3471,6 +3471,46 @@ function setupModalEventListeners() {
     if (signPreviewCloseBtn) {
         signPreviewCloseBtn.addEventListener('click', closeSignPreviewModal);
     }
+
+    // Toggle Button Event Listeners
+    const toggleSignPreviewBtn = document.getElementById('toggle-sign-preview-btn');
+    const toggleGalleryBtn = document.getElementById('toggle-gallery-btn');
+
+    if (toggleSignPreviewBtn) {
+        toggleSignPreviewBtn.addEventListener('click', () => {
+            const isActive = toggleSignPreviewBtn.classList.contains('active');
+            if (isActive) {
+                closeSignPreviewModal();
+                toggleSignPreviewBtn.classList.remove('active');
+            } else {
+                const dot = appState.editingDot
+                    ? getCurrentPageDots().get(appState.editingDot)
+                    : null;
+                if (dot) {
+                    openSignPreviewModal(dot);
+                    toggleSignPreviewBtn.classList.add('active');
+                }
+            }
+        });
+    }
+
+    if (toggleGalleryBtn) {
+        toggleGalleryBtn.addEventListener('click', () => {
+            const isActive = toggleGalleryBtn.classList.contains('active');
+            if (isActive) {
+                closeGalleryModal();
+                toggleGalleryBtn.classList.remove('active');
+            } else {
+                const dot = appState.editingDot
+                    ? getCurrentPageDots().get(appState.editingDot)
+                    : null;
+                if (dot) {
+                    openGalleryModal(dot);
+                    toggleGalleryBtn.classList.add('active');
+                }
+            }
+        });
+    }
 }
 
 function addButtonEventListeners() {
@@ -3782,12 +3822,16 @@ function openEditModal(internalId) {
     const modal = document.getElementById('mapping-slayer-edit-modal');
     modal.style.display = 'block';
 
-    // Also show the gallery modal
-    // Use setTimeout to ensure edit modal is fully rendered first
-    setTimeout(() => {
-        openGalleryModal(dot);
-        openSignPreviewModal(dot);
-    }, 50);
+    // Reset toggle button states when opening edit modal
+    const toggleSignPreviewBtn = document.getElementById('toggle-sign-preview-btn');
+    const toggleGalleryBtn = document.getElementById('toggle-gallery-btn');
+
+    if (toggleSignPreviewBtn) {
+        toggleSignPreviewBtn.classList.remove('active');
+    }
+    if (toggleGalleryBtn) {
+        toggleGalleryBtn.classList.remove('active');
+    }
 }
 
 function openGroupEditModal() {
@@ -6116,6 +6160,12 @@ function closeGalleryModal() {
 
     // Clear current dot reference
     currentGalleryDot = null;
+
+    // Update toggle button state
+    const toggleBtn = document.getElementById('toggle-gallery-btn');
+    if (toggleBtn) {
+        toggleBtn.classList.remove('active');
+    }
 }
 
 function populateGallery(dot) {
@@ -6631,6 +6681,12 @@ function closeSignPreviewModal() {
 
     // Clear current dot reference
     currentSignPreviewDot = null;
+
+    // Update toggle button state
+    const toggleBtn = document.getElementById('toggle-sign-preview-btn');
+    if (toggleBtn) {
+        toggleBtn.classList.remove('active');
+    }
 }
 
 function updateSignPreview(dot, templateData) {

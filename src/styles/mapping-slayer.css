@@ -2358,6 +2358,41 @@ body {
     font-weight: normal;
 }
 
+/* Toggle buttons for Sign Preview and Gallery */
+.ms-modal-toggle-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.ms-modal-toggle-btn {
+    padding: 6px 12px;
+    background: #555;
+    color: #ccc;
+    border: 1px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.ms-modal-toggle-btn:hover {
+    background: #666;
+    color: #fff;
+}
+
+.ms-modal-toggle-btn.active {
+    background: #f07727;
+    color: white;
+    border-color: #f07727;
+}
+
+.ms-modal-toggle-btn.active:hover {
+    background: #ff8833;
+    border-color: #ff8833;
+}
+
 .ms-form-label {
     display: block;
     margin-bottom: 2px;

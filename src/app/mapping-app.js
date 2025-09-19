@@ -307,6 +307,14 @@ class MappingSlayerApp extends SlayerAppBase {
                                 <label for="edit-installed">Installed</label>
                                 <input type="checkbox" id="edit-installed" title="Mark as installed">
                             </div>
+                            <div class="ms-modal-toggle-buttons" style="margin-top: 10px;">
+                                <button type="button" class="ms-modal-toggle-btn" id="toggle-sign-preview-btn" title="Toggle Sign Preview">
+                                    SIGN PREVIEW
+                                </button>
+                                <button type="button" class="ms-modal-toggle-btn" id="toggle-gallery-btn" title="Toggle Gallery">
+                                    GALLERY
+                                </button>
+                            </div>
                         </div>
                         <div class="ms-modal-header-flags" id="edit-modal-flags">
                             <!-- Flag selectors will be dynamically inserted here -->
