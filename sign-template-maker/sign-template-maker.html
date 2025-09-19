@@ -2632,11 +2632,24 @@ MSG1</textarea
                 // Collect all message area data - including typography per message
                 Object.keys(messageData).forEach(msgId => {
                     const msgData = messageData[msgId];
+                    const fontFamily = msgData.fontFamily || 'Arial, sans-serif';
+                    const capHeight = msgData.capHeight || 62.5;
+
+                    // Calculate the actual font size for this cap height
+                    const fontSize = calculateFontSizeForCapHeight(fontFamily, capHeight);
+
+                    // Calculate the braille font size if braille is enabled
+                    const brailleHeight = msgData.brailleHeight || 23.9;
+                    const brailleFontSize = msgData.brailleEnabled
+                        ? calculateBrailleFontSize(brailleHeight)
+                        : null;
+
                     templateData.messages[msgId] = {
                         text: msgData.text,
                         // Typography settings per message
-                        fontFamily: msgData.fontFamily || 'Arial, sans-serif',
-                        capHeight: msgData.capHeight || 62.5,
+                        fontFamily: fontFamily,
+                        capHeight: capHeight,
+                        fontSize: fontSize, // Save the calculated font size
                         lineHeight: msgData.lineHeight || 1.2,
                         letterSpacing: msgData.letterSpacing || 0,
                         wordSpacing: msgData.wordSpacing || 0,
@@ -2650,7 +2663,8 @@ MSG1</textarea
                         verticalAlign: msgData.verticalAlign || 'middle',
                         // Braille
                         brailleEnabled: msgData.brailleEnabled || false,
-                        brailleHeight: msgData.brailleHeight || 23.9,
+                        brailleHeight: brailleHeight,
+                        brailleFontSize: brailleFontSize, // Save the calculated braille font size
                         brailleGap: msgData.brailleGap || 40
                     };
                 });

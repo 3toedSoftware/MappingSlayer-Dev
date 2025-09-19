@@ -6642,7 +6642,8 @@ function displayTemplate(templateData) {
             // Check for multi-line text
             const lines = messageText.split('\n');
             const lineHeight = msg.lineHeight || 1.2;
-            const fontSize = msg.capHeight || 62.5;
+            // Use the exact calculated fontSize from template maker
+            const fontSize = msg.fontSize;
             const lineSpacing = fontSize * lineHeight;
 
             if (lines.length > 1) {
@@ -6709,7 +6710,7 @@ function displayTemplate(templateData) {
                     <text x="${textX}" y="${brailleY}"
                           fill="${templateData.colors?.braille || '#000000'}"
                           font-family="Braille, monospace"
-                          font-size="${msg.brailleHeight || 23.9}"
+                          font-size="${msg.brailleFontSize}"
                           text-anchor="${textAnchor}"
                           dominant-baseline="middle">
                         ${brailleText}
