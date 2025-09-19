@@ -6549,7 +6549,7 @@ function updateSignPreviewPosition() {
         const editTop = editRect.top;
         const editLeft = editRect.left;
         const modalWidth = 380; // Width of sign preview modal (matches gallery modal)
-        const gap = 20; // Gap between modals
+        const gap = 10; // Gap between modals (matches gallery modal gap)
 
         // Calculate position to the left
         let left = editLeft - modalWidth - gap;
