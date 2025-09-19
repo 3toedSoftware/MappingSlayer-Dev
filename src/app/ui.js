@@ -5454,7 +5454,7 @@ function generateDynamicTextFields(prefix, dot = null) {
                         editingDot[field.fieldName] = input.value;
 
                         // Update the sign preview if it's open
-                        const template = appState.signTemplates?.get(editingDot.markerType);
+                        const template = loadedTemplates.get(editingDot.markerType);
                         if (template) {
                             updateSignPreview(editingDot, template);
                         }
@@ -6528,14 +6528,15 @@ function openSignPreviewModal(dot) {
     console.log('=== OPENING SIGN PREVIEW ===');
     console.log('Dot:', dot);
 
-    // Get the template for this marker type
-    const template = appState.signTemplates?.get(dot.markerType);
+    // Get the template for this marker type from loadedTemplates
+    const template = loadedTemplates.get(dot.markerType);
 
     if (template) {
         console.log('Template found for marker type:', dot.markerType);
         updateSignPreview(dot, template);
     } else {
         console.log('No template found for marker type:', dot.markerType);
+        console.log('Available templates:', Array.from(loadedTemplates.keys()));
         // Show placeholder if no template
         const display = document.getElementById('sign-preview-display');
         if (display) {
