@@ -6813,11 +6813,14 @@ function displayTemplate(templateData) {
                 // Position braille after the last text line with the specified gap
                 const brailleY = lastTextY + (msg.brailleGap || 40) + (msg.brailleHeight || 23.9);
 
+                // Check if this is an error message
+                const isError = brailleText.startsWith('BROKEN BRAILLE');
+
                 svgContent += `
                     <text x="${textX}" y="${brailleY}"
-                          fill="${templateData.colors?.braille || '#000000'}"
-                          font-family="Braille, monospace"
-                          font-size="${msg.brailleFontSize}"
+                          fill="${isError ? '#FF0000' : templateData.colors?.braille || '#000000'}"
+                          font-family="${isError ? 'Arial, sans-serif' : 'Braille, monospace'}"
+                          font-size="${isError ? '24' : msg.brailleFontSize}"
                           text-anchor="${textAnchor}"
                           dominant-baseline="middle">
                         ${brailleText}

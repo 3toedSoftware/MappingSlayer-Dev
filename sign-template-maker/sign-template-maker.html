@@ -2167,6 +2167,9 @@ MSG1</textarea
 
                         brailleMeasurer.remove();
 
+                        // Check if this is an error message
+                        const isError = brailleText.startsWith('BROKEN BRAILLE');
+
                         // Render braille lines
                         brailleLines.forEach((line, i) => {
                             brailleContainer
@@ -2174,9 +2177,12 @@ MSG1</textarea
                                 .attr('x', xPos) // Use same horizontal position as main text
                                 .attr('y', brailleY + i * brailleTargetHeight * 1.5) // 1.5 line height for braille spacing
                                 .attr('text-anchor', textAnchor) // Use same text anchor as main text
-                                .attr('font-family', 'Braille, monospace')
-                                .attr('font-size', brailleFontSize)
-                                .attr('fill', brailleColor)
+                                .attr(
+                                    'font-family',
+                                    isError ? 'Arial, sans-serif' : 'Braille, monospace'
+                                )
+                                .attr('font-size', isError ? '24' : brailleFontSize)
+                                .attr('fill', isError ? '#FF0000' : brailleColor)
                                 .text(line);
                         });
 
