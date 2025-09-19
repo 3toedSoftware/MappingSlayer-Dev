@@ -2666,6 +2666,11 @@ MSG1</textarea
                     };
                 }
 
+                // Custom fonts data - include base64 font data
+                if (Object.keys(customFonts).length > 0) {
+                    templateData.customFonts = customFonts;
+                }
+
                 // Create JSON string
                 const jsonStr = JSON.stringify(templateData, null, 2);
 
@@ -2751,6 +2756,54 @@ MSG1</textarea
                             if (templateData.colors.braille)
                                 document.getElementById('braille-color').value =
                                     templateData.colors.braille;
+                        }
+
+                        // Load custom fonts from template
+                        if (templateData.customFonts) {
+                            // Clear existing custom fonts
+                            customFonts = {};
+                            const fontSelect = document.getElementById('font-family');
+
+                            // Remove existing custom font options
+                            const existingCustomOptions = fontSelect.querySelectorAll(
+                                'option[data-custom="true"]'
+                            );
+                            existingCustomOptions.forEach(opt => opt.remove());
+
+                            // Add fonts from template
+                            Object.entries(templateData.customFonts).forEach(
+                                ([fontName, fontData]) => {
+                                    // Store the font data
+                                    customFonts[fontName] = fontData;
+
+                                    // Create and inject the @font-face rule
+                                    const styleId = `custom-font-${fontName.replace(/[^a-zA-Z0-9]/g, '-')}`;
+                                    let style = document.getElementById(styleId);
+                                    if (!style) {
+                                        style = document.createElement('style');
+                                        style.id = styleId;
+                                        document.head.appendChild(style);
+                                    }
+                                    style.textContent = `
+                                    @font-face {
+                                        font-family: '${fontName}';
+                                        src: url(${fontData}) format('truetype');
+                                    }
+                                `;
+
+                                    // Add to font dropdown
+                                    const option = document.createElement('option');
+                                    option.value = `'${fontName}', sans-serif`;
+                                    option.textContent = fontName;
+                                    option.setAttribute('data-custom', 'true');
+                                    fontSelect.appendChild(option);
+                                }
+                            );
+
+                            console.log(
+                                'Loaded custom fonts from template:',
+                                Object.keys(templateData.customFonts)
+                            );
                         }
 
                         // Apply typography

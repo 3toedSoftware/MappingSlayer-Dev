@@ -6550,6 +6550,27 @@ function displayTemplate(templateData) {
 
     if (!display) return;
 
+    // Load custom fonts if present in template
+    if (templateData.customFonts) {
+        Object.entries(templateData.customFonts).forEach(([fontName, fontData]) => {
+            // Create and inject the @font-face rule
+            const styleId = `template-font-${fontName.replace(/[^a-zA-Z0-9]/g, '-')}`;
+            let style = document.getElementById(styleId);
+            if (!style) {
+                style = document.createElement('style');
+                style.id = styleId;
+                document.head.appendChild(style);
+            }
+            style.textContent = `
+                @font-face {
+                    font-family: '${fontName}';
+                    src: url(${fontData}) format('truetype');
+                }
+            `;
+            console.log(`Loaded custom font: ${fontName}`);
+        });
+    }
+
     // Create a scale factor to fit the sign in the modal
     // Account for padding and ensure it fits comfortably in the preview area
     const containerWidth = display.offsetWidth || 750; // Use actual width or fallback
