@@ -6695,16 +6695,28 @@ function displayTemplate(templateData) {
             if (msg.brailleEnabled && window.translateToGrade2Braille) {
                 const brailleText = window.translateToGrade2Braille(messageText.toLowerCase());
 
-                // Calculate braille position based on text position and gap
-                let brailleY;
-                if (verticalAlign === 'top') {
-                    brailleY = textY + (msg.capHeight || 62.5) + (msg.brailleGap || 40);
-                } else if (verticalAlign === 'bottom') {
-                    brailleY = textY + (msg.brailleGap || 40);
+                // Calculate braille position based on the last line of text
+                let lastTextY;
+
+                if (lines.length > 1) {
+                    // For multi-line text, calculate position of last line
+                    let startY = textY;
+
+                    if (verticalAlign === 'middle') {
+                        startY = textY - ((lines.length - 1) * lineSpacing) / 2;
+                    } else if (verticalAlign === 'bottom') {
+                        startY = textY - (lines.length - 1) * lineSpacing;
+                    }
+
+                    // Last line position
+                    lastTextY = startY + (lines.length - 1) * lineSpacing;
                 } else {
-                    // middle
-                    brailleY = textY + (msg.capHeight || 62.5) / 2 + (msg.brailleGap || 40);
+                    // Single line text
+                    lastTextY = textY;
                 }
+
+                // Position braille after the last text line with the specified gap
+                const brailleY = lastTextY + (msg.brailleGap || 40) + (msg.brailleHeight || 23.9);
 
                 svgContent += `
                     <text x="${textX}" y="${brailleY}"
