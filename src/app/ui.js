@@ -6602,13 +6602,41 @@ function displayTemplate(templateData) {
 
     // Add logo if present
     if (templateData.logo && templateData.logo.svgContent) {
-        svgContent += `
-            <g transform="translate(${templateData.logo.x}, ${templateData.logo.y})">
-                <svg width="${templateData.logo.width}" height="${templateData.logo.height}">
-                    ${templateData.logo.svgContent.replace(/<\?xml.*?\?>|<!DOCTYPE.*?>|<svg[^>]*>|<\/svg>/gi, '')}
-                </svg>
-            </g>
-        `;
+        try {
+            // Parse the SVG to get its viewBox or dimensions
+            /* global DOMParser */
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(templateData.logo.svgContent, 'image/svg+xml');
+            const svgElement = doc.documentElement;
+
+            // Get viewBox or dimensions from the original SVG
+            const viewBox = svgElement.getAttribute('viewBox');
+            let originalWidth, originalHeight;
+
+            if (viewBox) {
+                const parts = viewBox.split(' ');
+                originalWidth = parseFloat(parts[2]) || 100;
+                originalHeight = parseFloat(parts[3]) || 100;
+            } else {
+                originalWidth = parseFloat(svgElement.getAttribute('width')) || 100;
+                originalHeight = parseFloat(svgElement.getAttribute('height')) || 100;
+            }
+
+            // Calculate scale to fit the specified dimensions
+            const scaleX = templateData.logo.width / originalWidth;
+            const scaleY = templateData.logo.height / originalHeight;
+
+            // Extract inner content of SVG
+            const innerContent = svgElement.innerHTML;
+
+            svgContent += `
+                <g transform="translate(${templateData.logo.x}, ${templateData.logo.y}) scale(${scaleX}, ${scaleY})">
+                    ${innerContent}
+                </g>
+            `;
+        } catch (e) {
+            console.error('Error parsing logo SVG:', e);
+        }
     }
 
     svgContent += '</svg>';
