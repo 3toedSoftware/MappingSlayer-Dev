@@ -19,7 +19,10 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-        <!-- Braille support -->
+        <!-- LibLouis for proper Grade 2 Braille translation -->
+        <script src="../../sign-template-maker/lib/liblouis/easy-api.js"></script>
+        <script src="../../sign-template-maker/lib/liblouis/build-no-tables-utf16.js"></script>
+        <!-- Fallback Grade 2 if LibLouis fails -->
         <script src="../../braille-grade2.js"></script>
     </head>
     <body>
@@ -135,6 +138,45 @@
                         });
                     } catch (brailleError) {
                         console.warn('Braille font failed to load:', brailleError);
+                    }
+
+                    // Initialize LibLouis for proper Grade 2 braille
+                    try {
+                        // Wait a bit for LibLouis to load
+                        await new Promise(resolve => setTimeout(resolve, 100));
+
+                        let lou = null;
+
+                        // Check if LiblouisEasyApi is available
+                        if (typeof LiblouisEasyApi !== 'undefined') {
+                            console.log('Found LiblouisEasyApi, initializing...');
+                            // Check for liblouisBuild first
+                            if (typeof liblouisBuild !== 'undefined') {
+                                console.log('Found liblouisBuild, using it for initialization');
+                                lou = new LiblouisEasyApi(liblouisBuild);
+                            } else {
+                                // Try without argument to use default
+                                console.log('Trying LiblouisEasyApi with auto-detection');
+                                lou = new LiblouisEasyApi();
+                            }
+                        }
+
+                        if (lou) {
+                            // Set up virtual filesystem for LibLouis
+                            lou.enableOnDemandTableLoading(
+                                '../../sign-template-maker/lib/liblouis/tables/'
+                            );
+
+                            // Make it globally available
+                            window.lou = lou;
+                            window.translator = lou;
+                            console.log('LibLouis Grade 2 translator initialized successfully!');
+                        } else {
+                            console.warn('LibLouis not found, using fallback Grade 2 translation');
+                        }
+                    } catch (liblouisError) {
+                        console.error('Error initializing LibLouis:', liblouisError);
+                        console.warn('Will use fallback Grade 2 translation');
                     }
 
                     // Import core framework
