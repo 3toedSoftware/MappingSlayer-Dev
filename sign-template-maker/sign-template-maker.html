@@ -1080,6 +1080,16 @@ MSG1</textarea
                             fontName = customName.trim();
                         }
 
+                        // Check if font already exists
+                        if (customFonts[fontName]) {
+                            const overwrite = confirm(
+                                `A font named "${fontName}" already exists. Do you want to replace it with the new version?`
+                            );
+                            if (!overwrite) {
+                                return; // User cancelled, don't proceed
+                            }
+                        }
+
                         // Store font
                         customFonts[fontName] = base64;
                         localStorage.setItem('customFonts', JSON.stringify(customFonts));
