@@ -141,9 +141,16 @@
                     }
 
                     // Initialize LibLouis for proper Grade 2 braille
+                    console.log('=== LIBLOUIS INITIALIZATION DEBUG ===');
                     try {
+                        console.log('Waiting 100ms for LibLouis scripts to load...');
                         // Wait a bit for LibLouis to load
                         await new Promise(resolve => setTimeout(resolve, 100));
+
+                        console.log('Checking for LibLouis components:');
+                        console.log('- LiblouisEasyApi:', typeof LiblouisEasyApi);
+                        console.log('- liblouisBuild:', typeof liblouisBuild);
+                        console.log('- Module:', typeof Module);
 
                         let lou = null;
 
@@ -159,25 +166,43 @@
                                 console.log('Trying LiblouisEasyApi with auto-detection');
                                 lou = new LiblouisEasyApi();
                             }
+                        } else {
+                            console.error(
+                                'LiblouisEasyApi NOT FOUND - LibLouis scripts may not have loaded'
+                            );
                         }
 
                         if (lou) {
+                            console.log('LibLouis object created, setting up table loading...');
+                            const tablePath = '../../sign-template-maker/lib/liblouis/tables/';
+                            console.log('Table path:', tablePath);
+
                             // Set up virtual filesystem for LibLouis
-                            lou.enableOnDemandTableLoading(
-                                '../../sign-template-maker/lib/liblouis/tables/'
-                            );
+                            lou.enableOnDemandTableLoading(tablePath);
+                            console.log('enableOnDemandTableLoading called');
+
+                            // Test if it works
+                            try {
+                                console.log('Testing LibLouis with simple text...');
+                                const testResult = lou.translateString('en-us-g2.ctb', 'test');
+                                console.log('LibLouis test successful! Result:', testResult);
+                            } catch (testError) {
+                                console.error('LibLouis test failed:', testError);
+                            }
 
                             // Make it globally available
                             window.lou = lou;
                             window.translator = lou;
+                            console.log('LibLouis set as window.lou and window.translator');
                             console.log('LibLouis Grade 2 translator initialized successfully!');
                         } else {
-                            console.warn('LibLouis not found, using fallback Grade 2 translation');
+                            console.error('LibLouis object could not be created');
                         }
                     } catch (liblouisError) {
                         console.error('Error initializing LibLouis:', liblouisError);
-                        console.warn('Will use fallback Grade 2 translation');
+                        console.error('Error stack:', liblouisError.stack);
                     }
+                    console.log('=== END LIBLOUIS INITIALIZATION ===');
 
                     // Import core framework
                     const { initializeCore, appBridge, saveManager } = await import(

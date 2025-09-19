@@ -6598,25 +6598,40 @@ function wrapTextForTemplate(text, fontSize, fontFamily, maxWidth) {
 
 // Helper function for braille translation (matches template maker's approach)
 function translateToBrailleForTemplate(text) {
+    console.log('=== BRAILLE TRANSLATION DEBUG ===');
+    console.log('Input text:', text);
+    console.log('window.translator:', window.translator);
+    console.log('window.lou:', window.lou);
+    console.log('window.LiblouisEasyApi:', window.LiblouisEasyApi);
+    console.log('window.liblouisBuild:', window.liblouisBuild);
+
     // IMPORTANT: Convert to lowercase for ADA compliance
     // ADA signage is visually all caps, but braille should be lowercase
     const lowercaseText = text.toLowerCase();
 
     // Try LibLouis first if available
     if (typeof window.translator !== 'undefined' && window.translator?.translateString) {
+        console.log('Found window.translator with translateString method');
         try {
+            console.log('Attempting translation with en-us-g2.ctb table');
             const result = window.translator.translateString('en-us-g2.ctb', lowercaseText);
-            console.log(`LibLouis Grade 2: "${lowercaseText}" -> "${result}"`);
+            console.log(`LibLouis Grade 2 SUCCESS: "${lowercaseText}" -> "${result}"`);
             return result;
         } catch (e) {
-            console.error('LibLouis translation failed:', e);
+            console.error('LibLouis translation FAILED:', e);
+            console.error('Error details:', e.message, e.stack);
             // Return error message instead of falling back
             return 'BROKEN BRAILLE - LibLouis ERROR';
         }
     }
 
     // No LibLouis available - return error message
-    console.error('LibLouis not available - cannot produce accurate braille');
+    console.error('LibLouis not available - checking why:');
+    console.error('- window.translator undefined?', typeof window.translator === 'undefined');
+    console.error(
+        '- translator exists but no translateString?',
+        window.translator && !window.translator.translateString
+    );
     return 'BROKEN BRAILLE - NO LibLouis';
 }
 
