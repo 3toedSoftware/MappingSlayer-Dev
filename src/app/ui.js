@@ -7042,14 +7042,8 @@ function displayTemplate(templateData) {
 
     display.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; height: 100%; box-sizing: border-box;">
-            <div style="color: #f07727; margin-bottom: 15px; font-weight: bold; font-size: 14px;">
-                ${templateData.name || 'Unnamed Template'}
-            </div>
             <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
                 ${svgContent}
-            </div>
-            <div style="color: #999; font-size: 11px; margin-top: 15px;">
-                ${templateData.signWidth} × ${templateData.signHeight}px | ${Object.keys(templateData.messages || {}).length} messages
             </div>
         </div>
     `;
