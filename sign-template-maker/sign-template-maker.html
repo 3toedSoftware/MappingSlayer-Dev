@@ -2206,9 +2206,17 @@ MSG1</textarea
                 if (currentMessageId && messageData[currentMessageId]) {
                     const currentData = messageData[currentMessageId];
                     const debugInfo = document.getElementById('debug-info');
+                    // Calculate font size for current message
+                    const currentFontFamily = currentData.fontFamily || 'Arial, sans-serif';
+                    const currentTargetCapHeight = currentData.capHeight || 62.5;
+                    const currentFontSize = calculateFontSizeForCapHeight(
+                        currentFontFamily,
+                        currentTargetCapHeight
+                    );
+
                     debugInfo.innerHTML = `
                     Current Message: MSG${currentMessageId}<br>
-                    Font Size: ${fontSize}px (${(fontSize / 100).toFixed(3)}" at 100 DPI)<br>
+                    Font Size: ${currentFontSize}px (${(currentFontSize / 100).toFixed(3)}" at 100 DPI)<br>
                     Text Area: ${currentData.boxWidth}x${currentData.boxHeight}px<br>
                     Position: (${currentData.boxX}, ${currentData.boxY})<br>
                     Total Messages: ${Object.keys(messageData).length}
