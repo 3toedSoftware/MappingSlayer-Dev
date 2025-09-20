@@ -1,5 +1,25 @@
 # Claude Code Instructions for Mapping Slayer
 
+## Startup Greeting
+
+When starting a new Claude Code session, ask the user:
+"Would you like to see your toolbelt?"
+
+If they say yes, run:
+```bash
+node show-toolbelt.js
+```
+
+This displays the complete toolbelt including:
+- Available core tools (File ops, Search, Bash, Git, etc.)
+- MCP server status (Playwright, Chrome DevTools)
+- Running services and ports
+- Permission counts
+- Mapping Slayer specific features
+- Quick command reference
+
+If they say no or want to get straight to work, proceed directly without showing the toolbelt.
+
 ## Project Overview
 
 Mapping Slayer is a professional sign mapping platform for creating detailed maps with marker placement, PDF integration, and comprehensive project management.
@@ -286,6 +306,57 @@ start chrome --remote-debugging-port=9222 --user-data-dir=temp-profile "http://l
 - Real-time monitoring of JavaScript errors
 - Automated error detection and analysis
 
+### Important: Playwright vs User Interaction
+
+**Problem**: When Playwright launches and controls a browser, it can block normal user mouse clicks and interactions - not just in the web app but even in Chrome's own UI (download dialogs, etc).
+
+**SOLVED: Collaborative Debugging with connectOverCDP**
+
+Instead of Playwright launching its own browser (which blocks user interaction), connect to a user-launched browser:
+
+#### When User Needs Help:
+
+User might say things like:
+- "I'm having an issue in mapping slayer"
+- "Can you help me debug something?"
+- "Something's not working right"
+- "I need you to see what I'm seeing"
+
+Claude should:
+1. Ask if they want collaborative debugging (both can interact) or just observation
+2. If yes, offer to open Chrome with debugging enabled
+3. Run the setup steps below
+
+#### Setup Steps:
+
+1. **Create profile directory**:
+   ```bash
+   mkdir C:\temp\chrome-debug-profile
+   ```
+
+2. **Claude launches Chrome with debugging** (when user requests collaborative debugging):
+   ```bash
+   start chrome --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-debug-profile" "http://localhost:8080/src/app/mapping_slayer.html"
+   ```
+
+3. **Verify debug mode**: Navigate to `http://localhost:9222/json/version` - you should see JSON data with `webSocketDebuggerUrl`
+
+4. **Claude connects using the collaborative script**:
+   ```bash
+   node collaborative-browser.js
+   ```
+
+#### Verified Working:
+- ✅ User can click buttons and interact normally
+- ✅ Playwright can also interact with the same browser
+- ✅ No blocking or interference between user and automation
+- ✅ Both can trigger file dialogs, click buttons, type, etc.
+
+#### When to Use Each Approach:
+- **Playwright MCP (browser_navigate)**: Quick automation tasks where user doesn't need to interact
+- **Collaborative (connectOverCDP)**: Debugging sessions where both user and Claude need to interact with the same page
+- **Live Server**: User-only testing without any automation
+
 ### Test Page Available
 
 A test page with various console outputs and errors is available at:
@@ -295,6 +366,33 @@ test-console-errors.html
 ```
 
 This can be used to verify the Chrome DevTools MCP connection is working properly.
+
+## Collaborative Debugging (IMPORTANT - Ask First!)
+
+### When User Reports Issues or Needs Help
+
+**ALWAYS ASK FIRST**: When a user says they need help with Mapping Slayer or reports an issue, immediately ask:
+
+"Do you want me to open a collaborative debugging session where we can both see and interact with Mapping Slayer together? Or would you prefer to describe the issue first?"
+
+This is critical because:
+- Users often need to show you something visually
+- Collaborative debugging allows both user and Claude to interact with the same browser
+- Regular Playwright blocks user interaction, collaborative mode doesn't
+
+### Quick Setup for Collaborative Debugging
+
+When user wants collaborative debugging:
+1. Start dev server: `npm run dev`
+2. Launch Chrome: `start chrome --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-debug-profile" "http://localhost:8080/src/app/mapping_slayer.html"`
+3. Connect: `node collaborative-browser.js`
+4. Both user and Claude can now interact with the same page!
+
+**CRITICAL**:
+- ❌ DO NOT use `mcp__playwright__browser_navigate` or any Playwright MCP tools - these create a NEW browser that blocks user interaction
+- ✅ DO use `node collaborative-browser.js` to connect to the EXISTING Chrome instance
+- The user should only see ONE Chrome window - the one opened in step 2
+- If a second browser window opens, something went wrong - you're using Playwright MCP instead of connectOverCDP
 
 ## Collaboration Style
 
