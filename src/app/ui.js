@@ -3883,8 +3883,12 @@ function openEditModal(internalId) {
                     toggleSignPreviewBtn.classList.remove('active');
                     closeSignPreviewModal();
                 } else {
-                    if (dot) {
-                        openSignPreviewModal(dot);
+                    // Get the current editing dot, not the one from when buttons were created
+                    const currentDot = appState.editingDot
+                        ? getCurrentPageDots().get(appState.editingDot)
+                        : null;
+                    if (currentDot) {
+                        openSignPreviewModal(currentDot);
                         toggleSignPreviewBtn.classList.add('active');
                     }
                 }
@@ -3898,8 +3902,12 @@ function openEditModal(internalId) {
                     toggleGalleryBtn.classList.remove('active');
                     closeGalleryModal();
                 } else {
-                    if (dot) {
-                        openGalleryModal(dot);
+                    // Get the current editing dot, not the one from when buttons were created
+                    const currentDot = appState.editingDot
+                        ? getCurrentPageDots().get(appState.editingDot)
+                        : null;
+                    if (currentDot) {
+                        openGalleryModal(currentDot);
                         toggleGalleryBtn.classList.add('active');
                     }
                 }
