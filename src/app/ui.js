@@ -3837,14 +3837,77 @@ function openEditModal(internalId) {
     const modal = document.getElementById('mapping-slayer-edit-modal');
     modal.style.display = 'block';
 
-    // Reset toggle button states when opening edit modal
-    const toggleSignPreviewBtn = document.getElementById('toggle-sign-preview-btn');
-    const toggleGalleryBtn = document.getElementById('toggle-gallery-btn');
+    // Create toggle buttons if they don't exist
+    let toggleSignPreviewBtn = document.getElementById('toggle-sign-preview-btn');
+    let toggleGalleryBtn = document.getElementById('toggle-gallery-btn');
 
-    if (toggleSignPreviewBtn) {
+    if (!toggleSignPreviewBtn || !toggleGalleryBtn) {
+        // Find where to insert the buttons
+        const installedDiv = document
+            .querySelector('#edit-installed')
+            ?.closest('.ms-form-group-inline');
+        if (installedDiv) {
+            // Create container for toggle buttons
+            const toggleContainer = document.createElement('div');
+            toggleContainer.className = 'ms-modal-toggle-buttons';
+            toggleContainer.style.marginTop = '10px';
+
+            // Create Sign Preview button
+            toggleSignPreviewBtn = document.createElement('button');
+            toggleSignPreviewBtn.type = 'button';
+            toggleSignPreviewBtn.className = 'ms-modal-toggle-btn';
+            toggleSignPreviewBtn.id = 'toggle-sign-preview-btn';
+            toggleSignPreviewBtn.title = 'Toggle Sign Preview';
+            toggleSignPreviewBtn.textContent = 'SIGN PREVIEW';
+
+            // Create Gallery button
+            toggleGalleryBtn = document.createElement('button');
+            toggleGalleryBtn.type = 'button';
+            toggleGalleryBtn.className = 'ms-modal-toggle-btn';
+            toggleGalleryBtn.id = 'toggle-gallery-btn';
+            toggleGalleryBtn.title = 'Toggle Gallery';
+            toggleGalleryBtn.textContent = 'GALLERY';
+
+            toggleContainer.appendChild(toggleSignPreviewBtn);
+            toggleContainer.appendChild(toggleGalleryBtn);
+
+            // Insert after the installed checkbox
+            installedDiv.parentNode.insertBefore(toggleContainer, installedDiv.nextSibling);
+
+            // Add event listeners
+            toggleSignPreviewBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                const isActive = toggleSignPreviewBtn.classList.contains('active');
+
+                if (isActive) {
+                    toggleSignPreviewBtn.classList.remove('active');
+                    closeSignPreviewModal();
+                } else {
+                    if (dot) {
+                        openSignPreviewModal(dot);
+                        toggleSignPreviewBtn.classList.add('active');
+                    }
+                }
+            });
+
+            toggleGalleryBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                const isActive = toggleGalleryBtn.classList.contains('active');
+
+                if (isActive) {
+                    toggleGalleryBtn.classList.remove('active');
+                    closeGalleryModal();
+                } else {
+                    if (dot) {
+                        openGalleryModal(dot);
+                        toggleGalleryBtn.classList.add('active');
+                    }
+                }
+            });
+        }
+    } else {
+        // Reset toggle button states when opening edit modal
         toggleSignPreviewBtn.classList.remove('active');
-    }
-    if (toggleGalleryBtn) {
         toggleGalleryBtn.classList.remove('active');
     }
 }
@@ -6136,6 +6199,7 @@ function openGalleryModal(dot) {
 
     // Show the modal
     galleryModal.classList.add('ms-visible');
+    galleryModal.style.display = 'block';
 
     // Initialize gallery with dot's photos
     populateGallery(dot);
@@ -6165,6 +6229,7 @@ function closeGalleryModal() {
     const galleryModal = document.getElementById('mapping-slayer-gallery-modal');
     if (galleryModal) {
         galleryModal.classList.remove('ms-visible');
+        galleryModal.style.display = 'none';
     }
 
     // Clean up resize listener
@@ -6679,6 +6744,7 @@ function closeSignPreviewModal() {
     const previewModal = document.getElementById('mapping-slayer-sign-preview-modal');
     if (previewModal) {
         previewModal.classList.remove('ms-visible');
+        previewModal.style.display = 'none';
     }
 
     // Clean up resize listener
