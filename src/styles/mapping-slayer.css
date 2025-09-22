@@ -393,10 +393,10 @@ body {
 
 /* Special handling for panel-content inside filter section */
 .ms-filter-section .ms-panel-content {
-    overflow-y: hidden; /* Let the filter-checkboxes handle scrolling */
+    overflow-y: hidden; /* Let the marker-type-container handle scrolling */
 }
 
-.ms-filter-checkboxes {
+.ms-marker-type-container {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -408,7 +408,7 @@ body {
     padding-right: 5px; /* Space for scrollbar */
 }
 
-.ms-filter-checkbox {
+.ms-marker-type-item {
     display: flex;
     align-items: center;
     padding: 4px;
@@ -420,7 +420,7 @@ body {
     gap: 4px;
 }
 
-.ms-filter-checkbox:hover {
+.ms-marker-type-item:hover {
     background: #4a4a4a;
 }
 
@@ -430,14 +430,14 @@ body {
     background-color: #454545;
 }
 
-.ms-filter-checkbox input[type='checkbox'] {
+.ms-marker-type-item input[type='checkbox'] {
     width: 14px;
     height: 14px;
     accent-color: #f07727;
     flex-shrink: 0;
 }
 
-.ms-filter-checkbox .ms-checkbox-label {
+.ms-marker-type-item .ms-checkbox-label {
     font-size: 11px;
     color: #ccc;
     display: flex;

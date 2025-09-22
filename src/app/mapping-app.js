@@ -106,7 +106,7 @@ class MappingSlayerApp extends SlayerAppBase {
                             </div>
                         </div>
                         <div class="ms-panel-content">
-                            <div class="ms-filter-checkboxes" id="filter-checkboxes"></div>
+                            <div class="ms-marker-type-container" id="filter-checkboxes"></div>
                         </div>
                     </div>
 
@@ -2156,6 +2156,7 @@ class MappingSlayerApp extends SlayerAppBase {
             { selector: '#add-marker-type-btn', title: 'Add a new marker type' },
             { selector: '#import-marker-types-btn', title: 'Import marker types from file' },
             { selector: '#export-marker-types-btn', title: 'Export marker types to file' },
+            { selector: '.ms-marker-type-item', title: 'Right-click to set Sign Template' },
 
             // List controls
             { selector: '#sort-toggle-btn', title: 'Toggle sort by location or name' },

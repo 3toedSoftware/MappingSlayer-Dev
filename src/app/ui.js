@@ -286,7 +286,7 @@ function updateFilterCheckboxesImmediate() {
         } else {
             // Create new element
             item = document.createElement('div');
-            item.className = 'ms-filter-checkbox';
+            item.className = 'ms-marker-type-item';
             if (markerTypeCode === appState.activeMarkerType) {
                 item.classList.add('ms-legend-item-active');
             }
