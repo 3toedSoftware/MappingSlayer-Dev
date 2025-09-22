@@ -330,6 +330,31 @@ class ThumbnailGenerator {
                 throw new Error('No SVG generated');
             }
 
+            // Embed fonts into the SVG if they exist
+            if (templateData.customFonts) {
+                const defs =
+                    svgElement.querySelector('defs') ||
+                    svgElement.insertBefore(
+                        document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
+                        svgElement.firstChild
+                    );
+
+                const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+                let fontStyles = '';
+
+                Object.entries(templateData.customFonts).forEach(([fontName, fontData]) => {
+                    fontStyles += `
+                        @font-face {
+                            font-family: '${fontName}';
+                            src: url(${fontData}) format('truetype');
+                        }
+                    `;
+                });
+
+                style.textContent = fontStyles;
+                defs.appendChild(style);
+            }
+
             // Convert SVG to image and add to PDF
             await this.svgToPDF(svgElement, pdf, x, y, width, height);
 
