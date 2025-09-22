@@ -27,6 +27,7 @@ import {
     resetKeyboardShortcutsFlag
 } from './ui.js';
 import { getCurrentPageDots, setDirtyState } from './state.js';
+import { thumbnailGenerator } from './thumbnail-generator.js';
 
 class MappingSlayerApp extends SlayerAppBase {
     constructor() {
@@ -261,7 +262,8 @@ class MappingSlayerApp extends SlayerAppBase {
                         <span class="ms-automap-status" id="automap-status"></span>
                     </div>
                     
-                    <div class="ms-control-group">                
+                    <div class="ms-control-group">
+                        <button class="ms-btn ms-btn-primary ms-btn-compact" id="create-thumbnails-btn" disabled="">CREATE THUMBNAILS</button>
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="create-pdf-btn" disabled="">CREATE PDF</button>
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="create-schedule-btn" disabled="">CREATE MESSAGE SCHEDULE</button>
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="update-from-schedule-btn" disabled="">UPDATE FROM MESSAGE SCHEDULE</button>
@@ -593,6 +595,87 @@ class MappingSlayerApp extends SlayerAppBase {
                     </div>
                 </div>
             </div>
+
+            <!-- Thumbnail Generator Modal -->
+            <div class="ms-modal" id="mapping-slayer-thumbnails-modal" style="display: none;">
+                <div class="ms-modal-content" style="width: 500px;">
+                    <div class="ms-modal-header">
+                        <span>Create Thumbnails</span>
+                    </div>
+                    <div class="ms-modal-body">
+                        <div class="ms-form-group">
+                            <label>Select Marker Types to Include:</label>
+                            <div id="thumbnail-marker-types" class="ms-checkbox-group" style="max-height: 150px; overflow-y: auto; border: 1px solid #444; padding: 8px; border-radius: 4px;">
+                                <!-- Marker type checkboxes will be populated here -->
+                            </div>
+                        </div>
+
+                        <div class="ms-form-group">
+                            <label>Thumbnail Size (inches):</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="thumbnail-width" min="0.5" max="5" step="0.1" value="2" style="width: 80px;">
+                                <span style="align-self: center;">×</span>
+                                <input type="number" id="thumbnail-height" min="0.5" max="5" step="0.1" value="2" style="width: 80px;">
+                            </div>
+                        </div>
+
+                        <div class="ms-form-group">
+                            <label>Page Size:</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select id="thumbnail-page-size" style="flex: 1;">
+                                    <option value="letter">Letter (8.5" × 11")</option>
+                                    <option value="legal">Legal (8.5" × 14")</option>
+                                    <option value="tabloid">Tabloid (11" × 17")</option>
+                                    <option value="a4">A4 (210mm × 297mm)</option>
+                                    <option value="custom">Custom Size</option>
+                                </select>
+                                <select id="thumbnail-orientation" style="width: 100px;">
+                                    <option value="portrait">Portrait</option>
+                                    <option value="landscape">Landscape</option>
+                                </select>
+                            </div>
+                            <div id="custom-page-size" style="display: none; margin-top: 10px;">
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="number" id="custom-page-width" min="1" max="50" step="0.1" placeholder="Width" style="width: 80px;">
+                                    <span style="align-self: center;">×</span>
+                                    <input type="number" id="custom-page-height" min="1" max="50" step="0.1" placeholder="Height" style="width: 80px;">
+                                    <span style="align-self: center;">inches</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ms-form-group">
+                            <label>Grid Layout:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <div>
+                                    <label style="font-size: 11px;">Columns:</label>
+                                    <input type="number" id="thumbnail-cols" min="1" max="6" value="3" style="width: 60px;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px;">Rows:</label>
+                                    <input type="number" id="thumbnail-rows" min="1" max="8" value="4" style="width: 60px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ms-form-group">
+                            <label>Spacing (inches):</label>
+                            <input type="number" id="thumbnail-spacing" min="0" max="2" step="0.1" value="0.25" style="width: 80px;">
+                        </div>
+
+                        <div class="ms-form-group">
+                            <label>
+                                <input type="checkbox" id="thumbnail-include-notes" checked>
+                                Include Notes Field
+                            </label>
+                        </div>
+                    </div>
+                    <div class="ms-modal-buttons">
+                        <button class="ms-btn ms-btn-secondary" id="cancel-thumbnails-btn">CANCEL</button>
+                        <button class="ms-btn ms-btn-primary" id="generate-thumbnails-btn">GENERATE PDF</button>
+                    </div>
+                </div>
+            </div>
         `;
 
         // Append modals to document body for proper z-index stacking
@@ -663,6 +746,9 @@ class MappingSlayerApp extends SlayerAppBase {
         addViewToggleEventListeners();
         addButtonEventListeners();
         setupModalEventListeners();
+
+        // Initialize thumbnail generator
+        thumbnailGenerator.init();
 
         // Remove setTimeout to match toggle behavior timing
         (async () => {
@@ -1028,6 +1114,7 @@ class MappingSlayerApp extends SlayerAppBase {
 
     enableButtons() {
         const buttonsToEnable = [
+            '#create-thumbnails-btn',
             '#create-pdf-btn',
             '#create-schedule-btn',
             '#update-from-schedule-btn',

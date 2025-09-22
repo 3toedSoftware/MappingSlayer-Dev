@@ -6815,6 +6815,7 @@ function updateSignPreview(dot, templateData) {
 // Template Modal Functions
 let currentTemplateMarkerType = null;
 const loadedTemplates = new Map(); // Store loaded templates by marker type
+window.loadedTemplates = loadedTemplates; // Make it globally available for thumbnail generator
 
 function openTemplateModal(markerTypeCode) {
     const modal = document.getElementById('mapping-slayer-template-modal');
@@ -7228,6 +7229,9 @@ function displayTemplate(templateData) {
         info.style.display = 'block';
     }
 }
+
+// Make displayTemplate globally available for thumbnail generator
+window.displayTemplate = displayTemplate;
 
 function setupTemplateModalListeners() {
     const addBtn = document.getElementById('template-add-btn');
