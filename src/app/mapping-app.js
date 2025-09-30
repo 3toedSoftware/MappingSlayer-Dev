@@ -812,7 +812,10 @@ class MappingSlayerApp extends SlayerAppBase {
         const guideBtn = document.getElementById('guide-btn');
         if (guideBtn) {
             guideBtn.addEventListener('click', () => {
-                window.open('/MappingSlayer-Dev/ms_user_guide.html', '_blank');
+                window.open(
+                    'https://3toedsoftware.github.io/MappingSlayer-Dev/ms_user_guide.html',
+                    '_blank'
+                );
             });
         }
 
