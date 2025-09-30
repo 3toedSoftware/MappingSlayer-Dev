@@ -3490,6 +3490,7 @@ function setupModalEventListeners() {
 
             if (isActive) {
                 toggleSignPreviewBtn.classList.remove('active');
+                appState.signPreviewToggleActive = false;
                 closeSignPreviewModal();
             } else {
                 const dot = appState.editingDot
@@ -3497,6 +3498,7 @@ function setupModalEventListeners() {
                     : null;
                 if (dot) {
                     openSignPreviewModal(dot);
+                    appState.signPreviewToggleActive = true;
                     // Add active class after opening modal to ensure it sticks
                     setTimeout(() => {
                         toggleSignPreviewBtn.classList.add('active');
@@ -3514,6 +3516,7 @@ function setupModalEventListeners() {
 
             if (isActive) {
                 toggleGalleryBtn.classList.remove('active');
+                appState.galleryToggleActive = false;
                 closeGalleryModal();
             } else {
                 const dot = appState.editingDot
@@ -3521,6 +3524,7 @@ function setupModalEventListeners() {
                     : null;
                 if (dot) {
                     openGalleryModal(dot);
+                    appState.galleryToggleActive = true;
                     // Add active class after opening modal to ensure it sticks
                     setTimeout(() => {
                         toggleGalleryBtn.classList.add('active');
@@ -3884,6 +3888,7 @@ function openEditModal(internalId) {
 
                 if (isActive) {
                     toggleSignPreviewBtn.classList.remove('active');
+                    appState.signPreviewToggleActive = false;
                     closeSignPreviewModal();
                 } else {
                     // Get the current editing dot, not the one from when buttons were created
@@ -3892,6 +3897,7 @@ function openEditModal(internalId) {
                         : null;
                     if (currentDot) {
                         openSignPreviewModal(currentDot);
+                        appState.signPreviewToggleActive = true;
                         toggleSignPreviewBtn.classList.add('active');
                     }
                 }
@@ -3903,6 +3909,7 @@ function openEditModal(internalId) {
 
                 if (isActive) {
                     toggleGalleryBtn.classList.remove('active');
+                    appState.galleryToggleActive = false;
                     closeGalleryModal();
                 } else {
                     // Get the current editing dot, not the one from when buttons were created
@@ -3911,15 +3918,33 @@ function openEditModal(internalId) {
                         : null;
                     if (currentDot) {
                         openGalleryModal(currentDot);
+                        appState.galleryToggleActive = true;
                         toggleGalleryBtn.classList.add('active');
                     }
                 }
             });
         }
     } else {
-        // Reset toggle button states when opening edit modal
-        toggleSignPreviewBtn.classList.remove('active');
-        toggleGalleryBtn.classList.remove('active');
+        // Restore toggle button states from appState when opening edit modal
+        if (appState.signPreviewToggleActive) {
+            toggleSignPreviewBtn.classList.add('active');
+            const dot = appState.editingDot ? getCurrentPageDots().get(appState.editingDot) : null;
+            if (dot) {
+                openSignPreviewModal(dot);
+            }
+        } else {
+            toggleSignPreviewBtn.classList.remove('active');
+        }
+
+        if (appState.galleryToggleActive) {
+            toggleGalleryBtn.classList.add('active');
+            const dot = appState.editingDot ? getCurrentPageDots().get(appState.editingDot) : null;
+            if (dot) {
+                openGalleryModal(dot);
+            }
+        } else {
+            toggleGalleryBtn.classList.remove('active');
+        }
     }
 }
 

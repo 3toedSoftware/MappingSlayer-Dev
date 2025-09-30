@@ -68,7 +68,10 @@ export const appState = {
     draggingAnnotationEndpoint: null,
     draggingAnnotationOriginalPos: null,
     showAnnotationEndpoints: true,
-    nextAnnotationId: 1
+    nextAnnotationId: 1,
+    // Toggle button states - persist across dots
+    signPreviewToggleActive: false,
+    galleryToggleActive: false
 };
 
 export function setDirtyState() {
