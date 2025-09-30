@@ -1,0 +1,1248 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mapping Slayer - User Guide</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 20px;
+                background: #fff;
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 40px;
+                padding: 30px 0;
+                border-bottom: 3px solid #f07727;
+            }
+
+            .logo {
+                font-size: 48px;
+                font-weight: bold;
+                color: #f07727;
+                margin-bottom: 10px;
+            }
+
+            .subtitle {
+                font-size: 24px;
+                color: #666;
+                margin-bottom: 20px;
+            }
+
+            .version {
+                font-size: 14px;
+                color: #999;
+            }
+
+            h1 {
+                color: #f07727;
+                border-bottom: 2px solid #f07727;
+                padding-bottom: 10px;
+                margin-top: 40px;
+                page-break-before: auto;
+            }
+
+            h2 {
+                color: #333;
+                margin-top: 30px;
+                border-left: 4px solid #f07727;
+                padding-left: 15px;
+            }
+
+            h3 {
+                color: #555;
+                margin-top: 25px;
+            }
+
+            .feature-box {
+                background: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0;
+            }
+
+            .tip {
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
+                border-radius: 5px;
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            .tip::before {
+                content: '💡 TIP: ';
+                font-weight: bold;
+                color: #856404;
+            }
+
+            .warning {
+                background: #f8d7da;
+                border: 1px solid #f5c6cb;
+                border-radius: 5px;
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            .warning::before {
+                content: '⚠️ WARNING: ';
+                font-weight: bold;
+                color: #721c24;
+            }
+
+            .keyboard-shortcut {
+                background: #e9ecef;
+                border: 1px solid #adb5bd;
+                border-radius: 3px;
+                padding: 2px 6px;
+                font-family: monospace;
+                font-size: 14px;
+                display: inline-block;
+                margin: 0 2px;
+            }
+
+            .button-ref {
+                background: #f07727;
+                color: white;
+                border: none;
+                border-radius: 3px;
+                padding: 2px 8px;
+                font-weight: bold;
+                font-size: 12px;
+                display: inline-block;
+                margin: 0 2px;
+            }
+
+            .step-list {
+                background: #f8f9fa;
+                border-left: 4px solid #007bff;
+                padding: 15px 20px;
+                margin: 15px 0;
+            }
+
+            .step-list ol {
+                margin: 0;
+                padding-left: 20px;
+            }
+
+            .step-list li {
+                margin: 8px 0;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+            }
+
+            th,
+            td {
+                border: 1px solid #ddd;
+                padding: 12px;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f07727;
+                color: white;
+                font-weight: bold;
+            }
+
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            .toc {
+                background: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 30px 0;
+            }
+
+            .toc h2 {
+                margin-top: 0;
+                border: none;
+                padding: 0;
+            }
+
+            .toc ul {
+                list-style-type: none;
+                padding-left: 0;
+            }
+
+            .toc li {
+                margin: 8px 0;
+                padding-left: 20px;
+            }
+
+            .toc a {
+                text-decoration: none;
+                color: #f07727;
+            }
+
+            .toc a:hover {
+                text-decoration: underline;
+            }
+
+            .section-divider {
+                height: 2px;
+                background: linear-gradient(to right, #f07727, transparent);
+                margin: 40px 0;
+                border: none;
+            }
+
+            code {
+                background: #f4f4f4;
+                padding: 2px 5px;
+                border-radius: 3px;
+                font-family: 'Courier New', monospace;
+            }
+
+            @media print {
+                body {
+                    max-width: none;
+                    padding: 0;
+                }
+
+                .header {
+                    page-break-after: always;
+                }
+
+                h1 {
+                    page-break-before: always;
+                }
+
+                h1:first-of-type {
+                    page-break-before: auto;
+                }
+
+                .feature-box,
+                .tip,
+                .warning,
+                .step-list {
+                    page-break-inside: avoid;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="logo">MAPPING SLAYER</div>
+            <div class="subtitle">Professional Sign Mapping Platform</div>
+            <div class="version">User Guide<br />Updated January 2025</div>
+        </div>
+
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#getting-started">1. Getting Started</a></li>
+                <li><a href="#interface-overview">2. Interface Overview</a></li>
+                <li><a href="#marker-types">3. Working with Marker Types</a></li>
+                <li><a href="#placing-dots">4. Placing and Managing Location Dots</a></li>
+                <li><a href="#editing">5. Editing Locations</a></li>
+                <li><a href="#navigation">6. Navigation and Search</a></li>
+                <li><a href="#automap">7. Automap Features</a></li>
+                <li><a href="#text-scraping">8. Text Scraping and OCR</a></li>
+                <li><a href="#projects">9. Saving and Loading Projects</a></li>
+                <li><a href="#export">10. Export Options</a></li>
+                <li><a href="#sign-templates">11. Sign Templates and Preview</a></li>
+                <li><a href="#keyboard">12. Keyboard Shortcuts</a></li>
+                <li><a href="#special-features">13. Special Features</a></li>
+                <li><a href="#tips">14. Tips and Best Practices</a></li>
+                <li><a href="#troubleshooting">15. Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <h1 id="getting-started">1. Getting Started</h1>
+
+        <h2>What is Mapping Slayer?</h2>
+        <p>
+            Mapping Slayer is a professional web-based tool for creating detailed sign location maps
+            on PDF documents. Designed for signage professionals, project managers, and contractors,
+            it enables precise annotation of architectural drawings, floor plans, and site maps with
+            numbered location markers and detailed information.
+        </p>
+
+        <h2>System Requirements</h2>
+        <div class="feature-box">
+            <h3>Supported Browsers</h3>
+            <ul>
+                <li><strong>Chrome 90+</strong> - Recommended for best performance</li>
+                <li><strong>Firefox 88+</strong> - Fully supported</li>
+                <li><strong>Safari 14+</strong> - Fully supported</li>
+                <li><strong>Edge 90+</strong> - Fully supported</li>
+            </ul>
+
+            <h3>Technical Requirements</h3>
+            <ul>
+                <li>JavaScript must be enabled</li>
+                <li>Minimum 4GB RAM (8GB recommended for large projects)</li>
+                <li>Stable internet connection for initial loading</li>
+                <li>Screen resolution of 1280x720 or higher</li>
+            </ul>
+        </div>
+
+        <h2>First Time Setup</h2>
+        <div class="step-list">
+            <ol>
+                <li><strong>Open Mapping Slayer</strong> in your web browser</li>
+                <li>
+                    <strong>Load a PDF</strong> by clicking in the upload area or using
+                    <span class="button-ref">LOAD</span>
+                </li>
+                <li><strong>Configure marker types</strong> for your project needs</li>
+                <li>
+                    <strong>Enable tooltips</strong> via <span class="button-ref">HELP</span> →
+                    <span class="button-ref">TOOL TIPS</span> for contextual help
+                </li>
+            </ol>
+        </div>
+
+        <h2>Supported File Types</h2>
+        <table>
+            <tr>
+                <th>Format</th>
+                <th>Extension</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>PDF Documents</td>
+                <td>.pdf</td>
+                <td>Base maps for annotation (architectural drawings, floor plans, site maps)</td>
+            </tr>
+            <tr>
+                <td>Slayer Projects</td>
+                <td>.slayer</td>
+                <td>Complete project files including PDF and all annotations</td>
+            </tr>
+        </table>
+
+        <hr class="section-divider" />
+
+        <h1 id="interface-overview">2. Interface Overview</h1>
+
+        <p>
+            Mapping Slayer features a clean, professional interface divided into distinct functional
+            areas:
+        </p>
+
+        <h2>Header Bar</h2>
+        <div class="feature-box">
+            <h3>Left Section</h3>
+            <ul>
+                <li><strong>MAPPING SLAYER</strong> - Application logo</li>
+                <li><strong>Project name</strong> - Displays current project title</li>
+            </ul>
+
+            <h3>Center Section - Search and Replace</h3>
+            <ul>
+                <li><span class="button-ref">FIND ALL</span> - Select all matching locations</li>
+                <li><strong>Find field</strong> - Search for text in locations</li>
+                <li><strong>Replace field</strong> - Text to replace with</li>
+                <li><span class="button-ref">REPLACE</span> - Execute replacement</li>
+            </ul>
+
+            <h3>Right Section - File Operations</h3>
+            <ul>
+                <li><span class="button-ref">SAVE</span> - Save project as .slayer file</li>
+                <li><span class="button-ref">SAVE AS</span> - Save with new name</li>
+                <li><span class="button-ref">LOAD</span> - Load PDF or .slayer file</li>
+                <li><strong>File name display</strong> - Shows current file</li>
+            </ul>
+        </div>
+
+        <h2>Left Panel - Marker Types and Location List</h2>
+        <div class="feature-box">
+            <h3>Marker Types Section</h3>
+            <ul>
+                <li><strong>Filter checkboxes</strong> - Show/hide dots by type</li>
+                <li><strong>Type preview</strong> - Visual representation with colors</li>
+                <li><strong>Type name</strong> - Editable marker type names</li>
+                <li><strong>Design reference</strong> - Upload area for reference images</li>
+                <li><span class="button-ref">+</span> - Add new marker type</li>
+                <li><span class="button-ref">IMP</span> - Import marker types</li>
+                <li><span class="button-ref">EXP</span> - Export marker types</li>
+            </ul>
+
+            <h3>Location List Section</h3>
+            <ul>
+                <li>
+                    <span class="button-ref">BY LOC</span> /
+                    <span class="button-ref">BY TYPE</span> - Sort toggle
+                </li>
+                <li>
+                    <span class="button-ref">UNGROUPED</span> /
+                    <span class="button-ref">GROUPED</span> - View toggle
+                </li>
+                <li><strong>Location items</strong> - Shows all placed dots with:</li>
+                <ul>
+                    <li>Location number</li>
+                    <li>Message 1 field (editable)</li>
+                    <li>Message 2 field (editable when enabled)</li>
+                    <li>Marker type badge</li>
+                    <li>Installed indicator</li>
+                </ul>
+            </ul>
+        </div>
+
+        <h2>Center Area - Map Canvas</h2>
+        <div class="feature-box">
+            <h3>Map Overlay Controls</h3>
+            <ul>
+                <li><span class="button-ref">HELP</span> - Open controls and shortcuts</li>
+                <li>
+                    <span class="button-ref">HIDE LOC</span> /
+                    <span class="button-ref">SHOW LOC</span> - Toggle location numbers
+                </li>
+                <li>
+                    <span class="button-ref">HIDE MSG1</span> /
+                    <span class="button-ref">SHOW MSG1</span> - Toggle message 1 display
+                </li>
+                <li>
+                    <span class="button-ref">SHOW MSG2</span> /
+                    <span class="button-ref">HIDE MSG2</span> - Toggle message 2 display
+                </li>
+                <li>
+                    <span class="button-ref">INST ONLY</span> /
+                    <span class="button-ref">SHOW ALL</span> - Filter by installation status
+                </li>
+                <li><span class="button-ref">RENUMBER</span> - Reorganize location numbers</li>
+                <li><span class="button-ref">DOTCAM</span> - Photo capture mode</li>
+            </ul>
+
+            <h3>Navigation Controls</h3>
+            <ul>
+                <li><strong>Page navigation</strong> - Previous/Next buttons with page counter</li>
+                <li><strong>Crop tool</strong> - Toggle crop mode for focused areas</li>
+                <li><strong>Zoom controls</strong> - Mouse wheel to zoom, middle-click to pan</li>
+            </ul>
+
+            <h3>Canvas Area</h3>
+            <ul>
+                <li><strong>PDF display</strong> - Your loaded document</li>
+                <li><strong>Location dots</strong> - Placed markers with numbers and messages</li>
+                <li><strong>Selection box</strong> - Click and drag to select multiple dots</li>
+                <li><strong>Annotation lines</strong> - Ctrl+drag from dots to create pointers</li>
+            </ul>
+        </div>
+
+        <h2>Right Panel - Properties and Actions</h2>
+        <div class="feature-box">
+            <h3>Legend Section</h3>
+            <ul>
+                <li><strong>Map Legend</strong> - Summary for current page</li>
+                <li><strong>Project Legend</strong> - Summary for entire project</li>
+                <li>Shows counts by marker type and installation status</li>
+            </ul>
+
+            <h3>Automap Section</h3>
+            <ul>
+                <li><strong>Text to find</strong> - Pattern for automatic placement</li>
+                <li><strong>Marker type selector</strong> - Type for new dots</li>
+                <li><span class="button-ref">AUTOMAP IT!</span> - Execute automatic mapping</li>
+            </ul>
+
+            <h3>Export Section</h3>
+            <ul>
+                <li><span class="button-ref">CREATE PDF</span> - Generate annotated PDF</li>
+                <li>
+                    <span class="button-ref">CREATE THUMBNAILS</span> - Generate PDF grid of sign
+                    thumbnails
+                </li>
+                <li>
+                    <span class="button-ref">CREATE MESSAGE SCHEDULE</span> - Export Excel schedule
+                </li>
+                <li>
+                    <span class="button-ref">UPDATE FROM MESSAGE SCHEDULE</span> - Import Excel
+                    changes
+                </li>
+                <li><span class="button-ref">EXPORT HTML</span> - Generate web report</li>
+            </ul>
+        </div>
+
+        <hr class="section-divider" />
+
+        <h1 id="marker-types">3. Working with Marker Types</h1>
+
+        <p>Marker types categorize your location dots, each with unique colors and properties.</p>
+
+        <h2>Default Marker Types</h2>
+        <p>Mapping Slayer starts with three default types:</p>
+        <ul>
+            <li><strong>INT</strong> - Interior locations (green)</li>
+            <li><strong>EXT</strong> - Exterior locations (red)</li>
+            <li><strong>HCP</strong> - Handicap/Accessible locations (blue)</li>
+        </ul>
+
+        <h2>Creating Custom Marker Types</h2>
+        <div class="step-list">
+            <ol>
+                <li>
+                    Click the <span class="button-ref">+</span> button in the marker types section
+                </li>
+                <li>Enter a code (1-4 characters, e.g., "DOOR", "ELEV")</li>
+                <li>Enter a descriptive name</li>
+                <li>The new type appears with an auto-assigned color</li>
+            </ol>
+        </div>
+
+        <h2>Customizing Marker Types</h2>
+        <div class="feature-box">
+            <h3>Edit Names</h3>
+            <p>Click on any marker type name to edit it directly. Press Enter to save.</p>
+
+            <h3>Change Colors</h3>
+            <ol>
+                <li>Click the colored circle next to a marker type</li>
+                <li>Use the color picker to select dot color</li>
+                <li>Click the text color circle to change text color</li>
+                <li>Colors update immediately on all dots</li>
+            </ol>
+
+            <h3>Add Design References</h3>
+            <ol>
+                <li>Click the <span class="button-ref">+</span> in the design reference box</li>
+                <li>Select an image file (PNG, JPG, SVG)</li>
+                <li>Image appears as reference for that type</li>
+                <li>Click the image to update or remove</li>
+            </ol>
+        </div>
+
+        <h2>Managing Marker Types</h2>
+        <div class="feature-box">
+            <h3>Delete a Type</h3>
+            <p>
+                Right-click on the marker type name and confirm deletion. Warning: This removes all
+                dots of that type!
+            </p>
+
+            <h3>Import/Export Types</h3>
+            <ul>
+                <li>
+                    <span class="button-ref">EXP</span> - Save marker types as JSON file for reuse
+                </li>
+                <li><span class="button-ref">IMP</span> - Load previously saved marker types</li>
+            </ul>
+
+            <h3>Filter Display</h3>
+            <p>Use the checkboxes next to each type to show/hide those dots on the map.</p>
+        </div>
+
+        <hr class="section-divider" />
+
+        <h1 id="placing-dots">4. Placing and Managing Location Dots</h1>
+
+        <h2>Adding Dots Manually</h2>
+        <div class="step-list">
+            <ol>
+                <li>Select a marker type from the left panel (it highlights in orange)</li>
+                <li>Click anywhere on the PDF to place a dot</li>
+                <li>The dot appears with an auto-generated location number</li>
+                <li>
+                    If <span class="button-ref">SHOW MSG1</span> is active, dots display message
+                    fields
+                </li>
+            </ol>
+        </div>
+
+        <div class="tip">
+            Hold Shift while clicking to place multiple dots quickly without deselecting the tool.
+        </div>
+
+        <h2>Selecting Dots</h2>
+        <div class="feature-box">
+            <h3>Single Selection</h3>
+            <ul>
+                <li>Click on any dot to select it</li>
+                <li>Selected dots show an orange outline</li>
+                <li>Click again to deselect</li>
+            </ul>
+
+            <h3>Multiple Selection</h3>
+            <ul>
+                <li><strong>Box select:</strong> Click and drag to draw selection rectangle</li>
+                <li><strong>Shift-click:</strong> Add individual dots to selection</li>
+                <li><strong>Ctrl/Cmd+A:</strong> Select all dots on current page</li>
+                <li><strong>Find All:</strong> Select all dots matching search criteria</li>
+            </ul>
+        </div>
+
+        <h2>Moving and Copying Dots</h2>
+        <div class="feature-box">
+            <h3>Move Dots</h3>
+            <ol>
+                <li>Select one or more dots</li>
+                <li>Drag any selected dot to move all selected dots</li>
+                <li>Dots maintain relative positions when moving groups</li>
+            </ol>
+
+            <h3>Copy and Paste</h3>
+            <ol>
+                <li>Select dots to copy</li>
+                <li>Press <kbd>Ctrl+C</kbd> to copy</li>
+                <li>Press <kbd>Ctrl+V</kbd> to paste at cursor position</li>
+                <li>Pasted dots retain all properties except location numbers</li>
+            </ol>
+        </div>
+
+        <h2>Deleting Dots</h2>
+        <ul>
+            <li><strong>Single dot:</strong> Select and press Delete key</li>
+            <li><strong>Multiple dots:</strong> Select all desired dots and press Delete</li>
+            <li><strong>Via edit modal:</strong> Right-click and use DELETE button</li>
+        </ul>
+
+        <hr class="section-divider" />
+
+        <h1 id="editing">5. Editing Locations</h1>
+
+        <h2>Quick Edit in List</h2>
+        <p>The location list provides direct editing of messages:</p>
+        <ul>
+            <li>Click in any MESSAGE 1 field to edit</li>
+            <li>Click in MESSAGE 2 field (when visible) to edit</li>
+            <li>Changes save automatically when you click elsewhere</li>
+            <li>Tab key moves between fields</li>
+        </ul>
+
+        <h2>Edit Location Modal</h2>
+        <p>Right-click any dot to open the detailed edit modal:</p>
+
+        <div class="feature-box">
+            <h3>Available Fields</h3>
+            <ul>
+                <li><strong>Marker Type</strong> - Change the dot's category</li>
+                <li><strong>Location Number</strong> - Modify the identifying number</li>
+                <li>
+                    <strong>Message fields</strong> - Edit associated text (based on project
+                    settings)
+                </li>
+                <li><strong>Notes</strong> - Add detailed information</li>
+                <li><strong>Installed checkbox</strong> - Mark as complete</li>
+                <li><strong>Flag checkboxes</strong> - Apply custom flags</li>
+            </ul>
+
+            <h3>Modal Actions</h3>
+            <ul>
+                <li><span class="button-ref">UPDATE</span> - Save all changes</li>
+                <li><span class="button-ref">DELETE</span> - Remove this location</li>
+                <li><span class="button-ref">CANCEL</span> - Close without saving</li>
+                <li>
+                    <span class="button-ref">SIGN PREVIEW</span> - View the sign template for this
+                    location
+                </li>
+                <li>
+                    <span class="button-ref">GALLERY</span> - View and manage photos for this
+                    location
+                </li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            Use the SIGN PREVIEW and GALLERY toggle buttons at the top of the Edit Location modal
+            for quick access to sign templates and photos without closing the edit window.
+        </div>
+
+        <h2>Bulk Editing</h2>
+        <p>Select multiple dots and right-click to edit them together:</p>
+        <ul>
+            <li>Change marker type for all selected</li>
+            <li>Apply the same message to all</li>
+            <li>Mark all as installed</li>
+            <li>Set flags for entire group</li>
+            <li>Delete all selected at once</li>
+        </ul>
+
+        <h2>Custom Flags</h2>
+        <p>Configure up to 4 custom flags for special categorization:</p>
+        <div class="step-list">
+            <ol>
+                <li>Right-click on "MARKER TYPES" header text</li>
+                <li>Name each flag position</li>
+                <li>Choose symbols or upload custom icons</li>
+                <li>Apply flags to dots via edit modal</li>
+            </ol>
+        </div>
+
+        <hr class="section-divider" />
+
+        <h1 id="navigation">6. Navigation and Search</h1>
+
+        <h2>Page Navigation</h2>
+        <ul>
+            <li>
+                Use <span class="button-ref">&lt;</span> and
+                <span class="button-ref">&gt;</span> buttons to change pages
+            </li>
+            <li>Page counter shows current page and total</li>
+            <li>Keyboard: <kbd>Page Up</kbd> / <kbd>Page Down</kbd></li>
+            <li>Location list shows page numbers for each dot</li>
+        </ul>
+
+        <h2>Zoom and Pan</h2>
+        <div class="feature-box">
+            <h3>Zooming</h3>
+            <ul>
+                <li><strong>Mouse wheel:</strong> Scroll to zoom in/out at cursor position</li>
+                <li><strong>Double-click dot in list:</strong> Zoom to that location</li>
+                <li><strong>Middle-click dot in list:</strong> Center on that location</li>
+            </ul>
+
+            <h3>Panning</h3>
+            <ul>
+                <li><strong>Middle-click + drag:</strong> Pan around the map</li>
+                <li><strong>Arrow keys:</strong> Nudge view in small increments</li>
+            </ul>
+        </div>
+
+        <h2>Search Features</h2>
+        <div class="feature-box">
+            <h3>Find Locations</h3>
+            <ol>
+                <li>Enter text in the Find field</li>
+                <li>Press Enter or click <span class="button-ref">FIND ALL</span></li>
+                <li>All matching locations are selected</li>
+                <li>Search includes location numbers and all message fields</li>
+            </ol>
+
+            <h3>Replace Text</h3>
+            <ol>
+                <li>Search for text to replace</li>
+                <li>Enter replacement text in Replace field</li>
+                <li>Click <span class="button-ref">REPLACE</span></li>
+                <li>Only affects selected locations</li>
+            </ol>
+        </div>
+
+        <h2>Crop Mode</h2>
+        <p>Focus on specific areas of large drawings:</p>
+        <ol>
+            <li>Click the crop button (icon changes to indicate active)</li>
+            <li>Click and drag to define crop area</li>
+            <li>Only the selected area remains visible</li>
+            <li>Click crop button again to restore full view</li>
+        </ol>
+
+        <hr class="section-divider" />
+
+        <h1 id="automap">7. Automap Features</h1>
+
+        <p>
+            Automap automatically places dots at text locations in your PDF. This feature works best
+            with searchable PDFs containing real text (not scanned images).
+        </p>
+
+        <h2>Using Automap</h2>
+        <div class="step-list">
+            <ol>
+                <li>Enter text pattern in "Text to find" field (e.g., "DOOR", "RM", "ELEV")</li>
+                <li>Select the marker type for new dots</li>
+                <li>Click <span class="button-ref">AUTOMAP IT!</span></li>
+                <li>Progress window shows dots being placed</li>
+                <li>Review results and adjust as needed</li>
+            </ol>
+        </div>
+
+        <h2>Automap Patterns</h2>
+        <div class="feature-box">
+            <h3>Simple Text</h3>
+            <p>Enter exact text to find: <code>DOOR</code>, <code>EXIT</code>, <code>ROOM</code></p>
+
+            <h3>With Numbers</h3>
+            <p>Include numbers for specific matches: <code>DOOR 101</code>, <code>RM 2</code></p>
+
+            <h3>Partial Matches</h3>
+            <p>
+                Automap finds text containing your pattern: searching <code>RM</code> finds "RM
+                101", "STORM", "PLATFORM"
+            </p>
+        </div>
+
+        <div class="warning">
+            Automap only works with searchable PDFs. For scanned documents, use OCR scraping or
+            manual placement.
+        </div>
+
+        <hr class="section-divider" />
+
+        <h1 id="text-scraping">8. Text Scraping and OCR</h1>
+
+        <p>Quickly capture text from your PDF to use as location messages.</p>
+
+        <h2>Standard Text Scraping</h2>
+        <p>For searchable PDFs with selectable text:</p>
+        <ol>
+            <li>Hold <kbd>Shift</kbd> + right-click and drag</li>
+            <li>Yellow box appears around selected area</li>
+            <li>Release to capture text</li>
+            <li>Text automatically fills MESSAGE 1 of selected dots</li>
+        </ol>
+
+        <h2>OCR Scraping</h2>
+        <p>For scanned PDFs or images without selectable text:</p>
+        <ol>
+            <li>Hold <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + right-click and drag</li>
+            <li>Purple box indicates OCR mode</li>
+            <li>Processing extracts text from image</li>
+            <li>Results populate selected dots' messages</li>
+        </ol>
+
+        <div class="tip">
+            Select multiple dots before scraping to apply the same text to all selected locations.
+        </div>
+
+        <hr class="section-divider" />
+
+        <h1 id="projects">9. Saving and Loading Projects</h1>
+
+        <h2>Saving Your Work</h2>
+        <div class="feature-box">
+            <h3>Save Project</h3>
+            <ol>
+                <li>Click <span class="button-ref">SAVE</span> to save with current name</li>
+                <li>First save prompts for filename</li>
+                <li>Creates .slayer file containing everything</li>
+            </ol>
+
+            <h3>Save As</h3>
+            <ol>
+                <li>Click <span class="button-ref">SAVE AS</span> to save with new name</li>
+                <li>Enter desired filename</li>
+                <li>Original file remains unchanged</li>
+            </ol>
+        </div>
+
+        <h2>Loading Files</h2>
+        <div class="feature-box">
+            <h3>Load PDF</h3>
+            <ol>
+                <li>Click <span class="button-ref">LOAD</span> or click upload area</li>
+                <li>Select a PDF file</li>
+                <li>Starts fresh project with default marker types</li>
+            </ol>
+
+            <h3>Load Project</h3>
+            <ol>
+                <li>Click <span class="button-ref">LOAD</span></li>
+                <li>Select a .slayer file</li>
+                <li>Restores complete project state</li>
+            </ol>
+        </div>
+
+        <div class="tip">
+            Save frequently and use descriptive names like "BuildingA_Floor2_Rev3.slayer" to track
+            versions.
+        </div>
+
+        <hr class="section-divider" />
+
+        <h1 id="export">10. Export Options</h1>
+
+        <h2>PDF Export</h2>
+        <p>Generate annotated PDFs with your location markers:</p>
+        <div class="step-list">
+            <ol>
+                <li>Click <span class="button-ref">CREATE PDF</span></li>
+                <li>
+                    Choose export format:
+                    <ul>
+                        <li>
+                            <strong>Current Map - With Detail Pages:</strong> Current page plus
+                            detail sheets
+                        </li>
+                        <li><strong>Current Map Only:</strong> Just the current page with dots</li>
+                        <li><strong>All Maps Only:</strong> All pages with dots, no details</li>
+                    </ul>
+                </li>
+                <li>PDF downloads with annotations embedded</li>
+            </ol>
+        </div>
+
+        <h2>Message Schedule (Excel)</h2>
+        <p>Export location data for spreadsheet management:</p>
+        <ol>
+            <li>Click <span class="button-ref">CREATE MESSAGE SCHEDULE</span></li>
+            <li>Excel file downloads with all location data</li>
+            <li>Edit messages, notes, and properties in Excel</li>
+            <li>
+                Use <span class="button-ref">UPDATE FROM MESSAGE SCHEDULE</span> to reimport changes
+            </li>
+        </ol>
+
+        <h2>HTML Report</h2>
+        <p>Create web-based project documentation:</p>
+        <ol>
+            <li>Click <span class="button-ref">EXPORT HTML</span></li>
+            <li>Generates interactive HTML report</li>
+            <li>Includes maps, location lists, and summaries</li>
+            <li>Share via email or web hosting</li>
+        </ol>
+
+        <hr class="section-divider" />
+
+        <h1 id="sign-templates">11. Sign Templates and Preview</h1>
+
+        <p>
+            Mapping Slayer includes powerful sign template features with Grade 2 Braille translation
+            support, allowing you to preview signs and generate professional thumbnail sheets.
+        </p>
+
+        <h2>Sign Preview</h2>
+        <p>View sign templates directly from the Edit Location modal:</p>
+        <div class="step-list">
+            <ol>
+                <li>Right-click any dot to open the Edit Location modal</li>
+                <li>Click <span class="button-ref">SIGN PREVIEW</span> at the top of the modal</li>
+                <li>The sign template for that marker type displays in a preview window</li>
+                <li>Preview shows the actual sign design with all text and braille</li>
+                <li>Click anywhere outside to close the preview</li>
+            </ol>
+        </div>
+
+        <div class="tip">
+            The SIGN PREVIEW button stays in the Edit Location modal, so you can preview the sign
+            while editing location details.
+        </div>
+
+        <h2>Grade 2 Braille Translation</h2>
+        <p>
+            Mapping Slayer uses LibLouis for authentic Grade 2 Braille translation on all sign
+            templates:
+        </p>
+        <div class="feature-box">
+            <h3>Braille Features</h3>
+            <ul>
+                <li>
+                    <strong>Automatic Translation</strong> - Text converts to Grade 2 Braille
+                    automatically
+                </li>
+                <li>
+                    <strong>Unicode Support</strong> - Proper Unicode braille characters for display
+                </li>
+                <li><strong>US English Standard</strong> - Follows en-us-g2.ctb standards</li>
+                <li><strong>Custom Font</strong> - Uses embedded Braille font for PDF exports</li>
+            </ul>
+        </div>
+
+        <h2>Create Thumbnails</h2>
+        <p>Generate professional PDF sheets displaying all your sign designs:</p>
+        <div class="step-list">
+            <ol>
+                <li>Click <span class="button-ref">CREATE THUMBNAILS</span> in the right panel</li>
+                <li>Select which marker types to include in the thumbnail sheet</li>
+                <li>
+                    Choose your page size:
+                    <ul>
+                        <li>Letter (8.5" × 11")</li>
+                        <li>Legal (8.5" × 14")</li>
+                        <li>Tabloid (11" × 17")</li>
+                        <li>Custom dimensions</li>
+                    </ul>
+                </li>
+                <li>Set columns per page (1-6 columns)</li>
+                <li>Adjust sign scale percentage (50-200%)</li>
+                <li>Choose margin size</li>
+                <li>Click <span class="button-ref">GENERATE</span></li>
+                <li>PDF downloads with all sign thumbnails in a grid layout</li>
+            </ol>
+        </div>
+
+        <h2>Thumbnail Options</h2>
+        <div class="feature-box">
+            <h3>Layout Control</h3>
+            <ul>
+                <li><strong>Columns:</strong> More columns = smaller signs, fits more per page</li>
+                <li><strong>Scale:</strong> Adjust sign size without changing column count</li>
+                <li><strong>Margins:</strong> Small, Medium, or Large spacing around signs</li>
+            </ul>
+
+            <h3>Best Practices</h3>
+            <ul>
+                <li>Use 2-3 columns for detailed review of large signs</li>
+                <li>Use 4-6 columns for compact reference sheets</li>
+                <li>Tabloid paper works best for multiple columns</li>
+                <li>Keep scale at 100% for actual-size preview</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            Thumbnail PDFs include location information and are perfect for client presentations,
+            fabrication references, and project documentation.
+        </div>
+
+        <h2>Photo Gallery</h2>
+        <p>Access photos directly from the Edit Location modal:</p>
+        <ol>
+            <li>Right-click any dot to open the Edit Location modal</li>
+            <li>Click <span class="button-ref">GALLERY</span> at the top of the modal</li>
+            <li>View all photos associated with this location</li>
+            <li>Add new photos by clicking the upload area</li>
+            <li>Delete photos using the × button on each image</li>
+        </ol>
+
+        <hr class="section-divider" />
+
+        <h1 id="keyboard">12. Keyboard Shortcuts</h1>
+
+        <h2>Essential Shortcuts</h2>
+        <table>
+            <tr>
+                <th>Action</th>
+                <th>Windows/Linux</th>
+                <th>Mac</th>
+            </tr>
+            <tr>
+                <td>Select All</td>
+                <td><kbd>Ctrl+A</kbd></td>
+                <td><kbd>Cmd+A</kbd></td>
+            </tr>
+            <tr>
+                <td>Copy</td>
+                <td><kbd>Ctrl+C</kbd></td>
+                <td><kbd>Cmd+C</kbd></td>
+            </tr>
+            <tr>
+                <td>Paste</td>
+                <td><kbd>Ctrl+V</kbd></td>
+                <td><kbd>Cmd+V</kbd></td>
+            </tr>
+            <tr>
+                <td>Undo</td>
+                <td><kbd>Ctrl+Z</kbd></td>
+                <td><kbd>Cmd+Z</kbd></td>
+            </tr>
+            <tr>
+                <td>Redo</td>
+                <td><kbd>Ctrl+Y</kbd></td>
+                <td><kbd>Cmd+Y</kbd></td>
+            </tr>
+            <tr>
+                <td>Delete Selected</td>
+                <td><kbd>Delete</kbd></td>
+                <td><kbd>Delete</kbd></td>
+            </tr>
+            <tr>
+                <td>Clear Selection</td>
+                <td><kbd>Escape</kbd></td>
+                <td><kbd>Escape</kbd></td>
+            </tr>
+        </table>
+
+        <h2>Navigation Shortcuts</h2>
+        <table>
+            <tr>
+                <th>Action</th>
+                <th>Shortcut</th>
+            </tr>
+            <tr>
+                <td>Next Page</td>
+                <td><kbd>Page Down</kbd></td>
+            </tr>
+            <tr>
+                <td>Previous Page</td>
+                <td><kbd>Page Up</kbd></td>
+            </tr>
+            <tr>
+                <td>Pan View</td>
+                <td>Middle-click + drag</td>
+            </tr>
+            <tr>
+                <td>Zoom In/Out</td>
+                <td>Mouse wheel</td>
+            </tr>
+        </table>
+
+        <h2>Special Actions</h2>
+        <table>
+            <tr>
+                <th>Action</th>
+                <th>Method</th>
+            </tr>
+            <tr>
+                <td>Multi-select</td>
+                <td>Click + drag for box select</td>
+            </tr>
+            <tr>
+                <td>Add to selection</td>
+                <td><kbd>Shift</kbd> + click</td>
+            </tr>
+            <tr>
+                <td>Annotation line</td>
+                <td><kbd>Ctrl</kbd> + drag from dot</td>
+            </tr>
+            <tr>
+                <td>Text scraping</td>
+                <td><kbd>Shift</kbd> + right-click + drag</td>
+            </tr>
+            <tr>
+                <td>OCR scraping</td>
+                <td><kbd>Shift</kbd> + <kbd>Ctrl</kbd> + right-click + drag</td>
+            </tr>
+        </table>
+
+        <hr class="section-divider" />
+
+        <h1 id="special-features">13. Special Features</h1>
+
+        <h2>Renumbering</h2>
+        <p>Reorganize location numbers for professional presentation:</p>
+        <div class="feature-box">
+            <h3>Renumber Options</h3>
+            <ul>
+                <li>
+                    <strong>Current Page Only:</strong> Renumber by position (top-to-bottom,
+                    left-to-right)
+                </li>
+                <li><strong>Current Page by Marker Type:</strong> Separate numbering per type</li>
+                <li><strong>All Pages:</strong> Continuous numbering across document</li>
+                <li>
+                    <strong>All Pages by Marker Type:</strong> Type-specific numbering throughout
+                </li>
+            </ul>
+        </div>
+
+        <h2>DOTCAM Mode</h2>
+        <p>Capture photos directly associated with locations:</p>
+        <ol>
+            <li>Click <span class="button-ref">DOTCAM</span> to activate</li>
+            <li>Place a new dot - camera opens automatically</li>
+            <li>Take photo or select from device</li>
+            <li>Photo links to that specific location</li>
+            <li>View photos in edit modal gallery</li>
+        </ol>
+
+        <h2>Installation Tracking</h2>
+        <p>Monitor project completion:</p>
+        <ul>
+            <li>Mark dots as "Installed" via edit modal</li>
+            <li>Use <span class="button-ref">INST ONLY</span> to show only installed items</li>
+            <li>Legend displays installation counts</li>
+            <li>Installed dots show special indicator in list</li>
+        </ul>
+
+        <h2>Annotation Lines</h2>
+        <p>Create visual connections between dots and specific points:</p>
+        <ol>
+            <li>Select a dot</li>
+            <li>Hold <kbd>Ctrl</kbd> and drag to target location</li>
+            <li>Arrow line connects dot to point</li>
+            <li>Useful for indicating exact positions in complex areas</li>
+        </ol>
+
+        <hr class="section-divider" />
+
+        <h1 id="tips">14. Tips and Best Practices</h1>
+
+        <h2>Project Organization</h2>
+        <ul>
+            <li><strong>Consistent Naming:</strong> Use standard codes across projects</li>
+            <li>
+                <strong>Color Coding:</strong> Assign meaningful colors (red=emergency,
+                blue=accessible)
+            </li>
+            <li><strong>Regular Saves:</strong> Save after completing each section</li>
+            <li><strong>Version Control:</strong> Keep dated backups of important projects</li>
+        </ul>
+
+        <h2>Efficiency Tips</h2>
+        <ul>
+            <li><strong>Bulk Operations:</strong> Select multiple dots before editing</li>
+            <li><strong>Keyboard Navigation:</strong> Learn shortcuts to work faster</li>
+            <li><strong>Automap First:</strong> Use automatic placement, then refine manually</li>
+            <li><strong>Template Types:</strong> Export and reuse marker type configurations</li>
+        </ul>
+
+        <h2>Quality Checks</h2>
+        <ul>
+            <li><strong>Review Mode:</strong> Hide messages to see dot placement clearly</li>
+            <li><strong>Legend Verification:</strong> Check counts match expectations</li>
+            <li><strong>Search Duplicates:</strong> Find repeated location numbers</li>
+            <li><strong>Export Preview:</strong> Generate PDF to review before sharing</li>
+        </ul>
+
+        <hr class="section-divider" />
+
+        <h1 id="troubleshooting">15. Troubleshooting</h1>
+
+        <h2>Common Issues and Solutions</h2>
+
+        <div class="feature-box">
+            <h3>PDF Won't Load</h3>
+            <ul>
+                <li>Check file isn't corrupted - try opening in PDF reader</li>
+                <li>Ensure file size is under 100MB</li>
+                <li>Try a different browser if issue persists</li>
+            </ul>
+
+            <h3>Automap Not Finding Text</h3>
+            <ul>
+                <li>Verify PDF contains searchable text (not just images)</li>
+                <li>Try simpler search patterns</li>
+                <li>Check for special characters or formatting</li>
+                <li>Use OCR scraping for scanned documents</li>
+            </ul>
+
+            <h3>Dots Not Visible</h3>
+            <ul>
+                <li>Check marker type filters aren't hiding dots</li>
+                <li>Verify you're on the correct page</li>
+                <li>Try "SHOW ALL" instead of "INST ONLY"</li>
+                <li>Check if crop mode is active</li>
+            </ul>
+
+            <h3>Can't Select Dots</h3>
+            <ul>
+                <li>Ensure you're not in placement mode</li>
+                <li>Try clicking directly on dot center</li>
+                <li>Use box selection for small dots</li>
+                <li>Check zoom level - zoom in for precision</li>
+            </ul>
+
+            <h3>Export Issues</h3>
+            <ul>
+                <li>Allow pop-ups for PDF downloads</li>
+                <li>Check browser download settings</li>
+                <li>Ensure project has dots before exporting</li>
+                <li>Try different export format</li>
+            </ul>
+        </div>
+
+        <h2>Performance Optimization</h2>
+        <ul>
+            <li><strong>Large Projects:</strong> Hide unnecessary marker types</li>
+            <li><strong>Slow Response:</strong> Reduce number of visible dots</li>
+            <li><strong>Memory Issues:</strong> Close other browser tabs</li>
+            <li><strong>Refresh Page:</strong> Save project, refresh, and reload</li>
+        </ul>
+
+        <h2>Data Recovery</h2>
+        <ul>
+            <li><strong>Browser Crash:</strong> Check Downloads folder for auto-saved files</li>
+            <li><strong>Accidental Deletion:</strong> Use Undo (Ctrl+Z) immediately</li>
+            <li><strong>Lost Work:</strong> Always save before closing browser</li>
+        </ul>
+
+        <hr class="section-divider" />
+
+        <div class="feature-box" style="text-align: center; margin-top: 60px">
+            <h2 style="border: none; padding: 0">Need More Help?</h2>
+            <p>This guide covers all major features of Mapping Slayer.</p>
+            <p>
+                Remember to enable <span class="button-ref">TOOL TIPS</span> for contextual help
+                while working.
+            </p>
+            <p style="margin-top: 30px; color: #666">
+                <strong>Mapping Slayer</strong><br />
+                Professional Sign Mapping Platform<br />
+                Updated: January 2025
+            </p>
+        </div>
+    </body>
+</html>
