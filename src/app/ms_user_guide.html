@@ -236,7 +236,7 @@
         <div class="header">
             <div class="logo">MAPPING SLAYER</div>
             <div class="subtitle">Professional Sign Mapping Platform</div>
-            <div class="version">User Guide<br />September 2025</div>
+            <div class="version">User Guide<br />Updated January 2025</div>
         </div>
 
         <div class="toc">
@@ -252,10 +252,11 @@
                 <li><a href="#text-scraping">8. Text Scraping and OCR</a></li>
                 <li><a href="#projects">9. Saving and Loading Projects</a></li>
                 <li><a href="#export">10. Export Options</a></li>
-                <li><a href="#keyboard">11. Keyboard Shortcuts</a></li>
-                <li><a href="#special-features">12. Special Features</a></li>
-                <li><a href="#tips">13. Tips and Best Practices</a></li>
-                <li><a href="#troubleshooting">14. Troubleshooting</a></li>
+                <li><a href="#sign-templates">11. Sign Templates and Preview</a></li>
+                <li><a href="#keyboard">12. Keyboard Shortcuts</a></li>
+                <li><a href="#special-features">13. Special Features</a></li>
+                <li><a href="#tips">14. Tips and Best Practices</a></li>
+                <li><a href="#troubleshooting">15. Troubleshooting</a></li>
             </ul>
         </div>
 
@@ -452,6 +453,10 @@
             <ul>
                 <li><span class="button-ref">CREATE PDF</span> - Generate annotated PDF</li>
                 <li>
+                    <span class="button-ref">CREATE THUMBNAILS</span> - Generate PDF grid of sign
+                    thumbnails
+                </li>
+                <li>
                     <span class="button-ref">CREATE MESSAGE SCHEDULE</span> - Export Excel schedule
                 </li>
                 <li>
@@ -629,7 +634,20 @@
                 <li><span class="button-ref">UPDATE</span> - Save all changes</li>
                 <li><span class="button-ref">DELETE</span> - Remove this location</li>
                 <li><span class="button-ref">CANCEL</span> - Close without saving</li>
+                <li>
+                    <span class="button-ref">SIGN PREVIEW</span> - View the sign template for this
+                    location
+                </li>
+                <li>
+                    <span class="button-ref">GALLERY</span> - View and manage photos for this
+                    location
+                </li>
             </ul>
+        </div>
+
+        <div class="tip">
+            Use the SIGN PREVIEW and GALLERY toggle buttons at the top of the Edit Location modal
+            for quick access to sign templates and photos without closing the edit window.
         </div>
 
         <h2>Bulk Editing</h2>
@@ -869,7 +887,109 @@
 
         <hr class="section-divider" />
 
-        <h1 id="keyboard">11. Keyboard Shortcuts</h1>
+        <h1 id="sign-templates">11. Sign Templates and Preview</h1>
+
+        <p>
+            Mapping Slayer includes powerful sign template features with Grade 2 Braille translation
+            support, allowing you to preview signs and generate professional thumbnail sheets.
+        </p>
+
+        <h2>Sign Preview</h2>
+        <p>View sign templates directly from the Edit Location modal:</p>
+        <div class="step-list">
+            <ol>
+                <li>Right-click any dot to open the Edit Location modal</li>
+                <li>Click <span class="button-ref">SIGN PREVIEW</span> at the top of the modal</li>
+                <li>The sign template for that marker type displays in a preview window</li>
+                <li>Preview shows the actual sign design with all text and braille</li>
+                <li>Click anywhere outside to close the preview</li>
+            </ol>
+        </div>
+
+        <div class="tip">
+            The SIGN PREVIEW button stays in the Edit Location modal, so you can preview the sign
+            while editing location details.
+        </div>
+
+        <h2>Grade 2 Braille Translation</h2>
+        <p>
+            Mapping Slayer uses LibLouis for authentic Grade 2 Braille translation on all sign
+            templates:
+        </p>
+        <div class="feature-box">
+            <h3>Braille Features</h3>
+            <ul>
+                <li>
+                    <strong>Automatic Translation</strong> - Text converts to Grade 2 Braille
+                    automatically
+                </li>
+                <li>
+                    <strong>Unicode Support</strong> - Proper Unicode braille characters for display
+                </li>
+                <li><strong>US English Standard</strong> - Follows en-us-g2.ctb standards</li>
+                <li><strong>Custom Font</strong> - Uses embedded Braille font for PDF exports</li>
+            </ul>
+        </div>
+
+        <h2>Create Thumbnails</h2>
+        <p>Generate professional PDF sheets displaying all your sign designs:</p>
+        <div class="step-list">
+            <ol>
+                <li>Click <span class="button-ref">CREATE THUMBNAILS</span> in the right panel</li>
+                <li>Select which marker types to include in the thumbnail sheet</li>
+                <li>
+                    Choose your page size:
+                    <ul>
+                        <li>Letter (8.5" × 11")</li>
+                        <li>Legal (8.5" × 14")</li>
+                        <li>Tabloid (11" × 17")</li>
+                        <li>Custom dimensions</li>
+                    </ul>
+                </li>
+                <li>Set columns per page (1-6 columns)</li>
+                <li>Adjust sign scale percentage (50-200%)</li>
+                <li>Choose margin size</li>
+                <li>Click <span class="button-ref">GENERATE</span></li>
+                <li>PDF downloads with all sign thumbnails in a grid layout</li>
+            </ol>
+        </div>
+
+        <h2>Thumbnail Options</h2>
+        <div class="feature-box">
+            <h3>Layout Control</h3>
+            <ul>
+                <li><strong>Columns:</strong> More columns = smaller signs, fits more per page</li>
+                <li><strong>Scale:</strong> Adjust sign size without changing column count</li>
+                <li><strong>Margins:</strong> Small, Medium, or Large spacing around signs</li>
+            </ul>
+
+            <h3>Best Practices</h3>
+            <ul>
+                <li>Use 2-3 columns for detailed review of large signs</li>
+                <li>Use 4-6 columns for compact reference sheets</li>
+                <li>Tabloid paper works best for multiple columns</li>
+                <li>Keep scale at 100% for actual-size preview</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            Thumbnail PDFs include location information and are perfect for client presentations,
+            fabrication references, and project documentation.
+        </div>
+
+        <h2>Photo Gallery</h2>
+        <p>Access photos directly from the Edit Location modal:</p>
+        <ol>
+            <li>Right-click any dot to open the Edit Location modal</li>
+            <li>Click <span class="button-ref">GALLERY</span> at the top of the modal</li>
+            <li>View all photos associated with this location</li>
+            <li>Add new photos by clicking the upload area</li>
+            <li>Delete photos using the × button on each image</li>
+        </ol>
+
+        <hr class="section-divider" />
+
+        <h1 id="keyboard">12. Keyboard Shortcuts</h1>
 
         <h2>Essential Shortcuts</h2>
         <table>
@@ -969,7 +1089,7 @@
 
         <hr class="section-divider" />
 
-        <h1 id="special-features">12. Special Features</h1>
+        <h1 id="special-features">13. Special Features</h1>
 
         <h2>Renumbering</h2>
         <p>Reorganize location numbers for professional presentation:</p>
@@ -1018,7 +1138,7 @@
 
         <hr class="section-divider" />
 
-        <h1 id="tips">13. Tips and Best Practices</h1>
+        <h1 id="tips">14. Tips and Best Practices</h1>
 
         <h2>Project Organization</h2>
         <ul>
@@ -1049,7 +1169,7 @@
 
         <hr class="section-divider" />
 
-        <h1 id="troubleshooting">14. Troubleshooting</h1>
+        <h1 id="troubleshooting">15. Troubleshooting</h1>
 
         <h2>Common Issues and Solutions</h2>
 
@@ -1121,7 +1241,7 @@
             <p style="margin-top: 30px; color: #666">
                 <strong>Mapping Slayer</strong><br />
                 Professional Sign Mapping Platform<br />
-                Version: September 2025
+                Updated: January 2025
             </p>
         </div>
     </body>
