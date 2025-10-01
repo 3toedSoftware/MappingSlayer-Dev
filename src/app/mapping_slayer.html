@@ -22,10 +22,10 @@
         <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <!-- LibLouis for proper Grade 2 Braille translation -->
-        <script src="/sign-template-maker/lib/liblouis/easy-api.js"></script>
-        <script src="/sign-template-maker/lib/liblouis/build-no-tables-utf16.js"></script>
+        <script src="../../sign-template-maker/lib/liblouis/easy-api.js"></script>
+        <script src="../../sign-template-maker/lib/liblouis/build-no-tables-utf16.js"></script>
         <!-- Fallback Grade 2 if LibLouis fails -->
-        <script src="/braille-grade2.js"></script>
+        <script src="../../braille-grade2.js"></script>
     </head>
     <body>
         <div id="app-container"></div>
@@ -114,7 +114,7 @@
 
                     // Load Braille font
                     try {
-                        const response = await fetch('/BRAILLE.TTF');
+                        const response = await fetch('../../BRAILLE.TTF');
                         const blob = await response.blob();
                         const reader = new FileReader();
 
@@ -197,7 +197,7 @@
                                 // Load all table files
                                 for (const tableName of tablesToLoad) {
                                     const response = await fetch(
-                                        `/sign-template-maker/lib/liblouis/tables/${tableName}`
+                                        `../../sign-template-maker/lib/liblouis/tables/${tableName}`
                                     );
                                     if (response.ok) {
                                         tableContents[tableName] = await response.text();
