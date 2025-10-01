@@ -366,14 +366,12 @@ function updateFilterCheckboxesImmediate() {
             codeInputEl.addEventListener('blur', () => resizeInput(codeInputEl));
 
             item.addEventListener('click', e => {
-                if (
-                    e.target.closest(
-                        'input, .pcr-app, .ms-color-picker-wrapper, .ms-delete-marker-type-btn, .ms-design-reference-square'
-                    )
-                ) {
+                // Only prevent selection when clicking the delete button
+                if (e.target.closest('.ms-delete-marker-type-btn')) {
                     return;
                 }
-                e.preventDefault();
+                // Don't prevent default for inputs and interactive elements - let them work normally
+                // But still select the marker type
                 appState.activeMarkerType = markerTypeCode;
                 updateFilterCheckboxes();
                 updateMarkerTypeSelect(); // Update automap display
@@ -381,11 +379,8 @@ function updateFilterCheckboxesImmediate() {
 
             // Double-click to select all dots of this marker type on current page
             item.addEventListener('dblclick', e => {
-                if (
-                    e.target.closest(
-                        'input, .pcr-app, .ms-color-picker-wrapper, .ms-delete-marker-type-btn, .ms-design-reference-square'
-                    )
-                ) {
+                // Only prevent selection when clicking the delete button
+                if (e.target.closest('.ms-delete-marker-type-btn')) {
                     return;
                 }
                 e.preventDefault();
@@ -395,11 +390,8 @@ function updateFilterCheckboxesImmediate() {
 
             // Right-click context menu for marker types
             item.addEventListener('contextmenu', e => {
-                if (
-                    e.target.closest(
-                        'input, .pcr-app, .ms-color-picker-wrapper, .ms-delete-marker-type-btn, .ms-design-reference-square'
-                    )
-                ) {
+                // Only prevent context menu when clicking the delete button
+                if (e.target.closest('.ms-delete-marker-type-btn')) {
                     return;
                 }
                 e.preventDefault();
