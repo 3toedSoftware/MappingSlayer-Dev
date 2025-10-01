@@ -672,7 +672,7 @@ class MappingSlayerApp extends SlayerAppBase {
                     </div>
                     <div class="ms-modal-buttons">
                         <button class="ms-btn ms-btn-secondary" id="cancel-thumbnails-btn">CANCEL</button>
-                        <button class="ms-btn ms-btn-primary" id="generate-thumbnails-btn">GENERATE PDF</button>
+                        <button class="ms-btn ms-btn-primary" id="generate-thumbnails-btn">GENERATE THUMBNAILS</button>
                     </div>
                 </div>
             </div>
