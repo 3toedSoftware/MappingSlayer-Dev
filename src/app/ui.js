@@ -402,8 +402,22 @@ function updateFilterCheckboxesImmediate() {
             item.querySelector('input[type="checkbox"]').addEventListener('change', applyFilters);
             codeInputEl.addEventListener('change', e => handleMarkerTypeCodeChange(e.target));
             codeInputEl.addEventListener('blur', e => handleMarkerTypeCodeChange(e.target));
+            codeInputEl.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleMarkerTypeCodeChange(e.target);
+                    e.target.blur();
+                }
+            });
             nameInputEl.addEventListener('change', e => handleMarkerTypeNameChange(e.target));
             nameInputEl.addEventListener('blur', e => handleMarkerTypeNameChange(e.target));
+            nameInputEl.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleMarkerTypeNameChange(e.target);
+                    e.target.blur();
+                }
+            });
             item.querySelector('.ms-delete-marker-type-btn').addEventListener('click', () =>
                 deleteMarkerType(markerTypeCode)
             );
