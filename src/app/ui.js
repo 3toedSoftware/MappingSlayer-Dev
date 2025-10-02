@@ -3987,6 +3987,15 @@ function closeEditModal() {
     if (modal) {
         modal.style.display = 'none';
         appState.editingDot = null;
+
+        // Clear focus from any input fields to ensure keyboard shortcuts work
+        if (
+            document.activeElement &&
+            (document.activeElement.tagName === 'INPUT' ||
+                document.activeElement.tagName === 'TEXTAREA')
+        ) {
+            document.activeElement.blur();
+        }
     }
 
     // Also close the gallery modal and sign preview modal

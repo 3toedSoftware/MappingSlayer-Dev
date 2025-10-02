@@ -1746,6 +1746,10 @@ class MappingSlayerApp extends SlayerAppBase {
                 await renderPDFPage(this.appState.currentPdfPage || 1);
                 console.log('🔍 PDF page rendered');
 
+                // Update page info display
+                const { updatePageInfo } = await import('./ui.js');
+                updatePageInfo();
+
                 // Hide upload area
                 const uploadArea = document.getElementById('upload-area');
                 if (uploadArea) {
