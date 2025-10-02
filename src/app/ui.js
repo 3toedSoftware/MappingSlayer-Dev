@@ -4843,14 +4843,20 @@ async function pasteDots() {
     if (!isCollision(pasteX, pasteY)) {
         clearSelection();
 
-        // Generate next location number
+        // Generate next location number by finding highest existing number
         const pageData = getCurrentPageData();
-        const nextLocationNumber = String(pageData.nextLocationNumber).padStart(4, '0');
-        pageData.nextLocationNumber++;
+        let highestLocationNum = 0;
+        for (const dot of pageData.dots.values()) {
+            const num = parseInt(dot.locationNumber, 10);
+            if (!isNaN(num) && num > highestLocationNum) {
+                highestLocationNum = num;
+            }
+        }
+        const nextLocationNumber = String(highestLocationNum + 1).padStart(4, '0');
 
         // Create new dot with ALL properties including flags
         const newDot = {
-            internalId: appState.nextInternalId++,
+            internalId: String(appState.nextInternalId++).padStart(7, '0'),
             locationNumber: nextLocationNumber,
             x: pasteX,
             y: pasteY,
@@ -4890,14 +4896,20 @@ async function pasteDotAtPosition(x, y) {
     if (!isCollision(x, y)) {
         clearSelection();
 
-        // Generate next location number
+        // Generate next location number by finding highest existing number
         const pageData = getCurrentPageData();
-        const nextLocationNumber = String(pageData.nextLocationNumber).padStart(4, '0');
-        pageData.nextLocationNumber++;
+        let highestLocationNum = 0;
+        for (const dot of pageData.dots.values()) {
+            const num = parseInt(dot.locationNumber, 10);
+            if (!isNaN(num) && num > highestLocationNum) {
+                highestLocationNum = num;
+            }
+        }
+        const nextLocationNumber = String(highestLocationNum + 1).padStart(4, '0');
 
         // Create new dot object with all copied properties INCLUDING flags
         const newDot = {
-            internalId: appState.nextInternalId++,
+            internalId: String(appState.nextInternalId++).padStart(7, '0'),
             locationNumber: nextLocationNumber,
             x: x,
             y: y,
@@ -5092,17 +5104,17 @@ function setupKeyboardShortcuts() {
             }
         }
         // Copy (Ctrl+C)
-        else if (e.ctrlKey && e.key === 'c') {
+        else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
             e.preventDefault();
             copySelectedDots();
         }
         // Paste (Ctrl+V)
-        else if (e.ctrlKey && e.key === 'v') {
+        else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
             e.preventDefault();
             await pasteDots();
         }
         // Cut (Ctrl+X)
-        else if (e.ctrlKey && e.key === 'x') {
+        else if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
             e.preventDefault();
             copySelectedDots();
             await deleteSelectedDots();
