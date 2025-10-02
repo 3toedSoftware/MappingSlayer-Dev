@@ -672,7 +672,8 @@ class MappingSlayerApp extends SlayerAppBase {
                     </div>
                     <div class="ms-modal-buttons">
                         <button class="ms-btn ms-btn-secondary" id="cancel-thumbnails-btn">CANCEL</button>
-                        <button class="ms-btn ms-btn-primary" id="generate-thumbnails-btn">GENERATE THUMBNAILS</button>
+                        <button class="ms-btn ms-btn-primary" id="export-individual-svgs-btn">EXPORT INDIVIDUAL SVGs</button>
+                        <button class="ms-btn ms-btn-primary" id="generate-svg-grid-btn">GENERATE SVG GRID</button>
                     </div>
                 </div>
             </div>
