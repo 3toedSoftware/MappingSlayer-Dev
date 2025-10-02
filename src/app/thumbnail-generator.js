@@ -196,9 +196,9 @@ class ThumbnailGenerator {
                 originalDisplay.id = 'template-display-original';
             }
 
-            // Call displayTemplate to render the sign
+            // Call displayTemplate to render the sign (production mode = no outlines)
             if (window.displayTemplate) {
-                window.displayTemplate(templateData);
+                window.displayTemplate(templateData, true);
             }
 
             // Get the rendered SVG

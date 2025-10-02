@@ -6973,7 +6973,7 @@ function translateToBrailleForTemplate(text) {
     return 'BROKEN BRAILLE - NO LibLouis';
 }
 
-function displayTemplate(templateData) {
+function displayTemplate(templateData, productionMode = false) {
     const display = document.getElementById('template-display');
     const info = document.getElementById('template-info');
 
@@ -7025,19 +7025,25 @@ function displayTemplate(templateData) {
              style="max-width: ${templateData.signWidth * scale}px; max-height: ${templateData.signHeight * scale}px;">
             <!-- Sign background -->
             <rect width="${templateData.signWidth}" height="${templateData.signHeight}"
-                  fill="${templateData.colors?.signBackground || '#ffffff'}"
-                  stroke="#666" stroke-width="2"/>
+                  fill="${templateData.colors?.signBackground || '#ffffff'}"${
+                      productionMode
+                          ? ''
+                          : `
+                  stroke="#666" stroke-width="2"`
+                  }/>
     `;
 
     // Add message boxes
     if (templateData.messages) {
         Object.entries(templateData.messages).forEach(([id, msg]) => {
-            // Draw message box outline
-            svgContent += `
-                <rect x="${msg.boxX}" y="${msg.boxY}"
-                      width="${msg.boxWidth}" height="${msg.boxHeight}"
-                      fill="none" stroke="#999" stroke-width="1" stroke-dasharray="5,5" opacity="0.5"/>
-            `;
+            // Draw message box outline (skip in production mode)
+            if (!productionMode) {
+                svgContent += `
+                    <rect x="${msg.boxX}" y="${msg.boxY}"
+                          width="${msg.boxWidth}" height="${msg.boxHeight}"
+                          fill="none" stroke="#999" stroke-width="1" stroke-dasharray="5,5" opacity="0.5"/>
+                `;
+            }
 
             // Add message text
             const messageText = msg.text || `MSG${id}`;
