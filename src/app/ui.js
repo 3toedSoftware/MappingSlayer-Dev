@@ -5113,17 +5113,17 @@ function setupKeyboardShortcuts() {
             }
         }
         // Copy (Ctrl+C)
-        else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+        else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
             e.preventDefault();
             copySelectedDots();
         }
         // Paste (Ctrl+V)
-        else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+        else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
             e.preventDefault();
             await pasteDots();
         }
         // Cut (Ctrl+X)
-        else if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
+        else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'x') {
             e.preventDefault();
             copySelectedDots();
             await deleteSelectedDots();
