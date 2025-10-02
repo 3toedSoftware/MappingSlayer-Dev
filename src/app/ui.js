@@ -5094,7 +5094,7 @@ function setupKeyboardShortcuts() {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
         // Undo (Ctrl+Z or Cmd+Z)
-        if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
             e.preventDefault();
             const action = await CommandUndoManager.undo();
             if (action) {
@@ -5103,8 +5103,8 @@ function setupKeyboardShortcuts() {
         }
         // Redo (Ctrl+Y or Cmd+Y or Ctrl+Shift+Z or Cmd+Shift+Z)
         else if (
-            ((e.ctrlKey || e.metaKey) && e.key === 'y') ||
-            ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z')
+            ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') ||
+            ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'z')
         ) {
             e.preventDefault();
             const action = await CommandUndoManager.redo();
