@@ -1050,6 +1050,9 @@ function addSingleDotToLocationList(dot) {
                     const newWidth = Math.max((e.target.value || 'MESSAGE 1').length * 6, 60);
                     e.target.style.width = newWidth + 'px';
                     renderDotsForCurrentPage();
+                } else if (field === 'message2') {
+                    // Update the map view for message2 changes
+                    renderDotsForCurrentPage();
                 }
             }
         });
@@ -1334,6 +1337,9 @@ function renderFlatLocationList(allDots, container) {
                         const newWidth = Math.max((e.target.value || 'MESSAGE 1').length * 6, 42);
                         e.target.style.width = newWidth + 'px';
                         renderDotsForCurrentPage();
+                    } else if (field === 'message2') {
+                        // Update the map view for message2 changes
+                        renderDotsForCurrentPage();
                     }
                 }
             });
@@ -1580,6 +1586,17 @@ function renderGroupedLocationList(allDots, container) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         e.target.blur();
+                    }
+                });
+
+                input.addEventListener('input', e => {
+                    const pageData = getCurrentPageData();
+                    const dot = pageData.dots.get(e.target.dataset.dotId);
+                    if (dot) {
+                        dot[field] = e.target.value;
+                        setDirtyState();
+                        // Update the map view for message changes
+                        renderDotsForCurrentPage();
                     }
                 });
 
