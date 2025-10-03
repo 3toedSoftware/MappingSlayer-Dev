@@ -144,22 +144,6 @@ async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible, flagImageMap)
         pdf.setDrawColor(markerTypeInfo.color);
         pdf.circle(pdfX, pdfY, radius, 'F');
 
-        // Draw installed indicator (green diagonal line)
-        if (dot.installed) {
-            pdf.setDrawColor(0, 255, 0); // Green color
-            pdf.setLineWidth((3 * effectiveMultiplier) / 10); // Scale line width with dot size
-
-            // Calculate diagonal line endpoints (141% of radius, rotated -45 degrees)
-            const lineLength = radius * 1.41;
-            const angle = -Math.PI / 4; // -45 degrees in radians
-            const startX = pdfX - (lineLength / 2) * Math.cos(angle);
-            const startY = pdfY - (lineLength / 2) * Math.sin(angle);
-            const endX = pdfX + (lineLength / 2) * Math.cos(angle);
-            const endY = pdfY + (lineLength / 2) * Math.sin(angle);
-
-            pdf.line(startX, startY, endX, endY);
-        }
-
         // Draw flag indicators (matching canvas rendering)
         const flagSize = 10 * effectiveMultiplier; // Size of flag icons (matches canvas)
         // Flag center offset: container edge (10em) + external offset (4em) - half flag size (5em) = 9em
@@ -244,6 +228,23 @@ async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible, flagImageMap)
         pdf.setFontSize(fontSize);
         pdf.setTextColor(markerTypeInfo.textColor);
         pdf.text(dot.locationNumber, pdfX, pdfY, { align: 'center', baseline: 'middle' });
+
+        // Draw installed indicator (green diagonal line) - drawn last to be on top
+        if (dot.installed) {
+            pdf.setDrawColor(0, 255, 0); // Green color
+            pdf.setLineWidth(3); // Fixed 3px height like canvas
+
+            // Calculate diagonal line endpoints (141% of dot container width)
+            const dotWidth = 20 * effectiveMultiplier;
+            const lineLength = dotWidth * 1.41;
+            const angle = -Math.PI / 4; // -45 degrees in radians
+            const startX = pdfX - (lineLength / 2) * Math.cos(angle);
+            const startY = pdfY - (lineLength / 2) * Math.sin(angle);
+            const endX = pdfX + (lineLength / 2) * Math.cos(angle);
+            const endY = pdfY + (lineLength / 2) * Math.sin(angle);
+
+            pdf.line(startX, startY, endX, endY);
+        }
 
         if (messagesVisible && dot.message) {
             pdf.setFont('helvetica', 'bold');
