@@ -36,18 +36,23 @@ function getCurrentDateString() {
     return `${year}${month}${day}${hours}${minutes}${seconds}`;
 }
 
-function drawLegendWithJsPDF(pdf, dotsOnPage) {
+async function drawLegendWithJsPDF(pdf, dotsOnPage, flagImageMap) {
     if (dotsOnPage.length === 0) return;
     const usedMarkerTypeCodes = new Set(dotsOnPage.map(d => d.markerType));
     const sortedMarkerTypeCodes = Array.from(usedMarkerTypeCodes).sort((a, b) =>
         a.localeCompare(b, undefined, { numeric: true })
     );
+
+    // Calculate flag section height
+    const flagConfig = appState.globalFlagConfiguration;
+    const flagSectionHeight = flagConfig ? 100 : 0;
+
     const padding = 40,
         itemHeight = 32,
         dotRadius = 10,
         legendWidth = 440,
         headerHeight = 50;
-    const legendHeight = headerHeight + sortedMarkerTypeCodes.length * itemHeight + padding;
+    const legendHeight = headerHeight + sortedMarkerTypeCodes.length * itemHeight + padding + flagSectionHeight;
     const x = padding,
         y = padding;
     pdf.setFillColor(255, 255, 255);
@@ -73,21 +78,50 @@ function drawLegendWithJsPDF(pdf, dotsOnPage) {
         pdf.text(displayText, x + padding + 30, currentY, { baseline: 'middle' });
         currentY += itemHeight;
     });
-}
 
-async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible) {
-    const effectiveMultiplier = appState.dotSize * 2;
+    // Add flag legend section
+    if (flagConfig) {
+        currentY += 20; // Add spacing
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(20);
+        pdf.text('FLAGS:', x + padding, currentY);
+        currentY += 25;
 
-    // Pre-cache all flag icons for this page
-    const uniqueFlags = collectUniqueFlags(dotsOnPage);
-    const flagImageMap = new Map();
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(18);
 
-    for (const [key, flagData] of uniqueFlags) {
-        const base64 = await getFlagIconBase64(flagData.flag, flagData.position);
-        if (base64) {
-            flagImageMap.set(key, base64);
+        const flagSize = 20; // Size of flag icon in legend
+        const flagPositions = Object.keys(FLAG_POSITIONS);
+
+        for (let index = 0; index < flagPositions.length; index++) {
+            const key = flagPositions[index];
+            const position = FLAG_POSITIONS[key];
+            const config = flagConfig[position];
+
+            if (config && config.name) {
+                const xPos = x + padding + (index % 2) * 200;
+                const yPos = currentY + Math.floor(index / 2) * 25;
+
+                // Get the flag image from the map
+                const cacheKey = `${config.symbol || 'custom'}_${config.customIcon || 'default'}_${position}`;
+                const base64 = flagImageMap.get(cacheKey);
+
+                if (base64) {
+                    // Draw flag icon
+                    pdf.addImage(base64, 'PNG', xPos, yPos - flagSize/2, flagSize, flagSize);
+                    // Draw equal sign and name
+                    pdf.text(` = ${config.name}`, xPos + flagSize + 5, yPos, { baseline: 'middle' });
+                } else {
+                    // Fallback to text only if no image
+                    pdf.text(config.name, xPos, yPos, { baseline: 'middle' });
+                }
+            }
         }
     }
+}
+
+async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible, flagImageMap) {
+    const effectiveMultiplier = appState.dotSize * 2;
 
     // Now draw all dots with cached flag images
     dotsOnPage.forEach(dot => {
@@ -109,13 +143,14 @@ async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible) {
 
         // Draw flag indicators
         const flagOffset = radius + 6 * effectiveMultiplier;
+        const flagConfig = appState.globalFlagConfiguration;
 
-        if (dot.flags) {
+        if (dot.flags && flagConfig) {
             const flagSize = 12 * effectiveMultiplier; // Size of flag icons
 
             // Top-left flag
-            if (dot.flags[FLAG_POSITIONS.TOP_LEFT]) {
-                const flag = dot.flags[FLAG_POSITIONS.TOP_LEFT];
+            if (dot.flags[FLAG_POSITIONS.TOP_LEFT] && flagConfig[FLAG_POSITIONS.TOP_LEFT]) {
+                const flag = flagConfig[FLAG_POSITIONS.TOP_LEFT];
                 const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_topLeft`;
                 const base64 = flagImageMap.get(key);
 
@@ -132,8 +167,8 @@ async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible) {
             }
 
             // Top-right flag
-            if (dot.flags[FLAG_POSITIONS.TOP_RIGHT]) {
-                const flag = dot.flags[FLAG_POSITIONS.TOP_RIGHT];
+            if (dot.flags[FLAG_POSITIONS.TOP_RIGHT] && flagConfig[FLAG_POSITIONS.TOP_RIGHT]) {
+                const flag = flagConfig[FLAG_POSITIONS.TOP_RIGHT];
                 const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_topRight`;
                 const base64 = flagImageMap.get(key);
 
@@ -150,8 +185,8 @@ async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible) {
             }
 
             // Bottom-left flag
-            if (dot.flags[FLAG_POSITIONS.BOTTOM_LEFT]) {
-                const flag = dot.flags[FLAG_POSITIONS.BOTTOM_LEFT];
+            if (dot.flags[FLAG_POSITIONS.BOTTOM_LEFT] && flagConfig[FLAG_POSITIONS.BOTTOM_LEFT]) {
+                const flag = flagConfig[FLAG_POSITIONS.BOTTOM_LEFT];
                 const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_bottomLeft`;
                 const base64 = flagImageMap.get(key);
 
@@ -168,8 +203,8 @@ async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible) {
             }
 
             // Bottom-right flag
-            if (dot.flags[FLAG_POSITIONS.BOTTOM_RIGHT]) {
-                const flag = dot.flags[FLAG_POSITIONS.BOTTOM_RIGHT];
+            if (dot.flags[FLAG_POSITIONS.BOTTOM_RIGHT] && flagConfig[FLAG_POSITIONS.BOTTOM_RIGHT]) {
+                const flag = flagConfig[FLAG_POSITIONS.BOTTOM_RIGHT];
                 const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_bottomRight`;
                 const base64 = flagImageMap.get(key);
 
@@ -553,6 +588,25 @@ async function performPDFExport(exportType) {
             const chunkDetailPageNumbers = new Map();
             const chunkOriginalToNewPageMap = new Map();
 
+            // Pre-generate flag images for this chunk (only once)
+            const allChunkDots = [];
+            for (const pageNum of chunk) {
+                const dots = Array.from(getDotsForPage(pageNum).values()).filter(dot =>
+                    activeFilters.includes(dot.markerType)
+                );
+                allChunkDots.push(...dots);
+            }
+
+            const uniqueFlags = collectUniqueFlags(allChunkDots, appState.globalFlagConfiguration);
+            const flagImageMap = new Map();
+
+            for (const [key, flagData] of uniqueFlags) {
+                const base64 = await getFlagIconBase64(flagData.flag, flagData.position);
+                if (base64) {
+                    flagImageMap.set(key, base64);
+                }
+            }
+
             // Create map pages for this chunk
             for (const pageNum of chunk) {
                 const dotsToDraw = Array.from(getDotsForPage(pageNum).values()).filter(dot =>
@@ -584,9 +638,9 @@ async function performPDFExport(exportType) {
                 globalOriginalToNewPageMap.set(pageNum, totalPagesProcessed + newPageNumForMap);
 
                 chunkPdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
-                drawLegendWithJsPDF(chunkPdf, dotsToDraw);
+                await drawLegendWithJsPDF(chunkPdf, dotsToDraw, flagImageMap);
                 drawAnnotationLinesWithJsPDF(chunkPdf, pageNum);
-                await drawDotsWithJsPDF(chunkPdf, dotsToDraw, messagesVisible);
+                await drawDotsWithJsPDF(chunkPdf, dotsToDraw, messagesVisible, flagImageMap);
             }
 
             // Create detail pages for this chunk only if requested

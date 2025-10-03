@@ -41,6 +41,8 @@ The Sidekick AI feature in Mapping Slayer is an API/backend system without a hum
 
 **Important**: There is no user interface for Sidekick - it's designed as a backend system for AI assistants to interact with, not for direct human use.
 
+**When working with Mapping Slayer**: If you haven't already in this session, read `docs/SIDEKICK_AI_GUIDE.md` to familiarize yourself with the preferred direct evaluation method. DO NOT create separate script files - always use inline `node -p` with Playwright evaluation for Sidekick operations.
+
 ### Sidekick Workflow for Users
 
 **If user has NO existing work:**
@@ -383,7 +385,14 @@ This is critical because:
 ### Quick Setup for Collaborative Debugging
 
 When user wants collaborative debugging:
-1. Start dev server: `npm run dev`
+
+**CRITICAL - Always start fresh:**
+1. **Kill all node processes and restart server**:
+   ```bash
+   taskkill /F /IM node.exe 2>nul & timeout /t 2 /nobreak >nul & npm run dev
+   ```
+   - Wait for "Available on: http://127.0.0.1:8080" message
+   - This ensures no orphaned processes interfere
 2. Launch Chrome: `start chrome --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-debug-profile" "http://localhost:8080/src/app/mapping_slayer.html"`
 3. Connect: `node collaborative-browser.js`
 4. Both user and Claude can now interact with the same page!

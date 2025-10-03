@@ -81,8 +81,19 @@ export async function getFlagIconBase64(flag, position = '') {
 
     let base64Data = null;
 
-    // Handle custom uploaded icon
-    if (flag.customIcon) {
+    // Check if the symbol is actually a custom icon ID
+    if (flag.symbol && flag.symbol.startsWith('custom_')) {
+        // Look up the custom icon in the library
+        const { appState } = await import('./state.js');
+        const customIcon = appState.customIconLibrary?.find(icon => icon.id === flag.symbol);
+
+        if (customIcon && customIcon.data) {
+            base64Data = customIcon.data;
+        }
+    }
+
+    // Handle custom uploaded icon (old method, kept for compatibility)
+    if (!base64Data && flag.customIcon) {
         try {
             // If it's already base64
             if (flag.customIcon.startsWith('data:image')) {
@@ -132,6 +143,10 @@ export async function getFlagIconBase64(flag, position = '') {
 
     // If no custom icon, generate from symbol
     if (!base64Data && flag.symbol) {
+        // Import getSymbolInfo to get the actual Unicode character
+        const { getSymbolInfo } = await import('./flag-config.js');
+        const symbolInfo = getSymbolInfo(flag.symbol);
+
         // Position-based colors (matching current PDF export colors)
         let color = '#000000'; // Default black
         if (position === 'topLeft') color = '#FFD700'; // Gold
@@ -139,7 +154,10 @@ export async function getFlagIconBase64(flag, position = '') {
         if (position === 'bottomLeft') color = '#0088FF'; // Blue
         if (position === 'bottomRight') color = '#FF0000'; // Red
 
-        base64Data = await generateSymbolPNG(flag.symbol, color);
+        // Use the actual symbol character from symbolInfo
+        // symbolInfo.symbol is the actual Unicode character (e.g., ⭐)
+        // NOT the symbol name (e.g., "star")
+        base64Data = await generateSymbolPNG(symbolInfo.symbol, color);
     }
 
     // Cache the result
@@ -162,20 +180,21 @@ export function clearFlagIconCache() {
  * @param {Array} dots - Array of dot objects
  * @returns {Map} Map of unique flag keys to flag configs
  */
-export function collectUniqueFlags(dots) {
+export function collectUniqueFlags(dots, globalFlagConfig) {
     const uniqueFlags = new Map();
 
-    for (const dot of dots) {
-        if (dot.flags) {
-            const positions = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
-            for (const position of positions) {
-                if (dot.flags[position]) {
-                    const flag = dot.flags[position];
-                    const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_${position}`;
-                    if (!uniqueFlags.has(key)) {
-                        uniqueFlags.set(key, { flag, position });
-                    }
-                }
+    if (!globalFlagConfig) {
+        return uniqueFlags;
+    }
+
+    // Collect ALL configured flags (for legend) regardless of usage
+    const positions = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
+    for (const position of positions) {
+        if (globalFlagConfig[position]) {
+            const flag = globalFlagConfig[position];
+            const key = `${flag.symbol || 'custom'}_${flag.customIcon || 'default'}_${position}`;
+            if (!uniqueFlags.has(key)) {
+                uniqueFlags.set(key, { flag, position });
             }
         }
     }

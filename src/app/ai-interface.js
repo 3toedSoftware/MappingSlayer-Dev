@@ -272,6 +272,71 @@
                 }
             },
 
+            /**
+             * Select a marker type
+             * @param {string|number} markerTypeIdentifier - Marker type code (e.g., 'ID.1') or index
+             */
+            selectMarkerType: function (markerTypeIdentifier) {
+                try {
+                    // Get available marker types
+                    const markerTypes = window.appState.markerTypes;
+                    if (!markerTypes) {
+                        return { success: false, error: 'No marker types available' };
+                    }
+
+                    const typeKeys = Object.keys(markerTypes);
+                    let targetType = null;
+
+                    // If identifier is a number, use as index
+                    if (typeof markerTypeIdentifier === 'number' || !isNaN(markerTypeIdentifier)) {
+                        const index = parseInt(markerTypeIdentifier);
+                        if (index >= 0 && index < typeKeys.length) {
+                            targetType = typeKeys[index];
+                        }
+                    } else {
+                        // Check if the identifier exists as a marker type code
+                        if (markerTypes[markerTypeIdentifier]) {
+                            targetType = markerTypeIdentifier;
+                        }
+                    }
+
+                    if (!targetType) {
+                        return {
+                            success: false,
+                            error: `Marker type '${markerTypeIdentifier}' not found`,
+                            availableTypes: typeKeys
+                        };
+                    }
+
+                    // Store previous type
+                    const previousType = window.appState.currentMarkerType;
+
+                    // Update app state
+                    window.appState.currentMarkerType = targetType;
+
+                    // Update UI - click the corresponding marker type item
+                    const items = document.querySelectorAll('.ms-marker-type-item');
+                    const targetIndex = typeKeys.indexOf(targetType);
+
+                    if (items[targetIndex]) {
+                        items[targetIndex].click();
+                    }
+
+                    // Refresh UI
+                    this.refreshUI();
+
+                    return {
+                        success: true,
+                        message: `Marker type '${targetType}' selected`,
+                        previousType: previousType,
+                        currentType: targetType,
+                        markerInfo: markerTypes[targetType]
+                    };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            },
+
             // ===== Utility Functions =====
 
             /**
@@ -431,6 +496,7 @@
                         'updateMarkerTypes',
                         'runAutomap',
                         'selectDots',
+                        'selectMarkerType',
                         'navigateToPage',
                         'undo'
                     ],

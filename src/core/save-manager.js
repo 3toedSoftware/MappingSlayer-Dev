@@ -80,25 +80,60 @@ class SaveManager {
         }
 
         if (loadBtn) {
-            loadBtn.addEventListener('click', () => {
-                // Just use a simple file input like the upload area does
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.pdf,.slayer';
-                input.onchange = async e => {
-                    const file = e.target.files[0];
-                    if (file) {
+            loadBtn.addEventListener('click', async () => {
+                // Try to use File System Access API for file handle support
+                if ('showOpenFilePicker' in window) {
+                    try {
+                        const [fileHandle] = await window.showOpenFilePicker({
+                            types: [
+                                {
+                                    description: 'Slayer or PDF files',
+                                    accept: {
+                                        'application/pdf': ['.pdf'],
+                                        'application/json': ['.slayer']
+                                    }
+                                }
+                            ],
+                            multiple: false
+                        });
+
+                        const file = await fileHandle.getFile();
+
                         if (file.name.toLowerCase().endsWith('.slayer')) {
-                            await this.loadFileDirectly(file);
+                            // Load .slayer with file handle for SAVE support
+                            await this.loadFileWithHandle(file, fileHandle);
                         } else if (file.name.toLowerCase().endsWith('.pdf')) {
                             // For PDFs, use the mapping app's loadFile method
                             if (window.mappingApp && window.mappingApp.loadFile) {
                                 await window.mappingApp.loadFile(file);
                             }
                         }
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            console.error('Error loading file:', err);
+                        }
+                        // User cancelled or error occurred
                     }
-                };
-                input.click();
+                } else {
+                    // Fallback for browsers without File System Access API
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.pdf,.slayer';
+                    input.onchange = async e => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            if (file.name.toLowerCase().endsWith('.slayer')) {
+                                await this.loadFileDirectly(file);
+                            } else if (file.name.toLowerCase().endsWith('.pdf')) {
+                                // For PDFs, use the mapping app's loadFile method
+                                if (window.mappingApp && window.mappingApp.loadFile) {
+                                    await window.mappingApp.loadFile(file);
+                                }
+                            }
+                        }
+                    };
+                    input.click();
+                }
             });
             if (window.debugLog) {
                 window.debugLog('SAVE_MANAGER', '📊 [SaveManager] LOAD button listener attached');

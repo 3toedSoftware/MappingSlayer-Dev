@@ -52,6 +52,33 @@ In Suite mode, apps are loaded as modules through the app bridge system, and the
 
 This guide helps AI agents (Claude, ChatGPT, Gemini, etc.) interact with Mapping Slayer through the Sidekick JSON API.
 
+## Preferred Method: Direct Browser Evaluation (Claude Code)
+
+**IMPORTANT**: When using Claude Code with collaborative browser mode, DO NOT create script files. Instead, execute Sidekick commands directly using inline Playwright evaluation.
+
+### Example: Creating Marker Types
+
+```bash
+# ✅ CORRECT - Direct inline evaluation
+node -p "const p = require('playwright'); p.chromium.connectOverCDP('http://localhost:9222').then(async b => { const page = b.contexts()[0].pages().find(p => p.url().includes('localhost')); const r = await page.evaluate(() => { const mt = { 'I.1': { code: 'I.1', name: 'ADA Room Number Sign', color: '#2C3E50', textColor: '#ECF0F1' } }; if (window.sidekick) { const s = window.sidekick.getStateJSON(); Object.assign(s.appState.markerTypes, mt); return window.sidekick.applyStateJSON(s); } }); await b.close(); return JSON.stringify(r, null, 2); });"
+
+# ❌ WRONG - Don't create separate script files
+# node create-marker-types.js
+```
+
+### Why Direct Evaluation?
+
+- **Faster**: No file creation overhead
+- **Cleaner**: No temporary files to manage
+- **Simpler**: Single command execution
+- **Collaborative**: Works seamlessly with connectOverCDP
+
+### Pattern for Any Sidekick Operation
+
+```bash
+node -p "const p = require('playwright'); p.chromium.connectOverCDP('http://localhost:9222').then(async b => { const page = b.contexts()[0].pages().find(p => p.url().includes('localhost')); const result = await page.evaluate(() => { /* Your Sidekick code here */ return window.sidekick.getStateJSON(); }); await b.close(); return JSON.stringify(result, null, 2); });"
+```
+
 ## 1. First Steps - Check Connection
 
 Always verify Sidekick is available before attempting operations:
@@ -171,6 +198,25 @@ state.appState.markerTypes = {
 // Apply the updated state
 const result = window.sidekick.applyStateJSON(state);
 console.log('Marker types created:', result);
+
+// IMPORTANT: After updating marker types, refresh the UI color pickers
+// The state updates correctly (dots will use new colors), but the visual
+// marker type list color pickers need to be manually updated
+document.querySelectorAll('.ms-color-picker-wrapper').forEach(wrapper => {
+    const markerCode = wrapper.dataset.markerTypeCode;
+    const colorType = wrapper.dataset.colorType;
+    const markerType = window.appState.markerTypes[markerCode];
+    if (markerType) {
+        const newColor = colorType === 'dot' ? markerType.color : markerType.textColor;
+        wrapper.style.backgroundColor = newColor;
+    }
+});
+```
+
+**Note**: After updating marker types via Sidekick, the state changes immediately (placed dots will have the correct colors), but the marker type color picker UI elements don't automatically update. Use the browser-command.js script to refresh them without losing your work:
+
+```bash
+node browser-command.js "eval:(() => { let updated = 0; document.querySelectorAll('.ms-color-picker-wrapper').forEach(wrapper => { const markerCode = wrapper.dataset.markerTypeCode; const colorType = wrapper.dataset.colorType; const markerType = window.appState.markerTypes[markerCode]; if (markerType) { const newColor = colorType === 'dot' ? markerType.color : markerType.textColor; wrapper.style.backgroundColor = newColor; updated++; } }); return 'Updated ' + updated + ' color pickers'; })()"
 ```
 
 ### Alternative: Update Only Marker Types
