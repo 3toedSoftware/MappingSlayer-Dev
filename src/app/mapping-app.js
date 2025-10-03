@@ -150,7 +150,6 @@ class MappingSlayerApp extends SlayerAppBase {
                                 <button class="ms-btn ms-replace-btn" id="replace-btn">REPLACE</button>
                             </div>
                             <div class="ms-replace-status" id="replace-status"></div>
-                            <span id="find-count" style="display: none;"></span>
                         </div>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="help-btn">HELP</button>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="toggle-locations-btn">HIDE LOC</button>

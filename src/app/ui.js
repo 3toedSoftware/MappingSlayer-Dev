@@ -4486,14 +4486,11 @@ function renumberAllPagesByMarkerType() {
 // Find and Replace Functions
 function handleFind(e) {
     const query = e.target.value.toLowerCase().trim();
-    const findCountEl = document.getElementById('find-count');
     const findInput = e.target;
 
     clearSearchHighlights();
 
     if (!query) {
-        findCountEl.textContent = '';
-        findCountEl.style.display = 'none';
         findInput.classList.remove('ms-has-results', 'ms-no-results');
         appState.searchResults = [];
         appState.currentSearchIndex = -1;
@@ -4515,8 +4512,6 @@ function handleFind(e) {
         updateFindUI();
     } else {
         appState.currentSearchIndex = -1;
-        findCountEl.textContent = '0 found';
-        findCountEl.style.display = 'inline';
         findInput.classList.add('ms-no-results');
         findInput.classList.remove('ms-has-results');
     }
@@ -4534,7 +4529,6 @@ function handleFindEnter(e) {
 
 function updateFindUI() {
     clearSearchHighlights();
-    const findCountEl = document.getElementById('find-count');
 
     if (appState.searchResults.length > 0) {
         const dot = appState.searchResults[appState.currentSearchIndex];
@@ -4560,12 +4554,6 @@ function updateFindUI() {
                 listItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }, 100);
-
-        findCountEl.textContent = `${appState.currentSearchIndex + 1} of ${appState.searchResults.length} found`;
-        findCountEl.style.display = 'inline';
-    } else {
-        findCountEl.textContent = '0 found';
-        findCountEl.style.display = 'inline';
     }
 }
 
