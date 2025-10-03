@@ -52,7 +52,8 @@ async function drawLegendWithJsPDF(pdf, dotsOnPage, flagImageMap) {
         dotRadius = 10,
         legendWidth = 440,
         headerHeight = 50;
-    const legendHeight = headerHeight + sortedMarkerTypeCodes.length * itemHeight + padding + flagSectionHeight;
+    const legendHeight =
+        headerHeight + sortedMarkerTypeCodes.length * itemHeight + padding + flagSectionHeight;
     const x = padding,
         y = padding;
     pdf.setFillColor(255, 255, 255);
@@ -108,9 +109,11 @@ async function drawLegendWithJsPDF(pdf, dotsOnPage, flagImageMap) {
 
                 if (base64) {
                     // Draw flag icon
-                    pdf.addImage(base64, 'PNG', xPos, yPos - flagSize/2, flagSize, flagSize);
+                    pdf.addImage(base64, 'PNG', xPos, yPos - flagSize / 2, flagSize, flagSize);
                     // Draw equal sign and name
-                    pdf.text(` = ${config.name}`, xPos + flagSize + 5, yPos, { baseline: 'middle' });
+                    pdf.text(` = ${config.name}`, xPos + flagSize + 5, yPos, {
+                        baseline: 'middle'
+                    });
                 } else {
                     // Fallback to text only if no image
                     pdf.text(config.name, xPos, yPos, { baseline: 'middle' });
@@ -141,13 +144,29 @@ async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible, flagImageMap)
         pdf.setDrawColor(markerTypeInfo.color);
         pdf.circle(pdfX, pdfY, radius, 'F');
 
+        // Draw installed indicator (green diagonal line)
+        if (dot.installed) {
+            pdf.setDrawColor(0, 255, 0); // Green color
+            pdf.setLineWidth((3 * effectiveMultiplier) / 10); // Scale line width with dot size
+
+            // Calculate diagonal line endpoints (141% of radius, rotated -45 degrees)
+            const lineLength = radius * 1.41;
+            const angle = -Math.PI / 4; // -45 degrees in radians
+            const startX = pdfX - (lineLength / 2) * Math.cos(angle);
+            const startY = pdfY - (lineLength / 2) * Math.sin(angle);
+            const endX = pdfX + (lineLength / 2) * Math.cos(angle);
+            const endY = pdfY + (lineLength / 2) * Math.sin(angle);
+
+            pdf.line(startX, startY, endX, endY);
+        }
+
         // Draw flag indicators (matching canvas rendering)
         const flagSize = 10 * effectiveMultiplier; // Size of flag icons (matches canvas)
-        const flagOffset = radius - 4 * effectiveMultiplier; // Offset from edge (matches canvas)
+        // Flag center offset: container edge (10em) + external offset (4em) - half flag size (5em) = 9em
+        const flagOffset = 9 * effectiveMultiplier; // Distance from dot center to flag center
         const flagConfig = appState.globalFlagConfiguration;
 
         if (dot.flags && flagConfig) {
-
             // Top-left flag
             if (dot.flags[FLAG_POSITIONS.TOP_LEFT] && flagConfig[FLAG_POSITIONS.TOP_LEFT]) {
                 const flag = flagConfig[FLAG_POSITIONS.TOP_LEFT];
