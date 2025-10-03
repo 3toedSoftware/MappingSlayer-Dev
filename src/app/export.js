@@ -141,12 +141,12 @@ async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible, flagImageMap)
         pdf.setDrawColor(markerTypeInfo.color);
         pdf.circle(pdfX, pdfY, radius, 'F');
 
-        // Draw flag indicators
-        const flagOffset = radius + 6 * effectiveMultiplier;
+        // Draw flag indicators (matching canvas rendering)
+        const flagSize = 10 * effectiveMultiplier; // Size of flag icons (matches canvas)
+        const flagOffset = radius - 4 * effectiveMultiplier; // Offset from edge (matches canvas)
         const flagConfig = appState.globalFlagConfiguration;
 
         if (dot.flags && flagConfig) {
-            const flagSize = 12 * effectiveMultiplier; // Size of flag icons
 
             // Top-left flag
             if (dot.flags[FLAG_POSITIONS.TOP_LEFT] && flagConfig[FLAG_POSITIONS.TOP_LEFT]) {

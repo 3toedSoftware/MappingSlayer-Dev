@@ -21,9 +21,7 @@ export async function generateSymbolPNG(symbol, color = '#000000') {
         canvas.height = size;
         const ctx = canvas.getContext('2d');
 
-        // White background for better visibility in PDFs
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, size, size);
+        // Transparent background (no fill) for proper alpha blending in PDFs
 
         // Set up text rendering for emoji/symbols
         // Use system fonts that support emoji
@@ -118,9 +116,7 @@ export async function getFlagIconBase64(flag, position = '') {
                 canvas.height = targetSize;
                 const ctx = canvas.getContext('2d');
 
-                // White background
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(0, 0, targetSize, targetSize);
+                // Transparent background (no fill) for proper alpha blending
 
                 // Draw image centered and scaled
                 const scale = Math.min(targetSize / img.width, targetSize / img.height) * 0.8;
