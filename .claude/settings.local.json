@@ -113,7 +113,8 @@
       "Bash(tesseract:*)",
       "Bash(tasklist)",
       "Bash(git restore:*)",
-      "Bash(git submodule:*)"
+      "Bash(git submodule:*)",
+      "Bash(xargs cat:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

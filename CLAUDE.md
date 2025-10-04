@@ -7,7 +7,7 @@ When starting a new Claude Code session, ask the user:
 
 If they say yes, run:
 ```bash
-node show-toolbelt.js
+node dev-tools/show-toolbelt.js
 ```
 
 This displays the complete toolbelt including:
@@ -394,12 +394,12 @@ When user wants collaborative debugging:
    - Wait for "Available on: http://127.0.0.1:8080" message
    - This ensures no orphaned processes interfere
 2. Launch Chrome: `start chrome --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-debug-profile" "http://localhost:8080/src/app/mapping_slayer.html"`
-3. Connect: `node collaborative-browser.js`
+3. Connect: `node dev-tools/collaborative-browser.js`
 4. Both user and Claude can now interact with the same page!
 
 **CRITICAL**:
 - ❌ DO NOT use `mcp__playwright__browser_navigate` or any Playwright MCP tools - these create a NEW browser that blocks user interaction
-- ✅ DO use `node collaborative-browser.js` to connect to the EXISTING Chrome instance
+- ✅ DO use `node dev-tools/collaborative-browser.js` to connect to the EXISTING Chrome instance
 - The user should only see ONE Chrome window - the one opened in step 2
 - If a second browser window opens, something went wrong - you're using Playwright MCP instead of connectOverCDP
 

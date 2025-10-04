@@ -216,7 +216,7 @@ document.querySelectorAll('.ms-color-picker-wrapper').forEach(wrapper => {
 **Note**: After updating marker types via Sidekick, the state changes immediately (placed dots will have the correct colors), but the marker type color picker UI elements don't automatically update. Use the browser-command.js script to refresh them without losing your work:
 
 ```bash
-node browser-command.js "eval:(() => { let updated = 0; document.querySelectorAll('.ms-color-picker-wrapper').forEach(wrapper => { const markerCode = wrapper.dataset.markerTypeCode; const colorType = wrapper.dataset.colorType; const markerType = window.appState.markerTypes[markerCode]; if (markerType) { const newColor = colorType === 'dot' ? markerType.color : markerType.textColor; wrapper.style.backgroundColor = newColor; updated++; } }); return 'Updated ' + updated + ' color pickers'; })()"
+node dev-tools/browser-command.js "eval:(() => { let updated = 0; document.querySelectorAll('.ms-color-picker-wrapper').forEach(wrapper => { const markerCode = wrapper.dataset.markerTypeCode; const colorType = wrapper.dataset.colorType; const markerType = window.appState.markerTypes[markerCode]; if (markerType) { const newColor = colorType === 'dot' ? markerType.color : markerType.textColor; wrapper.style.backgroundColor = newColor; updated++; } }); return 'Updated ' + updated + ' color pickers'; })()"
 ```
 
 ### Alternative: Update Only Marker Types
