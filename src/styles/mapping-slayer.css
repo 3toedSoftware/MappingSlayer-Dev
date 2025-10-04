@@ -3961,6 +3961,35 @@ body {
     font-size: 11px;
 }
 
+.ms-template-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.ms-template-create-btn {
+    padding: 12px 32px;
+    background: #f07727;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+}
+
+.ms-template-create-btn:hover {
+    background: #ff8838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(240, 119, 39, 0.4);
+}
+
+.ms-template-create-btn:active {
+    transform: translateY(0);
+}
+
 /* Sign Preview Modal Styles - Matches Gallery Modal Styling */
 .ms-sign-preview-modal {
     position: absolute;

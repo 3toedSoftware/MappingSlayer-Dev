@@ -380,6 +380,9 @@ class MappingSlayerApp extends SlayerAppBase {
                             <div class="ms-template-filename"></div>
                             <div class="ms-template-details"></div>
                         </div>
+                        <div class="ms-template-actions">
+                            <button class="ms-template-create-btn" id="template-create-btn">CREATE</button>
+                        </div>
                     </div>
                     <!-- Hidden file input for template selection -->
                     <input type="file" id="template-file-input" accept=".json" style="display: none;">

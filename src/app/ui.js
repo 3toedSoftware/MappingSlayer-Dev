@@ -7329,6 +7329,14 @@ function setupTemplateModalListeners() {
         closeBtn.addEventListener('click', closeTemplateModal);
     }
 
+    const createBtn = document.getElementById('template-create-btn');
+    if (createBtn && !createBtn.hasListener) {
+        createBtn.hasListener = true;
+        createBtn.addEventListener('click', () => {
+            window.open('/sign-template-maker/sign-template-maker.html', '_blank');
+        });
+    }
+
     if (fileInput && !fileInput.hasListener) {
         fileInput.hasListener = true;
         fileInput.addEventListener('change', e => {
