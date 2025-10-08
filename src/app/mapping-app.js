@@ -262,6 +262,7 @@ class MappingSlayerApp extends SlayerAppBase {
                     </div>
                     
                     <div class="ms-control-group">
+                        <button class="ms-btn ms-btn-primary ms-btn-compact" id="export-photos-btn" disabled="">EXPORT PHOTOS</button>
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="create-thumbnails-btn" disabled="">CREATE THUMBNAILS</button>
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="create-pdf-btn" disabled="">CREATE PDF</button>
                         <button class="ms-btn ms-btn-primary ms-btn-compact" id="create-schedule-btn" disabled="">CREATE MESSAGE SCHEDULE</button>
@@ -1120,6 +1121,7 @@ class MappingSlayerApp extends SlayerAppBase {
 
     enableButtons() {
         const buttonsToEnable = [
+            '#export-photos-btn',
             '#create-thumbnails-btn',
             '#create-pdf-btn',
             '#create-schedule-btn',
