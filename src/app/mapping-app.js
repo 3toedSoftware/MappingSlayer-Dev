@@ -2275,7 +2275,7 @@ class MappingSlayerApp extends SlayerAppBase {
             { selector: '#toggle-messages2-btn', title: 'Show/hide message 2' },
             { selector: '#toggle-inst-display-btn', title: 'Cycle installed display modes' },
             { selector: '#renumber-btn', title: 'Renumber all locations sequentially' },
-            { selector: '#dotcam-btn', title: 'Focus camera on selected location' },
+            { selector: '#dotcam-btn', title: 'SURVEY TOOL - Opens camera after placing dot' },
 
             // Navigation
             { selector: '#prev-page', title: 'Previous page' },
