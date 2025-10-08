@@ -208,7 +208,8 @@ export default [
             'libs/**',
             'third-party/**',
             'backup/**',
-            'temp/**'
+            'temp/**',
+            'sign-template-maker/lib/**'
         ]
     }
 ];
