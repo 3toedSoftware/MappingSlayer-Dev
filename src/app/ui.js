@@ -6718,8 +6718,11 @@ async function exportAllPhotosToZip() {
     try {
         const blob = await zip.generateAsync({ type: 'blob' });
 
-        // Use project name if available, otherwise default name
-        const projectName = appState.projectName || 'mapping-slayer';
+        // Get project name from saveManager or fallback to default
+        const projectName =
+            window.saveManager?.projectName?.replace(/\.(pdf|mslay|slayer)$/i, '') ||
+            document.getElementById('project-name-display')?.textContent ||
+            'mapping-slayer-project';
         const suggestedName = `${projectName}-photos.zip`;
 
         // Try to use File System Access API for better UX
