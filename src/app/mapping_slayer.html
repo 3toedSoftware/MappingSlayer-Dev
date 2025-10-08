@@ -7,6 +7,11 @@
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
         <title>Mapping Slayer - Professional Sign Mapping Platform</title>
+
+        <!-- AI Interface Detection -->
+        <meta name="ai-interface" content="sidekick" />
+        <meta name="ai-interface-version" content="1.0" />
+        <meta name="ai-documentation" content="../../docs/SIDEKICK_AI_GUIDE.md" />
         <link rel="stylesheet" href="../styles/mapping-slayer.css" />
         <link
             rel="stylesheet"
@@ -20,6 +25,7 @@
         <!-- svg2pdf for vector SVG support in jsPDF -->
         <script src="https://cdn.jsdelivr.net/npm/svg2pdf.js@2.2.3/dist/svg2pdf.umd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <!-- LibLouis for proper Grade 2 Braille translation -->
         <script src="../../sign-template-maker/lib/liblouis/easy-api.js"></script>
@@ -73,6 +79,7 @@
                             <button type="button" class="btn btn-secondary" id="load-project-btn">LOAD</button>
                             <button type="button" class="btn btn-primary" id="save-project-btn">SAVE</button>
                             <button type="button" class="btn btn-primary" id="save-as-project-btn">SAVE AS</button>
+                            <button type="button" class="btn btn-info" id="export-photos-btn">EXPORT PHOTOS</button>
                         </div>
                     </div>
 

@@ -1,5 +1,5 @@
 // ui.js - Fixed version with proper syntax
-/* global Pickr, EyeDropper */
+/* global Pickr, EyeDropper, JSZip */
 
 // Import the state system
 import {
@@ -3747,6 +3747,13 @@ function addButtonEventListeners() {
         });
     }
 
+    const exportPhotosBtn = document.querySelector('#export-photos-btn');
+    if (exportPhotosBtn) {
+        exportPhotosBtn.addEventListener('click', async () => {
+            await exportAllPhotosToZip();
+        });
+    }
+
     const updateFromScheduleBtn = document.querySelector('#update-from-schedule-btn');
     const updateCsvInput = document.querySelector('#update-csv-input');
 
@@ -6661,9 +6668,109 @@ function addPhotoToDot(base64Data) {
     populateGallery(dot);
 }
 
+// Export all photos to ZIP file
+async function exportAllPhotosToZip() {
+    if (!window.JSZip) {
+        alert('JSZip library not loaded. Please refresh the page.');
+        return;
+    }
+
+    // Gather all photos from all pages
+    const allPhotos = [];
+
+    for (const [pageNum, pageData] of appState.dotsByPage) {
+        const dots = pageData.dots;
+        if (!dots) continue;
+
+        for (const [dotId, dot] of dots) {
+            if (dot.photo) {
+                allPhotos.push({
+                    locationNumber: dot.locationNumber,
+                    pageNum: pageNum,
+                    photo: dot.photo
+                });
+            }
+        }
+    }
+
+    if (allPhotos.length === 0) {
+        alert('No photos to export. Add photos to locations using the Gallery or DOTCAM mode.');
+        return;
+    }
+
+    // Create ZIP file
+    const zip = new JSZip();
+    const photoFolder = zip.folder('mapping-slayer-photos');
+
+    // Add each photo to the ZIP
+    for (const item of allPhotos) {
+        // Extract base64 data from data URL
+        const base64Data = item.photo.split(',')[1];
+
+        // Create filename: location-123-page-1.jpg
+        const filename = `location-${item.locationNumber}-page-${item.pageNum}.jpg`;
+
+        // Add to ZIP
+        photoFolder.file(filename, base64Data, { base64: true });
+    }
+
+    // Generate ZIP file and save with file picker
+    try {
+        const blob = await zip.generateAsync({ type: 'blob' });
+
+        // Use project name if available, otherwise default name
+        const projectName = appState.projectName || 'mapping-slayer';
+        const suggestedName = `${projectName}-photos.zip`;
+
+        // Try to use File System Access API for better UX
+        if ('showSaveFilePicker' in window) {
+            try {
+                const fileHandle = await window.showSaveFilePicker({
+                    suggestedName: suggestedName,
+                    types: [
+                        {
+                            description: 'ZIP Archive',
+                            accept: { 'application/zip': ['.zip'] }
+                        }
+                    ]
+                });
+
+                const writable = await fileHandle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+
+                alert(`Successfully exported ${allPhotos.length} photo(s) to ZIP file!`);
+            } catch (err) {
+                // User cancelled the picker
+                if (err.name !== 'AbortError') {
+                    throw err;
+                }
+            }
+        } else {
+            // Fallback to traditional download for browsers that don't support File System Access API
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = suggestedName;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+
+            alert(`Successfully exported ${allPhotos.length} photo(s) to ZIP file!`);
+        }
+    } catch (error) {
+        console.error('Error creating ZIP file:', error);
+        alert('Failed to create ZIP file. Check console for details.');
+    }
+}
+
 // Make gallery functions available globally
 window.openGalleryModal = openGalleryModal;
 window.closeGalleryModal = closeGalleryModal;
+window.exportAllPhotosToZip = exportAllPhotosToZip;
 
 // Marker Type Context Menu Functions
 function showMarkerTypeContextMenu(event, markerTypeCode) {
