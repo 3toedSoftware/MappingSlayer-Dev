@@ -342,11 +342,11 @@ class MappingSlayerApp extends SlayerAppBase {
             <div class="ms-gallery-modal" id="mapping-slayer-gallery-modal">
                 <div class="ms-gallery-content">
                     <div class="ms-gallery-header">
-                        <span class="ms-gallery-title">Gallery</span>
+                        <span class="ms-gallery-title">REFERENCE IMAGE</span>
                         <div class="ms-gallery-controls">
                             <button class="ms-gallery-btn ms-gallery-label-toggle-btn" id="gallery-label-toggle-btn" title="Toggle location number labels">#</button>
-                            <button class="ms-gallery-btn ms-gallery-add-btn" id="gallery-add-btn" title="Add photo to gallery">+</button>
-                            <button class="ms-gallery-btn ms-gallery-close-btn" id="gallery-close-btn" title="Delete selected photo">−</button>
+                            <button class="ms-gallery-btn ms-gallery-add-btn" id="gallery-add-btn" title="Add reference image">+</button>
+                            <button class="ms-gallery-btn ms-gallery-close-btn" id="gallery-close-btn" title="Delete reference image">−</button>
                         </div>
                     </div>
                     <div class="ms-gallery-body">
@@ -2309,8 +2309,8 @@ class MappingSlayerApp extends SlayerAppBase {
             { selector: '#edit-notes', title: 'Add notes for this location' },
 
             // Gallery buttons
-            { selector: '#gallery-add-btn', title: 'Add photo to location' },
-            { selector: '#gallery-close-btn', title: 'Remove photo from location' },
+            { selector: '#gallery-add-btn', title: 'Add reference image' },
+            { selector: '#gallery-close-btn', title: 'Delete reference image' },
 
             // Group edit buttons and fields
             { selector: '#group-delete-btn', title: 'Delete all selected locations' },

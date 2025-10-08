@@ -3902,8 +3902,8 @@ function openEditModal(internalId) {
             toggleGalleryBtn.type = 'button';
             toggleGalleryBtn.className = 'ms-modal-toggle-btn';
             toggleGalleryBtn.id = 'toggle-gallery-btn';
-            toggleGalleryBtn.title = 'Toggle Gallery';
-            toggleGalleryBtn.textContent = 'GALLERY';
+            toggleGalleryBtn.title = 'Toggle Reference Image';
+            toggleGalleryBtn.textContent = 'REF IMG';
 
             toggleContainer.appendChild(toggleSignPreviewBtn);
             toggleContainer.appendChild(toggleGalleryBtn);
