@@ -6678,15 +6678,28 @@ async function exportAllPhotosToZip() {
     // Gather all photos from all pages
     const allPhotos = [];
 
+    // Get project name once
+    const projectName =
+        window.saveManager?.projectName?.replace(/\.(pdf|mslay|slayer)$/i, '') ||
+        document.getElementById('project-name-display')?.textContent ||
+        'mapping-slayer-project';
+
     for (const [pageNum, pageData] of appState.dotsByPage) {
         const dots = pageData.dots;
         if (!dots) continue;
 
         for (const [dotId, dot] of dots) {
             if (dot.photo) {
+                // Get marker type info
+                const markerTypeCode = dot.markerType || 'unknown';
+                const markerTypeData = appState.markerTypes[markerTypeCode];
+                const markerTypeName = markerTypeData?.name || 'Unknown';
+
                 allPhotos.push({
                     locationNumber: dot.locationNumber,
                     pageNum: pageNum,
+                    markerTypeCode: markerTypeCode,
+                    markerTypeName: markerTypeName,
                     photo: dot.photo
                 });
             }
@@ -6707,8 +6720,14 @@ async function exportAllPhotosToZip() {
         // Extract base64 data from data URL
         const base64Data = item.photo.split(',')[1];
 
-        // Create filename: location-123-page-1.jpg
-        const filename = `location-${item.locationNumber}-page-${item.pageNum}.jpg`;
+        // Sanitize marker name for filename (remove special chars, no hyphens)
+        const sanitizedMarkerName = item.markerTypeName.replace(/[^a-zA-Z0-9]/g, '');
+
+        // Pad location number with zeros (4 digits)
+        const paddedLocationNumber = String(item.locationNumber).padStart(4, '0');
+
+        // Create filename: <project>-<marker-id>-<marker-name>-page<page>(<location>).jpg
+        const filename = `${projectName}-${item.markerTypeCode}-${sanitizedMarkerName}-page${item.pageNum}(${paddedLocationNumber}).jpg`;
 
         // Add to ZIP
         photoFolder.file(filename, base64Data, { base64: true });
@@ -6718,11 +6737,7 @@ async function exportAllPhotosToZip() {
     try {
         const blob = await zip.generateAsync({ type: 'blob' });
 
-        // Get project name from saveManager or fallback to default
-        const projectName =
-            window.saveManager?.projectName?.replace(/\.(pdf|mslay|slayer)$/i, '') ||
-            document.getElementById('project-name-display')?.textContent ||
-            'mapping-slayer-project';
+        // Use project name from above
         const suggestedName = `${projectName}-photos.zip`;
 
         // Try to use File System Access API for better UX
