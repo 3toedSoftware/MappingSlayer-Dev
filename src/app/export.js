@@ -369,7 +369,10 @@ function createDetailPage(pdf, dot, sourcePageNum, originalToNewPageMap) {
     const placeholderWidth = 240;
     const placeholderHeight = 240;
 
-    if (markerTypeInfo.designReference) {
+    // Use gallery photo if available, otherwise fall back to marker type design reference
+    const imageToUse = dot.photo || markerTypeInfo.designReference;
+
+    if (imageToUse) {
         // Draw placeholder border first
         pdf.setDrawColor(200);
         pdf.rect(margin + contentInnerMargin, contentY, placeholderWidth, placeholderHeight, 'S');
@@ -377,7 +380,7 @@ function createDetailPage(pdf, dot, sourcePageNum, originalToNewPageMap) {
         // Show the actual reference image, maintaining aspect ratio
         try {
             // Get image properties to calculate aspect ratio
-            const imgProps = pdf.getImageProperties(markerTypeInfo.designReference);
+            const imgProps = pdf.getImageProperties(imageToUse);
             const imgRatio = imgProps.width / imgProps.height;
             const placeholderRatio = placeholderWidth / placeholderHeight;
 
@@ -398,7 +401,7 @@ function createDetailPage(pdf, dot, sourcePageNum, originalToNewPageMap) {
             }
 
             pdf.addImage(
-                markerTypeInfo.designReference,
+                imageToUse,
                 'JPEG',
                 margin + contentInnerMargin + offsetX,
                 contentY + offsetY,
