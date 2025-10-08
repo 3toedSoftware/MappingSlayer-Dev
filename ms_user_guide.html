@@ -236,7 +236,7 @@
         <div class="header">
             <div class="logo">MAPPING SLAYER</div>
             <div class="subtitle">Professional Sign Mapping Platform</div>
-            <div class="version">User Guide<br />Updated January 2025</div>
+            <div class="version">User Guide<br />Updated October 2025</div>
         </div>
 
         <div class="toc">
@@ -451,6 +451,10 @@
 
             <h3>Export Section</h3>
             <ul>
+                <li>
+                    <span class="button-ref">EXPORT PHOTOS</span> - Export all reference images as
+                    ZIP
+                </li>
                 <li><span class="button-ref">CREATE PDF</span> - Generate annotated PDF</li>
                 <li>
                     <span class="button-ref">CREATE THUMBNAILS</span> - Generate PDF grid of sign
@@ -639,15 +643,15 @@
                     location
                 </li>
                 <li>
-                    <span class="button-ref">GALLERY</span> - View and manage photos for this
+                    <span class="button-ref">REF IMG</span> - View and manage reference image for this
                     location
                 </li>
             </ul>
         </div>
 
         <div class="tip">
-            Use the SIGN PREVIEW and GALLERY toggle buttons at the top of the Edit Location modal
-            for quick access to sign templates and photos without closing the edit window.
+            Use the SIGN PREVIEW and REF IMG toggle buttons at the top of the Edit Location modal
+            for quick access to sign templates and reference images without closing the edit window.
         </div>
 
         <h2>Bulk Editing</h2>
@@ -977,15 +981,39 @@
             fabrication references, and project documentation.
         </div>
 
-        <h2>Photo Gallery</h2>
-        <p>Access photos directly from the Edit Location modal:</p>
+        <h2>Reference Images</h2>
+        <p>
+            Add photos to individual locations for reference during installation or fabrication. These
+            photos are automatically included in PDF exports.
+        </p>
+
+        <h3>Adding Reference Images</h3>
         <ol>
             <li>Right-click any dot to open the Edit Location modal</li>
-            <li>Click <span class="button-ref">GALLERY</span> at the top of the modal</li>
-            <li>View all photos associated with this location</li>
-            <li>Add new photos by clicking the upload area</li>
-            <li>Delete photos using the × button on each image</li>
+            <li>Click <span class="button-ref">REF IMG</span> at the top of the modal</li>
+            <li>Click the + button or upload area to add a photo</li>
+            <li>Photos are automatically compressed and stored with the location</li>
         </ol>
+
+        <h3>Exporting All Photos</h3>
+        <p>Export all reference images from your project as a ZIP file:</p>
+        <ol>
+            <li>Click <span class="button-ref">EXPORT PHOTOS</span> in the footer controls</li>
+            <li>Choose where to save the ZIP file</li>
+            <li>Photos are named with full metadata for easy organization</li>
+        </ol>
+
+        <div class="tip">
+            <strong>Photo Filename Format:</strong><br />
+            Photos are exported as:
+            <code>ProjectName-MarkerID-MarkerName-page#(LocationNumber).jpg</code><br />
+            Example: <code>EXAMPLE_MAPS-ID.1-InteriorDoor-page1(0001).jpg</code>
+        </div>
+
+        <div class="tip">
+            Reference images automatically appear in CREATE PDF exports instead of generic design
+            references, providing accurate field documentation.
+        </div>
 
         <hr class="section-divider" />
 
@@ -1109,13 +1137,13 @@
         </div>
 
         <h2>DOTCAM Mode</h2>
-        <p>Capture photos directly associated with locations:</p>
+        <p>Capture reference images directly when placing new locations:</p>
         <ol>
             <li>Click <span class="button-ref">DOTCAM</span> to activate</li>
             <li>Place a new dot - camera opens automatically</li>
             <li>Take photo or select from device</li>
-            <li>Photo links to that specific location</li>
-            <li>View photos in edit modal gallery</li>
+            <li>Photo is saved as the location's reference image</li>
+            <li>View it later using the <span class="button-ref">REF IMG</span> button</li>
         </ol>
 
         <h2>Installation Tracking</h2>
