@@ -7458,7 +7458,7 @@ function setupTemplateModalListeners() {
     if (createBtn && !createBtn.hasListener) {
         createBtn.hasListener = true;
         createBtn.addEventListener('click', () => {
-            window.open('/sign-template-maker/sign-template-maker.html', '_blank');
+            window.open('../../sign-template-maker/sign-template-maker.html', '_blank');
         });
     }
 
