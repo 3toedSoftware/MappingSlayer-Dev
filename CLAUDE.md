@@ -6,11 +6,13 @@ When starting a new Claude Code session, ask the user:
 "Would you like to see your toolbelt?"
 
 If they say yes, run:
+
 ```bash
 node dev-tools/show-toolbelt.js
 ```
 
 This displays the complete toolbelt including:
+
 - Available core tools (File ops, Search, Bash, Git, etc.)
 - MCP server status (Playwright, Chrome DevTools)
 - Running services and ports
@@ -41,7 +43,15 @@ The Sidekick AI feature in Mapping Slayer is an API/backend system without a hum
 
 **Important**: There is no user interface for Sidekick - it's designed as a backend system for AI assistants to interact with, not for direct human use.
 
-**When working with Mapping Slayer**: If you haven't already in this session, read `docs/SIDEKICK_AI_GUIDE.md` to familiarize yourself with the preferred direct evaluation method. DO NOT create separate script files - always use inline `node -p` with Playwright evaluation for Sidekick operations.
+**When working with Mapping Slayer**:
+
+1. **ALWAYS check `FEATURE_INVENTORY.md` first** - This file maps all user-facing features to implementation details (element IDs, function names, Sidekick methods, file locations). Reference it when automating tasks to know exactly what to click or call.
+
+2. **Read `docs/SIDEKICK_AI_GUIDE.md`** if you haven't already in this session - Learn the preferred direct evaluation method.
+
+3. **DO NOT create separate script files** - Always use inline `node -p` with Playwright evaluation for Sidekick operations.
+
+4. **Update `FEATURE_INVENTORY.md`** when you discover new features, UI elements, or automation methods - Keep it current for future sessions.
 
 ### Sidekick Workflow for Users
 
@@ -319,12 +329,14 @@ Instead of Playwright launching its own browser (which blocks user interaction),
 #### When User Needs Help:
 
 User might say things like:
+
 - "I'm having an issue in mapping slayer"
 - "Can you help me debug something?"
 - "Something's not working right"
 - "I need you to see what I'm seeing"
 
 Claude should:
+
 1. Ask if they want collaborative debugging (both can interact) or just observation
 2. If yes, offer to open Chrome with debugging enabled
 3. Run the setup steps below
@@ -332,29 +344,33 @@ Claude should:
 #### Setup Steps:
 
 1. **Create profile directory**:
-   ```bash
-   mkdir C:\temp\chrome-debug-profile
-   ```
+
+    ```bash
+    mkdir C:\temp\chrome-debug-profile
+    ```
 
 2. **Claude launches Chrome with debugging** (when user requests collaborative debugging):
-   ```bash
-   start chrome --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-debug-profile" "http://localhost:8080/src/app/mapping_slayer.html"
-   ```
+
+    ```bash
+    start chrome --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-debug-profile" "http://localhost:8080/src/app/mapping_slayer.html"
+    ```
 
 3. **Verify debug mode**: Navigate to `http://localhost:9222/json/version` - you should see JSON data with `webSocketDebuggerUrl`
 
 4. **Claude connects using the collaborative script**:
-   ```bash
-   node collaborative-browser.js
-   ```
+    ```bash
+    node collaborative-browser.js
+    ```
 
 #### Verified Working:
+
 - ✅ User can click buttons and interact normally
 - ✅ Playwright can also interact with the same browser
 - ✅ No blocking or interference between user and automation
 - ✅ Both can trigger file dialogs, click buttons, type, etc.
 
 #### When to Use Each Approach:
+
 - **Playwright MCP (browser_navigate)**: Quick automation tasks where user doesn't need to interact
 - **Collaborative (connectOverCDP)**: Debugging sessions where both user and Claude need to interact with the same page
 - **Live Server**: User-only testing without any automation
@@ -378,30 +394,111 @@ This can be used to verify the Chrome DevTools MCP connection is working properl
 "Do you want me to open a collaborative debugging session where we can both see and interact with Mapping Slayer together? Or would you prefer to describe the issue first?"
 
 This is critical because:
+
 - Users often need to show you something visually
 - Collaborative debugging allows both user and Claude to interact with the same browser
 - Regular Playwright blocks user interaction, collaborative mode doesn't
 
 ### Quick Setup for Collaborative Debugging
 
-When user wants collaborative debugging:
+When user wants collaborative debugging or says "open mapping slayer in colab mode":
 
-**CRITICAL - Always start fresh:**
-1. **Kill all node processes and restart server**:
-   ```bash
-   taskkill /F /IM node.exe 2>nul & timeout /t 2 /nobreak >nul & npm run dev
-   ```
-   - Wait for "Available on: http://127.0.0.1:8080" message
-   - This ensures no orphaned processes interfere
-2. Launch Chrome: `start chrome --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-debug-profile" "http://localhost:8080/src/app/mapping_slayer.html"`
-3. Connect: `node dev-tools/collaborative-browser.js`
-4. Both user and Claude can now interact with the same page!
+**CRITICAL - Parse user intent carefully:**
 
-**CRITICAL**:
-- ❌ DO NOT use `mcp__playwright__browser_navigate` or any Playwright MCP tools - these create a NEW browser that blocks user interaction
-- ✅ DO use `node dev-tools/collaborative-browser.js` to connect to the EXISTING Chrome instance
-- The user should only see ONE Chrome window - the one opened in step 2
-- If a second browser window opens, something went wrong - you're using Playwright MCP instead of connectOverCDP
+**If user says "START dev server"** (explicitly asks to start):
+
+1. Kill any existing servers aggressively:
+
+    ```bash
+    taskkill /F /IM node.exe 2>nul
+    ```
+
+    Wait 2 seconds for processes to fully terminate
+
+2. Verify port 8080 is actually free:
+
+    ```bash
+    curl http://localhost:8080
+    ```
+
+    - If this succeeds: ERROR - port still in use! Tell user to manually check what's on port 8080
+    - If this fails (connection refused): Good! Port is free, proceed to step 3
+
+3. Start fresh server in background:
+
+    ```bash
+    npm run dev
+    ```
+
+    (run_in_background: true, wait 3 seconds)
+
+4. Verify server is healthy:
+    ```bash
+    curl http://localhost:8080
+    ```
+    If this fails, report error and stop
+
+**If user just says "open colab mode"** (doesn't mention starting):
+
+1. Check if server is running:
+
+    ```bash
+    curl http://localhost:8080
+    ```
+
+2. Based on result:
+    - **If curl succeeds**: Tell user "Found existing server, using it." and proceed
+    - **If curl fails**: Tell user "No server found, starting one in background." then run `npm run dev` (background, wait 3 seconds, verify with curl)
+
+**Either way, proceed to:**
+
+**Step 1: Launch Chrome with debugging enabled**:
+
+```bash
+start chrome --remote-debugging-port=9222 --user-data-dir="C:\temp\chrome-debug-profile" "http://localhost:8080/src/app/mapping_slayer.html"
+```
+
+**Step 2: Connect using collaborative script**:
+
+```bash
+node dev-tools/collaborative-browser.js
+```
+
+**Step 3: Ready!** Both user and Claude can now interact with the same page!
+
+**CRITICAL NOTES**:
+
+- When user says "START", kill and restart - don't use existing
+- When user doesn't say "START", check first and use existing if healthy
+- ALWAYS run taskkill and npm run dev as SEPARATE commands (not chained with &&)
+- ALWAYS verify server is healthy with curl before opening Chrome
+- taskkill exit code doesn't matter - it's okay if no processes are found
+
+**CRITICAL - Using Sidekick with Collaborative Debugging**:
+
+When working with Sidekick AI in collaborative mode:
+
+1. **NEVER use Playwright MCP tools** (`mcp__playwright__browser_navigate`, `mcp__playwright__browser_evaluate`, etc.)
+    - These tools launch a SEPARATE Playwright-controlled browser
+    - That browser blocks File System Access API (SAVE/LOAD won't work)
+    - It's a completely different browser from the user's debugging window
+    - This creates confusion with two browser windows open
+
+2. **ALWAYS use inline node evaluation** as documented in `docs/SIDEKICK_AI_GUIDE.md`:
+
+    ```bash
+    node -p "const playwright = require('playwright'); (async () => { const browser = await playwright.chromium.connectOverCDP('http://localhost:9222'); const contexts = browser.contexts(); const page = contexts[0].pages()[0]; const result = await page.evaluate(() => { /* Sidekick code here */ }); await browser.close(); return result; })()"
+    ```
+
+3. **Why this matters**:
+    - User's Chrome debugging window: SAVE/LOAD work perfectly ✅
+    - Playwright MCP browser: SAVE/LOAD are blocked ❌
+    - Using inline evaluation connects to the USER'S browser, not a new one
+    - This preserves all browser functionality including file pickers
+
+4. **The user should only see ONE Chrome window** - the one opened with debugging enabled
+    - If a second browser window opens, you're using Playwright MCP tools incorrectly
+    - Stop immediately and switch to inline node evaluation method
 
 ## Collaboration Style
 
@@ -415,6 +512,7 @@ When user wants collaborative debugging:
 - **Admit mistakes**: If something doesn't work as expected, acknowledge it and try a different approach
 - **NEVER claim something is "Fixed!" without verification**: Don't assume fixes work - test them first or say "I think this might fix it, let's test"
 - **Ask before taking action**: Especially with browser connections - explain what you want to do and why before doing it
+- **NEVER assume code names or structure**: ALWAYS look up the actual property names, function names, and code structure before responding. Use Read, Grep, or browser evaluation to verify what actually exists in the code. Do NOT guess what things "should" be called - find out what they ARE called. This is CRITICAL.
 
 ### Example Phrases to Use:
 
