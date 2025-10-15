@@ -9,7 +9,8 @@ import {
     setDirtyState,
     getCurrentPageData,
     CommandUndoManager,
-    getCurrentPageAnnotationLines
+    getCurrentPageAnnotationLines,
+    deletePage
 } from './state.js';
 import {
     renderDotsForCurrentPage,
@@ -3176,6 +3177,7 @@ function addMarkerTypeEventListener() {
 function addPageNavigationEventListeners() {
     const prevBtn = document.querySelector('#prev-page');
     const nextBtn = document.querySelector('#next-page');
+    const deleteBtn = document.querySelector('#delete-page');
     const pageInput = document.querySelector('#page-label-input');
 
     if (prevBtn) {
@@ -3190,6 +3192,77 @@ function addPageNavigationEventListeners() {
         nextBtn.addEventListener('click', () => {
             if (appState.currentPdfPage < appState.totalPages) {
                 changePage(appState.currentPdfPage + 1);
+            }
+        });
+    }
+
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', async () => {
+            // Don't allow deleting the last page
+            if (appState.totalPages <= 1) {
+                alert('Cannot delete the last page.');
+                return;
+            }
+
+            // Show confirmation dialog with warning
+            const currentPage = appState.currentPdfPage;
+            const dotCount = getCurrentPageDots().size;
+            const message = `Delete page ${currentPage}?\n\nThis page has ${dotCount} marker(s).\nThis action cannot be undone.`;
+
+            if (confirm(message)) {
+                try {
+                    // Store the page number to delete
+                    const pageToDelete = appState.currentPdfPage;
+
+                    // Move to previous page if we're deleting the last page, otherwise stay on same page number
+                    const newPage = pageToDelete === appState.totalPages ? pageToDelete - 1 : pageToDelete;
+
+                    // Delete the page data
+                    deletePage(pageToDelete);
+
+                    // Rebuild the PDF without the deleted page using pdf-lib
+                    if (appState.sourcePdfBuffer && window.PDFLib) {
+                        const existingPdfBytes = appState.sourcePdfBuffer;
+                        const pdfDoc = await window.PDFLib.PDFDocument.load(existingPdfBytes);
+
+                        // Remove the page (pdf-lib uses 0-based indexing)
+                        pdfDoc.removePage(pageToDelete - 1);
+
+                        // Save the modified PDF
+                        const modifiedPdfBytes = await pdfDoc.save();
+
+                        // Update the source PDF buffer
+                        appState.sourcePdfBuffer = modifiedPdfBytes.buffer;
+
+                        // Convert to base64 for saving
+                        const uint8Array = new Uint8Array(modifiedPdfBytes);
+                        let binary = '';
+                        for (let i = 0; i < uint8Array.length; i++) {
+                            binary += String.fromCharCode(uint8Array[i]);
+                        }
+                        appState.sourcePdfBase64 = btoa(binary);
+                        console.log('PDF page deleted and base64 updated');
+
+                        // Reload the PDF document with pdf.js
+                        const loadingTask = pdfjsLib.getDocument({ data: modifiedPdfBytes });
+                        appState.pdfDoc = await loadingTask.promise;
+                    }
+
+                    // Update total pages
+                    appState.totalPages--;
+
+                    // Update current page
+                    appState.currentPdfPage = newPage;
+
+                    // Re-render the PDF and update UI
+                    renderPDFPage(appState.currentPdfPage);
+                    updatePageInfo();
+                    renderDotsForCurrentPage();
+                    updateAllSectionsForCurrentPage();
+                } catch (error) {
+                    console.error('Error deleting page:', error);
+                    alert('Failed to delete page. See console for details.');
+                }
             }
         });
     }

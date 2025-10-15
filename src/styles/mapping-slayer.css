@@ -1785,6 +1785,18 @@ body {
     opacity: 0.5;
 }
 
+.ms-delete-page-btn {
+    background: #d32f2f !important;
+    margin-left: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.ms-delete-page-btn:hover {
+    background: #f44336 !important;
+}
+
 .ms-map-overlay-controls {
     position: absolute;
     bottom: 10px;

@@ -119,6 +119,55 @@ export function getCurrentPageAnnotationLines() {
     return getAnnotationLinesForPage(appState.currentPdfPage);
 }
 
+export function deletePage(pageNum) {
+    // Delete the page data
+    appState.dotsByPage.delete(pageNum);
+    appState.annotationLines.delete(pageNum);
+    appState.pageLabels.delete(pageNum);
+
+    // Renumber all subsequent pages
+    const pagesToRenumber = [];
+    for (const [existingPageNum, pageData] of appState.dotsByPage.entries()) {
+        if (existingPageNum > pageNum) {
+            pagesToRenumber.push({ oldNum: existingPageNum, newNum: existingPageNum - 1, data: pageData });
+        }
+    }
+
+    // Delete old page numbers and set new ones
+    for (const { oldNum, newNum, data } of pagesToRenumber) {
+        appState.dotsByPage.delete(oldNum);
+        appState.dotsByPage.set(newNum, data);
+    }
+
+    // Renumber annotation lines
+    const annotationsToRenumber = [];
+    for (const [existingPageNum, lines] of appState.annotationLines.entries()) {
+        if (existingPageNum > pageNum) {
+            annotationsToRenumber.push({ oldNum: existingPageNum, newNum: existingPageNum - 1, lines: lines });
+        }
+    }
+
+    for (const { oldNum, newNum, lines } of annotationsToRenumber) {
+        appState.annotationLines.delete(oldNum);
+        appState.annotationLines.set(newNum, lines);
+    }
+
+    // Renumber page labels
+    const labelsToRenumber = [];
+    for (const [existingPageNum, label] of appState.pageLabels.entries()) {
+        if (existingPageNum > pageNum) {
+            labelsToRenumber.push({ oldNum: existingPageNum, newNum: existingPageNum - 1, label: label });
+        }
+    }
+
+    for (const { oldNum, newNum, label } of labelsToRenumber) {
+        appState.pageLabels.delete(oldNum);
+        appState.pageLabels.set(newNum, label);
+    }
+
+    setDirtyState();
+}
+
 export function serializeDotsByPage(dotsByPageMap) {
     const obj = {};
     for (const [pageNum, pageData] of dotsByPageMap.entries()) {

@@ -199,6 +199,7 @@ class MappingSlayerApp extends SlayerAppBase {
                             <input type="text" id="page-label-input" placeholder="Enter Page Label" class="ms-page-label-input">
                             <span id="page-info">PAGE 1 OF 1</span>
                             <button class="ms-nav-btn" id="next-page">&gt;</button>
+                            <button class="ms-nav-btn ms-delete-page-btn" id="delete-page" title="Delete current page">×</button>
                         </div>
                     </div>
                     
