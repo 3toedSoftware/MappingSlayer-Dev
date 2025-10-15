@@ -1172,20 +1172,10 @@ class MappingSlayerApp extends SlayerAppBase {
                 }
                 console.log('✅ .slayer file loaded successfully via SaveManager');
             } else {
-                // Fallback to project manager if SaveManager not available
-                const { projectManager } = await import('../core/project-manager.js');
-                const success = await projectManager.load(loadedData.file);
-
-                if (success) {
-                    if (uploadArea) {
-                        uploadArea.innerHTML = '<div>✅ Suite project loaded successfully!</div>';
-                    }
-                    console.log('✅ .slayer file loaded successfully');
-                } else {
-                    if (uploadArea) {
-                        uploadArea.innerHTML = '<div>❌ Failed to load suite project.</div>';
-                    }
-                    console.error('❌ Failed to load .slayer file');
+                // SaveManager not available - this should not happen
+                console.error('❌ SaveManager not found - cannot load .slayer file');
+                if (uploadArea) {
+                    uploadArea.innerHTML = '<div>❌ SaveManager not available.</div>';
                 }
             }
             return;
@@ -1639,7 +1629,13 @@ class MappingSlayerApp extends SlayerAppBase {
         this.appState.dotSize = stateToImport.dotSize || 1;
         this.appState.currentPdfPage = stateToImport.currentPdfPage || 1;
         this.appState.totalPages = stateToImport.totalPages || this.appState.totalPages;
-        this.appState.pageLabels = new Map(Object.entries(stateToImport.pageLabels || {}));
+        // Convert pageLabels object to Map with NUMBER keys (not strings)
+        this.appState.pageLabels = new Map(
+            Object.entries(stateToImport.pageLabels || {}).map(([key, value]) => [
+                parseInt(key),
+                value
+            ])
+        );
         this.appState.recentSearches = stateToImport.recentSearches || [];
         this.appState.automapExactPhrase =
             stateToImport.automapExactPhrase !== undefined

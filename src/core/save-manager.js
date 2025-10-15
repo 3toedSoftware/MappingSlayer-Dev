@@ -579,6 +579,16 @@ class SaveManager {
             // Import the data
             await mappingApp.importData(mappingData);
 
+            // Update UI after import - directly call updatePageLabelInput from ui module
+            try {
+                const uiModule = await import('../app/ui.js');
+                if (uiModule.updatePageLabelInput) {
+                    uiModule.updatePageLabelInput();
+                }
+            } catch (err) {
+                console.warn('Could not update page label input:', err);
+            }
+
             // Update project name from filename
             this.projectName = file.name.replace('.slayer', '');
             // Note: fileHandle is set in load() method when using File System Access API

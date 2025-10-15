@@ -1,16 +1,14 @@
 // core/index.js
 /**
  * Core Module Exports - Central import point for all Mapping Slayer core utilities
- * Import everything from here: import { appBridge, projectManager } from '../core/index.js'
+ * Import everything from here: import { appBridge, saveManager } from '../core/index.js'
  */
 
 // Communication & Coordination
 export { AppBridge, appBridge, SYNC_EVENTS } from './app-bridge.js';
-export { ProjectManager, projectManager } from './project-manager.js';
 
 // Import instances for internal use
 import { appBridge } from './app-bridge.js';
-import { projectManager } from './project-manager.js';
 export { saveManager } from './save-manager.js';
 export { createSyncManager } from './sync-manager.js';
 export { fileHandleStore } from './file-handle-store.js';
@@ -192,8 +190,8 @@ export function initializeCore(debugMode = false) {
 
     // Set up beforeunload warning for unsaved changes
     window.addEventListener('beforeunload', event => {
-        // Only check if projectManager is available
-        if (typeof projectManager !== 'undefined' && projectManager.hasUnsavedChanges()) {
+        // Check if saveManager has unsaved changes
+        if (window.saveManager && window.saveManager.hasUnsavedChanges) {
             event.preventDefault();
             event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
             return event.returnValue;
@@ -211,7 +209,13 @@ export function getSystemStatus() {
     return {
         version: SLAYER_VERSION,
         bridge: appBridge ? appBridge.getStatus() : { status: 'not_initialized' },
-        project: projectManager ? projectManager.getCurrentProject() : null,
+        saveManager: window.saveManager
+            ? {
+                  projectName: window.saveManager.projectName,
+                  hasFileHandle: !!window.saveManager.fileHandle,
+                  hasUnsavedChanges: window.saveManager.hasUnsavedChanges
+              }
+            : null,
         timestamp: new Date().toISOString()
     };
 }

@@ -6,7 +6,6 @@
 
 import {
     appBridge,
-    projectManager,
     BRIDGE_EVENTS,
     APP_STATUS,
     appLog,
@@ -502,7 +501,12 @@ export default class SlayerAppBase {
     }
 
     async saveProject() {
-        await projectManager.save();
+        // Use saveManager if available (should be global in suite mode)
+        if (window.saveManager) {
+            await window.saveManager.save();
+        } else {
+            console.warn('SaveManager not available - cannot save project');
+        }
     }
 
     async loadProject() {
@@ -520,8 +524,12 @@ export default class SlayerAppBase {
                         await mappingApp.loadFile(file);
                     }
                 } else if (file.name.toLowerCase().endsWith('.slayer')) {
-                    // For slayer files, use projectManager
-                    await projectManager.load(file);
+                    // For slayer files, use saveManager
+                    if (window.saveManager) {
+                        await window.saveManager.loadFileDirectly(file);
+                    } else {
+                        console.warn('SaveManager not available - cannot load .slayer file');
+                    }
                 }
             }
         };
