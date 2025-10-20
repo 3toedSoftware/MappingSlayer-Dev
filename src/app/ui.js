@@ -841,8 +841,12 @@ function updateMapLegend() {
         // Create header row with collapse arrow
         const header = document.createElement('div');
         header.className = 'ms-map-legend-item ms-map-legend-item-header';
+
+        // Check if this marker type was previously expanded
+        const isExpanded = appState.expandedMarkerTypes.has(code);
+
         header.innerHTML =
-            '<span class="ms-map-legend-collapse-arrow">▶</span>' +
+            '<span class="ms-map-legend-collapse-arrow">' + (isExpanded ? '▼' : '▶') + '</span>' +
             '<div class="ms-map-legend-dot" style="background-color: ' +
             typeData.color +
             ';"></div>' +
@@ -855,10 +859,10 @@ function updateMapLegend() {
             count +
             '</span>';
 
-        // Create flag details section (initially hidden)
+        // Create flag details section
         const flagDetails = document.createElement('div');
         flagDetails.className = 'ms-map-legend-flag-details';
-        flagDetails.style.display = 'none';
+        flagDetails.style.display = isExpanded ? 'block' : 'none';
 
         // Add flag counts
         if (Object.keys(flagCounts).length > 0) {
@@ -890,9 +894,11 @@ function updateMapLegend() {
             if (isCollapsed) {
                 arrow.textContent = '▼';
                 flagDetails.style.display = 'block';
+                appState.expandedMarkerTypes.add(code);
             } else {
                 arrow.textContent = '▶';
                 flagDetails.style.display = 'none';
+                appState.expandedMarkerTypes.delete(code);
             }
         });
 
@@ -954,8 +960,12 @@ function updateProjectLegend() {
         // Create header row with collapse arrow
         const header = document.createElement('div');
         header.className = 'ms-map-legend-item ms-map-legend-item-header';
+
+        // Check if this marker type was previously expanded
+        const isExpanded = appState.expandedMarkerTypes.has(code);
+
         header.innerHTML =
-            '<span class="ms-map-legend-collapse-arrow">▶</span>' +
+            '<span class="ms-map-legend-collapse-arrow">' + (isExpanded ? '▼' : '▶') + '</span>' +
             '<div class="ms-map-legend-dot" style="background-color: ' +
             typeData.color +
             ';"></div>' +
@@ -968,10 +978,10 @@ function updateProjectLegend() {
             count +
             '</span>';
 
-        // Create flag details section (initially hidden)
+        // Create flag details section
         const flagDetails = document.createElement('div');
         flagDetails.className = 'ms-map-legend-flag-details';
-        flagDetails.style.display = 'none';
+        flagDetails.style.display = isExpanded ? 'block' : 'none';
 
         // Add flag counts
         if (Object.keys(flagCounts).length > 0) {
@@ -1003,9 +1013,11 @@ function updateProjectLegend() {
             if (isCollapsed) {
                 arrow.textContent = '▼';
                 flagDetails.style.display = 'block';
+                appState.expandedMarkerTypes.add(code);
             } else {
                 arrow.textContent = '▶';
                 flagDetails.style.display = 'none';
+                appState.expandedMarkerTypes.delete(code);
             }
         });
 
@@ -7401,11 +7413,11 @@ function displayTemplate(templateData, productionMode = false) {
             <!-- Sign background -->
             <rect width="${templateData.signWidth}" height="${templateData.signHeight}"
                   fill="${templateData.colors?.signBackground || '#ffffff'}"${
-                      productionMode
-                          ? ''
-                          : `
+    productionMode
+        ? ''
+        : `
                   stroke="#666" stroke-width="2"`
-                  }/>
+}/>
     `;
 
     // Add message boxes
@@ -7483,11 +7495,11 @@ function displayTemplate(templateData, productionMode = false) {
                           fill="${templateData.colors?.text || '#000000'}"
                           font-family="${msg.fontFamily || 'Arial, sans-serif'}"
                           font-size="${fontSize}"${
-                              msg.fontWeight
-                                  ? `
+    msg.fontWeight
+        ? `
                           font-weight="${msg.fontWeight}"`
-                                  : ''
-                          }
+        : ''
+}
                           letter-spacing="${msg.letterSpacing || 0}"
                           word-spacing="${msg.wordSpacing || 0}"
                           text-anchor="${textAnchor}">
@@ -7508,11 +7520,11 @@ function displayTemplate(templateData, productionMode = false) {
                           fill="${templateData.colors?.text || '#000000'}"
                           font-family="${msg.fontFamily || 'Arial, sans-serif'}"
                           font-size="${fontSize}"${
-                              msg.fontWeight
-                                  ? `
+    msg.fontWeight
+        ? `
                           font-weight="${msg.fontWeight}"`
-                                  : ''
-                          }
+        : ''
+}
                           letter-spacing="${msg.letterSpacing || 0}"
                           word-spacing="${msg.wordSpacing || 0}"
                           text-anchor="${textAnchor}"
