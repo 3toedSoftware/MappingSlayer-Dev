@@ -43,19 +43,55 @@ async function drawLegendWithJsPDF(pdf, dotsOnPage, flagImageMap) {
         a.localeCompare(b, undefined, { numeric: true })
     );
 
-    // Calculate flag section height
+    // Calculate flag counts per marker type
     const flagConfig = appState.globalFlagConfiguration;
-    const flagSectionHeight = flagConfig ? 100 : 0;
+    const markerTypeFlagCounts = new Map();
+
+    if (flagConfig) {
+        sortedMarkerTypeCodes.forEach(code => {
+            const flagCounts = {};
+            Object.values(FLAG_POSITIONS).forEach(position => {
+                flagCounts[position] = 0;
+            });
+
+            dotsOnPage.forEach(dot => {
+                if (dot.markerType === code && dot.flags) {
+                    Object.entries(dot.flags).forEach(([position, isActive]) => {
+                        if (isActive === true) {
+                            flagCounts[position] = (flagCounts[position] || 0) + 1;
+                        }
+                    });
+                }
+            });
+
+            markerTypeFlagCounts.set(code, flagCounts);
+        });
+    }
 
     const padding = 40,
-        itemHeight = 32,
+        markerItemHeight = 32,
+        flagItemHeight = 20,
         dotRadius = 10,
         legendWidth = 440,
         headerHeight = 50;
-    const legendHeight =
-        headerHeight + sortedMarkerTypeCodes.length * itemHeight + padding + flagSectionHeight;
+
+    // Calculate dynamic height based on marker types and their flags
+    let contentHeight = headerHeight + 20;
+    sortedMarkerTypeCodes.forEach(code => {
+        contentHeight += markerItemHeight; // Marker type row
+        const flagCounts = markerTypeFlagCounts.get(code);
+        if (flagCounts) {
+            const activeFlagCount = Object.values(flagCounts).filter(count => count > 0).length;
+            if (activeFlagCount > 0) {
+                contentHeight += activeFlagCount * flagItemHeight + 10; // Flags + spacing
+            }
+        }
+    });
+
+    const legendHeight = contentHeight + padding;
     const x = padding,
         y = padding;
+
     pdf.setFillColor(255, 255, 255);
     pdf.setDrawColor(0, 0, 0);
     pdf.setLineWidth(1);
@@ -64,12 +100,16 @@ async function drawLegendWithJsPDF(pdf, dotsOnPage, flagImageMap) {
     pdf.setFontSize(32);
     pdf.setTextColor(0, 0, 0);
     pdf.text('PAGE LEGEND', x + legendWidth / 2, y + 34, { align: 'center' });
+
     let currentY = y + headerHeight + 20;
-    pdf.setFont('helvetica', 'normal');
+
     sortedMarkerTypeCodes.forEach(code => {
         const typeData = appState.markerTypes[code];
         const count = dotsOnPage.filter(d => d.markerType === code).length;
         const displayText = `(${count}) ${typeData.code} - ${typeData.name}`;
+
+        // Draw marker type
+        pdf.setFont('helvetica', 'normal');
         pdf.setFillColor(typeData.color);
         pdf.setDrawColor(0, 0, 0);
         pdf.setLineWidth(1);
@@ -77,50 +117,47 @@ async function drawLegendWithJsPDF(pdf, dotsOnPage, flagImageMap) {
         pdf.setFontSize(24);
         pdf.setTextColor(0, 0, 0);
         pdf.text(displayText, x + padding + 30, currentY, { baseline: 'middle' });
-        currentY += itemHeight;
-    });
+        currentY += markerItemHeight;
 
-    // Add flag legend section
-    if (flagConfig) {
-        currentY += 20; // Add spacing
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(20);
-        pdf.text('FLAGS:', x + padding, currentY);
-        currentY += 25;
+        // Draw flags for this marker type
+        const flagCounts = markerTypeFlagCounts.get(code);
+        if (flagCounts && flagConfig) {
+            const flagSize = 16;
+            const flagIndent = 60;
 
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(18);
+            Object.entries(flagCounts).forEach(([position, flagCount]) => {
+                if (flagCount > 0) {
+                    const config = flagConfig[position];
+                    if (config && config.name) {
+                        const xPos = x + padding + flagIndent;
+                        const yPos = currentY;
 
-        const flagSize = 20; // Size of flag icon in legend
-        const flagPositions = Object.keys(FLAG_POSITIONS);
+                        // Get the flag image from the map
+                        const cacheKey = `${config.symbol || 'custom'}_${config.customIcon || 'default'}_${position}`;
+                        const base64 = flagImageMap.get(cacheKey);
 
-        for (let index = 0; index < flagPositions.length; index++) {
-            const key = flagPositions[index];
-            const position = FLAG_POSITIONS[key];
-            const config = flagConfig[position];
+                        if (base64) {
+                            // Draw flag icon
+                            pdf.addImage(base64, 'PNG', xPos, yPos - flagSize / 2, flagSize, flagSize);
+                        }
 
-            if (config && config.name) {
-                const xPos = x + padding + (index % 2) * 200;
-                const yPos = currentY + Math.floor(index / 2) * 25;
+                        // Draw flag name and count
+                        pdf.setFontSize(18);
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.text(`${config.name}: ${flagCount}`, xPos + flagSize + 5, yPos, {
+                            baseline: 'middle'
+                        });
 
-                // Get the flag image from the map
-                const cacheKey = `${config.symbol || 'custom'}_${config.customIcon || 'default'}_${position}`;
-                const base64 = flagImageMap.get(cacheKey);
-
-                if (base64) {
-                    // Draw flag icon
-                    pdf.addImage(base64, 'PNG', xPos, yPos - flagSize / 2, flagSize, flagSize);
-                    // Draw equal sign and name
-                    pdf.text(` = ${config.name}`, xPos + flagSize + 5, yPos, {
-                        baseline: 'middle'
-                    });
-                } else {
-                    // Fallback to text only if no image
-                    pdf.text(config.name, xPos, yPos, { baseline: 'middle' });
+                        currentY += flagItemHeight;
+                    }
                 }
+            });
+
+            if (Object.values(flagCounts).some(count => count > 0)) {
+                currentY += 10; // Add spacing after flags
             }
         }
-    }
+    });
 }
 
 async function drawDotsWithJsPDF(pdf, dotsOnPage, messagesVisible, flagImageMap) {
