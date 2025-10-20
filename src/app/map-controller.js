@@ -354,7 +354,24 @@ function createDotElement(dot) {
         "></div>`;
     }
 
-    dotElement.innerHTML = `${flagsHTML}${installedHTML}<span class="ms-dot-number" style="${locationDisplay}">${dot.locationNumber}</span><div class="ms-map-dot-message" style="color: ${markerTypeInfo.color}; font-size: ${messageFontSize}px;">${dot.message}</div><div class="ms-map-dot-message2" style="color: ${markerTypeInfo.color}; font-size: ${messageFontSize}px; margin-top: ${8 * effectiveMultiplier}px;">${dot.message2 || ''}</div>`;
+    // Add camera icon if dot has a photo and mode is active
+    let cameraHTML = '';
+    if (appState.showPhotoIndicators && dot.photo) {
+        const cameraSize = 16 * effectiveMultiplier;
+        const cameraOffset = -(size / 2 + cameraSize / 2 + 2);
+        cameraHTML = `<div class="ms-dot-camera-icon" style="
+            position: absolute;
+            top: ${cameraOffset}px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: ${cameraSize}px;
+            z-index: 15;
+            pointer-events: none;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+        ">📷</div>`;
+    }
+
+    dotElement.innerHTML = `${flagsHTML}${installedHTML}${cameraHTML}<span class="ms-dot-number" style="${locationDisplay}">${dot.locationNumber}</span><div class="ms-map-dot-message" style="color: ${markerTypeInfo.color}; font-size: ${messageFontSize}px;">${dot.message}</div><div class="ms-map-dot-message2" style="color: ${markerTypeInfo.color}; font-size: ${messageFontSize}px; margin-top: ${8 * effectiveMultiplier}px;">${dot.message2 || ''}</div>`;
 
     if (dot.notes && dot.notes.trim()) {
         dotElement.setAttribute('title', dot.notes);

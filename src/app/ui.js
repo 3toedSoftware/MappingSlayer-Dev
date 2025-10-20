@@ -3785,6 +3785,7 @@ function addButtonEventListeners() {
     const toggleMessages2Btn = document.querySelector('#toggle-messages2-btn');
     const toggleLocationsBtn = document.querySelector('#toggle-locations-btn');
     const renumberBtn = document.querySelector('#renumber-btn');
+    const showPicBtn = document.querySelector('#show-pic-btn');
     const dotcamBtn = document.querySelector('#dotcam-btn');
     const findInput = document.querySelector('#find-input');
     const replaceInput = document.querySelector('#replace-input');
@@ -3798,6 +3799,25 @@ function addButtonEventListeners() {
     if (renumberBtn) {
         renumberBtn.addEventListener('click', () => {
             openRenumberModal();
+        });
+    }
+
+    if (showPicBtn) {
+        showPicBtn.addEventListener('click', async () => {
+            appState.showPhotoIndicators = !appState.showPhotoIndicators;
+            showPicBtn.classList.toggle('active', appState.showPhotoIndicators);
+            if (appState.showPhotoIndicators) {
+                showPicBtn.textContent = 'HIDE PICS';
+                showPicBtn.style.background = '#6c757d';
+                showPicBtn.style.color = 'white';
+            } else {
+                showPicBtn.textContent = 'SHOW PICS';
+                showPicBtn.style.background = '';
+                showPicBtn.style.color = '';
+            }
+            // Re-render dots to show/hide camera icons
+            const { renderDotsForCurrentPage } = await import('./map-controller.js');
+            renderDotsForCurrentPage();
         });
     }
 
@@ -6929,7 +6949,7 @@ async function exportAllPhotosToZip() {
     }
 
     if (allPhotos.length === 0) {
-        alert('No photos to export. Add photos to locations using the Gallery or DOTCAM mode.');
+        alert('No photos to export. Add photos to locations using Reference Image.');
         return;
     }
 

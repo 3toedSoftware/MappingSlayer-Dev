@@ -71,7 +71,8 @@ export const appState = {
     nextAnnotationId: 1,
     // Toggle button states - persist across dots
     signPreviewToggleActive: false,
-    galleryToggleActive: false
+    galleryToggleActive: false,
+    showPhotoIndicators: false // Show camera icons on dots with photos
 };
 
 export function setDirtyState() {

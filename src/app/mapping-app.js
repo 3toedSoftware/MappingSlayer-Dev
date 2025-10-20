@@ -157,6 +157,7 @@ class MappingSlayerApp extends SlayerAppBase {
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="toggle-messages2-btn">SHOW MSG2</button>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="toggle-inst-display-btn">INST ONLY</button>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="renumber-btn">RENUMBER</button>
+                        <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="show-pic-btn">SHOW PICS</button>
                         <button class="ms-btn ms-btn-secondary ms-btn-compact ms-btn-uniform-width" id="dotcam-btn">DOTCAM</button>
                     </div>
                     
@@ -1440,10 +1441,10 @@ class MappingSlayerApp extends SlayerAppBase {
                 // Include crop data
                 cropData: this.cropTool
                     ? {
-                          cropBoundsPerPage: Array.from(this.cropTool.cropBoundsPerPage.entries()),
-                          globalCropBounds: this.cropTool.globalCropBounds,
-                          cropAllPages: this.cropTool.cropAllPages
-                      }
+                        cropBoundsPerPage: Array.from(this.cropTool.cropBoundsPerPage.entries()),
+                        globalCropBounds: this.cropTool.globalCropBounds,
+                        cropAllPages: this.cropTool.cropAllPages
+                    }
                     : null,
                 // Include PDF data
                 sourcePdfBase64: pdfBase64,
@@ -1967,8 +1968,8 @@ class MappingSlayerApp extends SlayerAppBase {
                         totalPages: this.appState.totalPages || 0,
                         pageLabels: this.appState.pageLabels
                             ? Array.from(this.appState.pageLabels.entries()).map(
-                                  ([num, label]) => ({ pageNumber: num, label: label })
-                              )
+                                ([num, label]) => ({ pageNumber: num, label: label })
+                            )
                             : []
                     },
                     // Include global flag configuration so Thumbnail Slayer can use proper names
