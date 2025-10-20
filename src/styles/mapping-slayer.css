@@ -1256,12 +1256,34 @@ body {
     display: none;
 }
 
+.ms-map-legend-item-container {
+    margin-bottom: 4px;
+}
+
 .ms-map-legend-item {
     display: flex;
     align-items: center;
     padding: 2px 0;
     font-size: 10px;
     color: #ccc;
+}
+
+.ms-map-legend-item-header {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ms-map-legend-item-header:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.ms-map-legend-collapse-arrow {
+    width: 12px;
+    margin-right: 4px;
+    font-size: 8px;
+    color: #999;
+    flex-shrink: 0;
+    user-select: none;
 }
 
 .ms-map-legend-dot {
@@ -1280,6 +1302,38 @@ body {
 
 .ms-map-legend-count {
     color: #ffffff;
+    font-weight: bold;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.ms-map-legend-flag-details {
+    padding-left: 26px;
+    margin-top: 2px;
+}
+
+.ms-map-legend-flag-row {
+    display: flex;
+    align-items: center;
+    padding: 2px 0;
+    font-size: 9px;
+    color: #aaa;
+}
+
+.ms-map-legend-flag-symbol {
+    width: 16px;
+    margin-right: 6px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.ms-map-legend-flag-name {
+    flex: 1;
+    min-width: 0;
+}
+
+.ms-map-legend-flag-count {
+    color: #f07727;
     font-weight: bold;
     margin-left: 8px;
     flex-shrink: 0;

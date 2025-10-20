@@ -775,6 +775,29 @@ function setupLegendCollapse() {
     }
 }
 
+// Helper function to calculate flag counts for a specific marker type
+function calculateFlagCountsForMarkerType(markerTypeCode, dotsMap) {
+    const flagCounts = {};
+
+    // Initialize counts for all flag positions
+    Object.values(FLAG_POSITIONS).forEach(position => {
+        flagCounts[position] = 0;
+    });
+
+    // Count flags for dots of this marker type
+    for (const dot of dotsMap.values()) {
+        if (dot.markerType === markerTypeCode && dot.flags) {
+            Object.entries(dot.flags).forEach(([position, isActive]) => {
+                if (isActive === true) {
+                    flagCounts[position] = (flagCounts[position] || 0) + 1;
+                }
+            });
+        }
+    }
+
+    return flagCounts;
+}
+
 function updateMapLegend() {
     const legend = document.getElementById('map-legend');
     const content = document.getElementById('map-legend-content');
@@ -808,9 +831,18 @@ function updateMapLegend() {
         const count = Array.from(getCurrentPageDots().values()).filter(
             d => d.markerType === code
         ).length;
+
+        // Calculate flag counts for this marker type on current page
+        const flagCounts = calculateFlagCountsForMarkerType(code, getCurrentPageDots());
+
         const item = document.createElement('div');
-        item.className = 'ms-map-legend-item';
-        item.innerHTML =
+        item.className = 'ms-map-legend-item-container';
+
+        // Create header row with collapse arrow
+        const header = document.createElement('div');
+        header.className = 'ms-map-legend-item ms-map-legend-item-header';
+        header.innerHTML =
+            '<span class="ms-map-legend-collapse-arrow">▶</span>' +
             '<div class="ms-map-legend-dot" style="background-color: ' +
             typeData.color +
             ';"></div>' +
@@ -822,6 +854,50 @@ function updateMapLegend() {
             '<span class="ms-map-legend-count">' +
             count +
             '</span>';
+
+        // Create flag details section (initially hidden)
+        const flagDetails = document.createElement('div');
+        flagDetails.className = 'ms-map-legend-flag-details';
+        flagDetails.style.display = 'none';
+
+        // Add flag counts
+        if (Object.keys(flagCounts).length > 0) {
+            for (const [flagPosition, flagCount] of Object.entries(flagCounts)) {
+                if (flagCount > 0) {
+                    const flagConfig = appState.globalFlagConfiguration?.[flagPosition];
+                    if (flagConfig) {
+                        const flagRow = document.createElement('div');
+                        flagRow.className = 'ms-map-legend-flag-row';
+
+                        const symbolInfo = getSymbolInfo(flagConfig.symbol);
+                        const symbolDisplay = symbolInfo && symbolInfo.symbol ? symbolInfo.symbol : '?';
+
+                        flagRow.innerHTML =
+                            '<span class="ms-map-legend-flag-symbol">' + symbolDisplay + '</span>' +
+                            '<span class="ms-map-legend-flag-name">' + flagConfig.name + '</span>' +
+                            '<span class="ms-map-legend-flag-count">' + flagCount + '</span>';
+                        flagDetails.appendChild(flagRow);
+                    }
+                }
+            }
+        }
+
+        // Add click handler to toggle collapse
+        header.addEventListener('click', () => {
+            const arrow = header.querySelector('.ms-map-legend-collapse-arrow');
+            const isCollapsed = flagDetails.style.display === 'none';
+
+            if (isCollapsed) {
+                arrow.textContent = '▼';
+                flagDetails.style.display = 'block';
+            } else {
+                arrow.textContent = '▶';
+                flagDetails.style.display = 'none';
+            }
+        });
+
+        item.appendChild(header);
+        item.appendChild(flagDetails);
         content.appendChild(item);
     });
 }
@@ -855,14 +931,31 @@ function updateProjectLegend() {
         a.localeCompare(b, undefined, { numeric: true })
     );
 
+    // Get all dots from all pages for flag counting
+    const allDots = new Map();
+    for (const pageData of appState.dotsByPage.values()) {
+        for (const [id, dot] of pageData.dots.entries()) {
+            allDots.set(id, dot);
+        }
+    }
+
     sortedMarkerTypeCodes.forEach(code => {
         const typeData = appState.markerTypes[code];
         if (!typeData) return;
 
         const count = projectCounts.get(code);
+
+        // Calculate flag counts for this marker type across all pages
+        const flagCounts = calculateFlagCountsForMarkerType(code, allDots);
+
         const item = document.createElement('div');
-        item.className = 'ms-map-legend-item';
-        item.innerHTML =
+        item.className = 'ms-map-legend-item-container';
+
+        // Create header row with collapse arrow
+        const header = document.createElement('div');
+        header.className = 'ms-map-legend-item ms-map-legend-item-header';
+        header.innerHTML =
+            '<span class="ms-map-legend-collapse-arrow">▶</span>' +
             '<div class="ms-map-legend-dot" style="background-color: ' +
             typeData.color +
             ';"></div>' +
@@ -874,6 +967,50 @@ function updateProjectLegend() {
             '<span class="ms-map-legend-count">' +
             count +
             '</span>';
+
+        // Create flag details section (initially hidden)
+        const flagDetails = document.createElement('div');
+        flagDetails.className = 'ms-map-legend-flag-details';
+        flagDetails.style.display = 'none';
+
+        // Add flag counts
+        if (Object.keys(flagCounts).length > 0) {
+            for (const [flagPosition, flagCount] of Object.entries(flagCounts)) {
+                if (flagCount > 0) {
+                    const flagConfig = appState.globalFlagConfiguration?.[flagPosition];
+                    if (flagConfig) {
+                        const flagRow = document.createElement('div');
+                        flagRow.className = 'ms-map-legend-flag-row';
+
+                        const symbolInfo = getSymbolInfo(flagConfig.symbol);
+                        const symbolDisplay = symbolInfo && symbolInfo.symbol ? symbolInfo.symbol : '?';
+
+                        flagRow.innerHTML =
+                            '<span class="ms-map-legend-flag-symbol">' + symbolDisplay + '</span>' +
+                            '<span class="ms-map-legend-flag-name">' + flagConfig.name + '</span>' +
+                            '<span class="ms-map-legend-flag-count">' + flagCount + '</span>';
+                        flagDetails.appendChild(flagRow);
+                    }
+                }
+            }
+        }
+
+        // Add click handler to toggle collapse
+        header.addEventListener('click', () => {
+            const arrow = header.querySelector('.ms-map-legend-collapse-arrow');
+            const isCollapsed = flagDetails.style.display === 'none';
+
+            if (isCollapsed) {
+                arrow.textContent = '▼';
+                flagDetails.style.display = 'block';
+            } else {
+                arrow.textContent = '▶';
+                flagDetails.style.display = 'none';
+            }
+        });
+
+        item.appendChild(header);
+        item.appendChild(flagDetails);
         content.appendChild(item);
     });
 }
